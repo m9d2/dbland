@@ -1,0 +1,24 @@
+@import 'base';
+
+#app {
+  margin: 0 auto;
+  font-weight: normal;
+}
+
+a {
+  text-decoration: none;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+@font-face {
+  font-family: 'iconfont';
+  src: url('./font/iconfont.ttf?t=1693292874058') format('truetype');
+}
