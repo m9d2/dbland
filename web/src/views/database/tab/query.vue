@@ -127,6 +127,8 @@ function formatSql() {
     uppercase: true,
     linesBetweenQueries: 2,
   }
+  const sql = format(consoleRef.value.getValue(), cfg)
+  consoleRef.value.setValue(sql)
 }
 
 async function querySql() {

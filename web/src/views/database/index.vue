@@ -206,6 +206,7 @@ const filterNode = (value: string, data: Tree) => {
 }
 
 .tree-box {
+  resize: both;
   height: 100%;
   width: 220px;
   min-width: 220px;
