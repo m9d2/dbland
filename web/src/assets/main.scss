@@ -22,3 +22,17 @@ li {
   font-family: 'iconfont';
   src: url('./font/iconfont.ttf?t=1693292874058') format('truetype');
 }
+
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}

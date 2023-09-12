@@ -2,15 +2,17 @@
   <div class="connect-box">
     <div class="connect-left">
       <span style="text-align: center;font-size: 20px; font-weight: bold; margin: 20px 0">Connections</span>
-      <List :list="configs" style="margin: 0 20px;" @node-click="clickConfig">
-        <template #default>
-          <span class="config-menu">
-            <el-popconfirm title="Are you sure delete it?" @confirm="drop(1)">
-              <template #reference>
-                <el-link :underline="false" :icon="Delete" />
-              </template>
-            </el-popconfirm>
-          </span>
+      <List :list="configs" style="margin: 0 20px;" @node-click="clickConfig" @node-mouse-enter="handleMouseEnter"
+        @node-mouse-leave="handleMouseLeave">
+        <template #default="{ index }">
+          <el-dropdown style="vertical-align: center;" size="small" trigger="hover">
+            <el-link v-show="index === activeIndex" :underline="false" :icon="ArrowDown" />
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item :icon="Delete">删除</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </template>
       </List>
     </div>
@@ -48,7 +50,7 @@ import { onMounted, ref, nextTick } from "vue";
 import type { DBConfig } from "@/api/config/type";
 import { getConfigs, deleteConfig } from "@/api/config";
 import { ElNotification } from "element-plus";
-import { Delete } from '@element-plus/icons-vue'
+import { MoreFilled, Delete, ArrowDown } from '@element-plus/icons-vue'
 import { findKeyByValue } from '@/common/utils'
 import type { AxiosPromise } from 'axios';
 import { DbTypeEnum } from '@/common/enums'
@@ -60,6 +62,7 @@ const dbType = ref()
 const configs = ref()
 const formRef = ref()
 const formTypeRef = ref()
+const activeIndex = ref()
 
 onMounted(() => {
   loadConfigs();
@@ -105,6 +108,14 @@ function success() {
   formDisplay.value = false
 }
 
+function handleMouseEnter(index: number) {
+  activeIndex.value = index;
+}
+
+function handleMouseLeave(index: number) {
+  activeIndex.value = null;
+}
+
 async function drop(id: number) {
   try {
     await deleteConfig(id)
@@ -146,12 +157,22 @@ async function clickConfig(index: number) {
   display: flex;
   flex-direction: column;
 
-  .config-menu {
-    width: 30px;
+  .el-dropdown {
+    
     line-height: 30px;
-    text-align: center;
-    display: none;
+    vertical-align: middle;
+    .el-link {
+      font-size: var(--font-size);
+    }
   }
+}
+
+.show {
+  display: none;
+}
+
+.hide {
+  display: block;
 }
 
 .connect-box {
