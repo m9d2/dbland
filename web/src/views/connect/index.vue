@@ -1,37 +1,36 @@
 <template>
   <div class="connect-box">
     <div class="connect-left">
-        <span style="text-align: center;font-size: 20px; font-weight: bold; margin-top: 20px">Connections</span>
-        <div class="configs">
-          <div class="config" :class="{active: item.active}" @click="clickConfig(index)" v-for="(item, index) in configs">
-            <span class="config-name">{{item.name}}</span>
-            <span class="config-menu">
-              <el-popconfirm title="Are you sure delete it?" @confirm="drop(item.id)">
-                <template #reference>
-                   <el-link :underline="false" :icon="Delete" />
-                </template>
-              </el-popconfirm>
-              </span>
-          </div>
-        </div>
+      <span style="text-align: center;font-size: 20px; font-weight: bold; margin: 20px 0">Connections</span>
+      <List :list="configs" style="margin: 0 20px;" @node-click="clickConfig">
+        <template #default>
+          <span class="config-menu">
+            <el-popconfirm title="Are you sure delete it?" @confirm="drop(1)">
+              <template #reference>
+                <el-link :underline="false" :icon="Delete" />
+              </template>
+            </el-popconfirm>
+          </span>
+        </template>
+      </List>
     </div>
     <div class="connect-content">
       <div class="connect-main">
         <ul v-if="itemDisplay">
           <li>
-            <Item name="MySQL" icon="&#xec6d;" @click="save('MySQL')"></Item>
+            <Item name="MySQL" icon="&#xec6d;" @click="save(DbTypeEnum.MySQL)"></Item>
           </li>
           <li>
-            <Item name="ORACLE" icon="&#xec48;" @click="save('ORACLE')"></Item>
+            <Item name="ORACLE" icon="&#xec48;" @click="save(DbTypeEnum.ORACLE)"></Item>
           </li>
           <li>
-            <Item name="PostgreSQL" icon="&#xe8b7;" @click="save('PostgreSQL')"></Item>
+            <Item name="PostgreSQL" icon="&#xe8b7;" @click="save(DbTypeEnum.PostgreSQL)"></Item>
           </li>
           <li>
-            <Item name="SQLite" icon="&#xe65a;" @click="save('SQLite')"></Item>
+            <Item name="SQLite" icon="&#xe65a;" @click="save(DbTypeEnum.SQLite)"></Item>
           </li>
           <li>
-            <Item name="MariaDB" icon="&#xec6d;" @click="save('MariaDB')"></Item>
+            <Item name="MariaDB" icon="&#xec6d;" @click="save(DbTypeEnum.MariaDB)"></Item>
           </li>
         </ul>
         <div class="connect-form" v-if="formDisplay">
@@ -45,11 +44,15 @@
 <script setup lang="ts">
 import Item from './item/index.vue'
 import Form from './form/index.vue'
-import {onMounted, ref, nextTick} from "vue";
-import {DBConfig} from "@/api/config/type";
-import {getConfigs, deleteConfig} from "@/api/config";
-import {ElNotification} from "element-plus";
+import { onMounted, ref, nextTick } from "vue";
+import type { DBConfig } from "@/api/config/type";
+import { getConfigs, deleteConfig } from "@/api/config";
+import { ElNotification } from "element-plus";
 import { Delete } from '@element-plus/icons-vue'
+import { findKeyByValue } from '@/common/utils'
+import type { AxiosPromise } from 'axios';
+import { DbTypeEnum } from '@/common/enums'
+import List from '@/components/layout/list/index.vue'
 
 const itemDisplay = ref(true)
 const formDisplay = ref(false)
@@ -75,7 +78,7 @@ function loadConfigs() {
         configs.value = childNodes
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     ElNotification({
       title: 'error',
       message: error.message,
@@ -84,7 +87,7 @@ function loadConfigs() {
   }
 }
 
-function save(name) {
+function save(name: string) {
   itemDisplay.value = false
   formDisplay.value = true
   dbType.value = name
@@ -105,12 +108,12 @@ function success() {
 async function drop(id: number) {
   try {
     await deleteConfig(id)
-    await loadConfigs()
+    loadConfigs()
     ElNotification({
       message: 'Delete Successful',
       type: 'success'
     })
-  } catch (error) {
+  } catch (error: any) {
     ElNotification({
       message: error.message,
       type: 'error'
@@ -121,14 +124,11 @@ async function drop(id: number) {
 async function clickConfig(index: number) {
   for (let i = 0; i < configs.value.length; i++) {
     configs.value[i].active = i == index;
-    if (i == index) {
-
-    }
   }
   const config = configs.value[index]
   itemDisplay.value = false
   formDisplay.value = true
-  dbType.value = 'MySQL'
+  dbType.value = findKeyByValue(DbTypeEnum, config.type)?.toLowerCase()
   await nextTick();
   formTypeRef.value = 'edit'
   formRef.value.setConfig(config)
@@ -145,39 +145,15 @@ async function clickConfig(index: number) {
   position: relative;
   display: flex;
   flex-direction: column;
-  .configs {
-    padding: 20px 20px;
-    .config {
-      display: flex;
-      box-sizing: border-box;
-      height: 30px;
-      line-height: 30px;
-      padding-left: 10px;
-      margin-top: 2px;
-      .config-name{
-        flex-grow: 1;
-      }
-      .config-menu {
-        width: 30px;
-        line-height: 30px;
-        text-align: center;
-        display: none;
-      }
-    }
 
-    .config:hover {
-      background-color: var(--tree-node-hover-bg-color);
-    }
-
-    .config:hover .config-menu {
-      display: block;
-    }
-  }
-  .active {
-    color: var(--color-text-hover);
-    background-color: var(--tree-node-hover-bg-color);
+  .config-menu {
+    width: 30px;
+    line-height: 30px;
+    text-align: center;
+    display: none;
   }
 }
+
 .connect-box {
   display: flex;
   height: 100%;
@@ -192,12 +168,15 @@ async function clickConfig(index: number) {
 
 .connect-main {
   width: 600px;
+
   ul {
     display: flex;
     flex-wrap: wrap;
+
     li {
       padding: 20px;
       width: 200px;
+
       .el-button {
         height: 100%;
         width: 100%;
@@ -205,5 +184,4 @@ async function clickConfig(index: number) {
     }
   }
 }
-
 </style>

@@ -20,16 +20,18 @@
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 
   --font-size: 12px;
+  --vt-c-primary: #1973ED;
 }
 
 :root {
   --color-background: var(--vt-c-white);
   --color-text: #232429;
+  --color-text-light: #A9AAAA;
   --color-border: #e5e7eb;
   --color-border-deep: #232429;
   --color-background-deep: #F6F8FA;
   --color-background-hover: rgba(0, 0, 0, 0.03);
-  --color-text-hover: #1973ED;
+  --color-text-hover: var(--vt-c-primary);
   --tree-node-hover-bg-color: rgba(0, 0, 0, 0.03);
 }
 

@@ -22,6 +22,15 @@ type ConnectorService struct {
 	executionLogRepository     repository.ExecutionLogRepository
 }
 
+type QueryReq struct {
+	Cid      uint   `json:"cid" binding:"required"`
+	Sql      string `json:"sql"`
+	Database string `json:"db"`
+	Table    string `json:"table"`
+	Page     int    `json:"page"`
+	Size     int    `json:"size"`
+}
+
 func (s ConnectorService) Ping(c *gin.Context) error {
 	var config model.ConnectionConfig
 	if err := c.ShouldBindJSON(&config); err != nil {
@@ -110,6 +119,8 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 		_ = db.Close()
 	}()
 
+	err = connector.Use(db, req.Database)
+
 	startTime := time.Now()
 	// exec sql
 	var result *connectors.Query
@@ -143,6 +154,20 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 	req.Sql = sqlStr
 	go s.saveExecutionLog(&req, cost, err)
 	return result, err
+}
+
+func (s ConnectorService) Execute(c *gin.Context) (int, error) {
+	var req QueryReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		return 0, err
+	}
+
+	slog.Info("query", "sql", req.Sql)
+	db, connector, err := s.getDBAndConnector(&req)
+	if err != nil {
+		return 0, err
+	}
+	return connector.Execute(db, req.Sql)
 }
 
 func (s ConnectorService) saveExecutionLog(queryReq *QueryReq, cost float64, err error) {
@@ -179,15 +204,6 @@ func (s ConnectorService) saveExecutionLog(queryReq *QueryReq, cost float64, err
 	s.executionLogRepository.Save(tx, log)
 }
 
-type QueryReq struct {
-	Cid      uint   `json:"cid" binding:"required"`
-	Sql      string `json:"sql"`
-	Database string `json:"db"`
-	Table    string `json:"table"`
-	Page     int    `json:"page"`
-	Size     int    `json:"size"`
-}
-
 func (s ConnectorService) getDBAndConnector(req *QueryReq) (*sqlx.DB, connectors.Connector, error) {
 	config, err := s.connectionConfigRepository.GetById(req.Cid)
 	if err != nil {
@@ -204,13 +220,6 @@ func (s ConnectorService) getDBAndConnector(req *QueryReq) (*sqlx.DB, connectors
 	db, err = connector.Connect(config)
 	if err != nil {
 		return nil, nil, err
-	}
-
-	if req.Database != "" {
-		err = connector.Use(db, req.Database)
-		if err != nil {
-			return nil, nil, err
-		}
 	}
 
 	return db, connector, nil

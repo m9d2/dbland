@@ -4,7 +4,7 @@
     <el-tab-pane v-for="item in tabsData" :key="item.name" :label="item.title" :name="item.name" lazy>
       <template #label>
           <span class="custom-tabs-label">
-            <span class="iconfont icon-biaoge blue"></span>
+            <span class="iconfont icon-biaoge blue" style="padding-right: 8px;"></span>
             <span>{{ item.title }}</span>
           </span>
       </template>
@@ -94,4 +94,23 @@ defineExpose({ newTab })
 .el-tabs__header {
   margin: 0 0 8px;
 }
+.el-tabs__nav-scroll {
+  background-color: var(--color-background-deep);
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  padding: 0 8px;
+}
+
+.el-tabs__item {
+  border-right: 1px solid var(--color-border);
+}
+
+.el-tabs__item:last-child {
+  border-right: none
+}
+.custom-tabs-label {
+  font-size: 12px;
+  vertical-align: middle;
+}
+
 </style>

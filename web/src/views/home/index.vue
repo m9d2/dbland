@@ -3,15 +3,16 @@
     <div class="left">
       <div class="logo">
         <a href="#" style="color: var(--color-text); font-size: 14px; font-weight: bold">
-          <el-image style="width: 40px; height: 40px" src="/src/assets/logo.svg" :fit="fit" />
+          <el-image style="width: 40px; height: 40px" src="/src/assets/logo.svg" />
         </a>
       </div>
       <div class="nav">
         <ul>
-          <router-link v-for="(item, index) in menuItems" :key="index" :to="item.route" @click="setActiveIndex(index)">
+          <router-link v-for="(item, index) in menuItems" :key="index" :to="item.route" @click="setActiveIndex(index)"
+            replace>
             <li :class="{ active: activeIndex === index }">
               <el-icon>
-                <component :is="item.icon" :class="{ active: activeIndex === index }"/>
+                <component :is="item.icon" :class="{ active: activeIndex === index }" />
               </el-icon>
             </li>
           </router-link>
@@ -31,16 +32,28 @@ import {
   Monitor,
   Setting,
 } from '@element-plus/icons-vue'
+import { onMounted } from 'vue';
 
 const menuItems = [
   { route: '/', icon: Coin },
   { route: '/connect', icon: Edit },
-  { route: '/chart', icon: Monitor },
+  // { route: '/chart', icon: Monitor },
   { route: '/setting', icon: Setting }
 ]
-let activeIndex
+let activeIndex: number
 
-const setActiveIndex = (index) => {
+onMounted(() => {
+  let color = localStorage.getItem('color-primary')
+  if (!color) {
+    const rootStyles = getComputedStyle(document.documentElement);
+    color = rootStyles.getPropertyValue('--vt-c-primary');
+  }
+  const root = document.documentElement
+  root.style.setProperty('--el-color-primary', color);
+  root.style.setProperty('--vt-c-primary', color);
+})
+
+const setActiveIndex = (index: number) => {
   activeIndex = index;
 }
 </script>
@@ -57,6 +70,7 @@ const setActiveIndex = (index) => {
     min-width: 68px;
     background-color: var(--color-background-deep);
     border: 1px solid var(--color-border);
+    border-top: none;
     height: 100vh;
 
     .logo {
@@ -91,10 +105,12 @@ li {
   display: flex;
   align-items: center;
   justify-content: center;
+
   .el-icon {
     font-size: 28px;
     color: var(--color-text);
   }
+
   .el-icon:hover {
     color: var(--color-text-hover);
   }

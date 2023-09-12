@@ -16,6 +16,7 @@ func (h ConnectorHandler) InitRouter(g *gin.RouterGroup) {
 	g.POST("columns", h.column)
 	g.POST("ddl", h.ddl)
 	g.POST("query", h.query)
+	g.POST("execute", h.execute)
 }
 
 func (h ConnectorHandler) ping(c *gin.Context) {
@@ -61,6 +62,15 @@ func (h ConnectorHandler) ddl(c *gin.Context) {
 
 func (h ConnectorHandler) query(c *gin.Context) {
 	data, err := h.service.Query(c)
+	if err != nil {
+		JSON(c, err)
+	} else {
+		JSON(c, data)
+	}
+}
+
+func (h ConnectorHandler) execute(c *gin.Context) {
+	data, err := h.service.Execute(c)
 	if err != nil {
 		JSON(c, err)
 	} else {

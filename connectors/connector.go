@@ -9,7 +9,7 @@ const (
 	Mysql      = "mysql"
 	Oracle     = "oracle"
 	SQLite     = "sqlite"
-	PostgreSQL = "postgreSQL"
+	PostgreSQL = "postgresql"
 )
 
 type Connector interface {
@@ -26,4 +26,5 @@ type Connector interface {
 	Query(db *sqlx.DB, sqlStr string) (*Query, error)
 	Count(db *sqlx.DB, sqlStr string) (int, error)
 	Ddl(db *sqlx.DB, table string) (string, error)
+	Execute(db *sqlx.DB, sqlStr string) (int, error)
 }

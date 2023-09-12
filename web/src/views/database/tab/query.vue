@@ -1,70 +1,99 @@
 <template>
   <div class="query-main">
     <div class="query-tool">
-      <el-select v-model="configValueRef" size="small" @change="changeConfig" default-first-option>
+      <el-select
+        v-model="configValueRef"
+        size="small"
+        @change="changeConfig"
+        default-first-option
+      >
         <el-option
-            v-for="item in configs"
-            :key="item.name"
-            :label="item.name"
-            :value="item.id"
+          v-for="item in configs"
+          :key="item.name"
+          :label="item.name"
+          :value="item.id"
         />
       </el-select>
       <el-select v-model="dbValueRef" size="small">
         <el-option
-            v-for="item in databases"
-            :key="item"
-            :label="item"
-            :value="item"
-            @change="changeConfig"
-            default-first-option
+          v-for="item in databases"
+          :key="item"
+          :label="item"
+          :value="item"
+          @change="changeConfig"
+          default-first-option
         />
       </el-select>
       <el-button @click="formatSql" size="small">Format</el-button>
       <el-button @click="querySql" size="small">Run</el-button>
     </div>
     <div class="query-console">
-      <Console class="code" ref="consoleRef" :sql="sqlStr"/>
+      <Console class="code" ref="consoleRef" :sql="sqlStr" />
     </div>
-    <div class="table-tool"></div>
-    <Table class="query-table" :columns="tableColumns" :data="tableData" :loading="loading"></Table>
+    <div class="table-tool" v-if="showQueryStatus">
+      <div style="margin-left: 8px;">
+        <el-link :underline="false"><el-icon><Plus /></el-icon></el-link>
+        <el-link :underline="false"><el-icon><Minus /></el-icon></el-link>
+        <el-link :underline="false"><el-icon><Edit /></el-icon></el-link>
+        <el-link :underline="false"><el-icon><Refresh /></el-icon></el-link>
+      </div>
+    </div>
+    <Table
+      class="query-table"
+      :columns="tableColumns"
+      :data="tableData"
+      :loading="loading"
+      @row-contextmenu="tableDbClick"
+    >
+    </Table>
     <div class="query-status">
       <div class="status-left">
-        <span v-show="showQueryStatus" style="margin-left: 8px">Total: {{total}}</span>
+        <span v-show="showQueryStatus" style="margin-left: 8px"
+          >Total: {{ total }}</span
+        >
       </div>
       <div class="status-center">
         <label>{{ sqlStr }}</label>
       </div>
       <div class="status-right">
-        <span v-show="showQueryStatus">Elapsed Time: {{elapsedTime}}s</span>
+        <span v-show="showQueryStatus">Elapsed Time: {{ elapsedTime }}s</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref } from 'vue'
-import Console from '@/components/database/console/index.vue'
-import Table from "@/components/database/table/index.vue"
-import {format} from "sql-formatter"
-import {getConfigs} from "@/api/config";
-import {getDatabases, query} from "@/api/connector";
-import type {DBConfig} from "@/api/config/type"
-import type {QueryReq} from "@/api/connector/type";
+import { onMounted, ref } from "vue";
+import Console from "@/components/database/console/index.vue";
+import Table from "@/components/database/table/index.vue";
+import { format } from "sql-formatter";
+import { getConfigs } from "@/api/config";
+import { getDatabases, query, execute } from "@/api/connector";
+import type { DBConfig } from "@/api/config/type";
+import type { QueryReq } from "@/api/connector/type";
 import type { AxiosPromise } from "axios";
-import {ElNotification} from "element-plus";
+import { ElNotification } from "element-plus";
+import ContextMenu from "@imengyu/vue3-context-menu";
+import { createDeleteSql } from "@/common/utils";
+import {
+  Plus,
+  Edit,
+  Minus,
+  Refresh,
+} from '@element-plus/icons-vue'
 
-const configs = ref()
-const configValueRef = ref()
-const databases = ref()
-const dbValueRef = ref<string>()
-const consoleRef = ref()
-const tableData = ref()
-const tableColumns = ref()
-const loading = ref(false)
-let sqlStr:string
-const elapsedTime = ref<string>()
-const showQueryStatus = ref(false)
-const total = ref()
+const configs = ref();
+const configValueRef = ref();
+const databases = ref();
+const dbValueRef = ref<string>();
+const consoleRef = ref();
+const tableData = ref();
+const tableColumns = ref();
+const loading = ref(false);
+let sqlStr: string;
+const elapsedTime = ref<string>();
+const showQueryStatus = ref(false);
+const total = ref();
 
 const props = defineProps({
   config: {
@@ -75,43 +104,43 @@ const props = defineProps({
   },
   sql: {
     type: String,
-  }
-})
+  },
+});
 
 onMounted(() => {
-  sqlStr = ''
+  sqlStr = "";
   if (props.config) {
-    configValueRef.value = props.config.id
+    configValueRef.value = props.config.id;
   }
   if (props.database) {
-    dbValueRef.value = props.database.name
+    dbValueRef.value = props.database.name;
   }
   if (props.sql) {
-    sqlStr = props.sql
+    sqlStr = props.sql;
   }
   loadConfigs();
-})
+});
 
-async function changeConfig(id:any) {
-  databases.value = []
+async function changeConfig(id: any) {
+  databases.value = [];
   const data = {
-    cid: id
-  }
+    cid: id,
+  };
   const response: AxiosPromise<string[]> = getDatabases(data);
-  response.then((res:any) => {
-    databases.value = res.data
+  response.then((res: any) => {
+    databases.value = res.data;
   });
 }
 
 function loadConfigs() {
   try {
     const response: AxiosPromise<DBConfig[]> = getConfigs();
-    response.then((res:any) => {
+    response.then((res: any) => {
       if (res.data) {
         if (!configValueRef.value) {
-          configValueRef.value = res.data[0].id
+          configValueRef.value = res.data[0].id;
         }
-        changeConfig(configValueRef.value)
+        changeConfig(configValueRef.value);
         configs.value = res.data;
       }
     });
@@ -122,40 +151,90 @@ function loadConfigs() {
 
 function formatSql() {
   const cfg = {
-    language: 'sql',
-    indent: '    ',
+    language: "sql",
+    indent: "    ",
     uppercase: true,
     linesBetweenQueries: 2,
-  }
-  const sql = format(consoleRef.value.getValue(), cfg)
-  consoleRef.value.setValue(sql)
+  };
+  const sql = format(consoleRef.value.getValue(), cfg);
+  consoleRef.value.setValue(sql);
 }
 
 async function querySql() {
-  loading.value = true
+  loading.value = true;
+  sqlStr = consoleRef.value.getValue();
   try {
     const params: QueryReq = {
-      cid: 2,
+      cid: configValueRef.value,
       db: dbValueRef.value,
       sql: sqlStr,
-    }
-    const { data } = await query(params)
-    tableColumns.value = data.columns
-    tableData.value = data.rows
-    total.value = data.total
-    elapsedTime.value = data.elapsed_time
-    showQueryStatus.value = true
+    };
+    const { data } = await query(params);
+    tableColumns.value = data.columns;
+    tableData.value = data.rows;
+    total.value = data.total;
+    elapsedTime.value = data.elapsed_time;
+    showQueryStatus.value = true;
   } catch (error: any) {
     ElNotification({
-      title: 'error',
+      title: "error",
       message: error.message,
-      type: 'error'
-    })
+      type: "error",
+    });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
+function tableDbClick(row: any, column: any, event: any) {
+  console.log(row);
+  console.log(column);
+  event.preventDefault();
+  ContextMenu.showContextMenu({
+    x: event.x,
+    y: event.y,
+    items: [
+      {
+        label: "Copy as",
+        children: [
+          {
+            label: "Insert Statement",
+            onClick: () => {
+              console.log("Insert Statement");
+            },
+          },
+          {
+            label: "Update Statement",
+            onClick: () => {
+              console.log("Update Statement");
+            },
+          },
+        ],
+      },
+      {
+        label: "Delete Record",
+        onClick: async () => {
+          try {
+            console.log('column', column)
+            const sql = createDeleteSql('', sqlStr, row);
+            const { data } = await execute({cid: configValueRef.value, sql: sql});
+            querySql()
+            ElNotification({
+              message: 'Affected rows: ' + data,
+              type: "success",
+            });
+          } catch (error: any) {
+            ElNotification({
+              title: "error",
+              message: error.message,
+              type: "error",
+            });
+          }
+        },
+      },
+    ],
+  });
+}
 </script>
 
 <style lang="scss" scoped>
@@ -182,6 +261,11 @@ async function querySql() {
   min-height: 30px;
   border: 1px solid var(--color-border);
   border-bottom: none;
+  line-height: 30px;
+  .el-link {
+    margin-right: 8px;
+    font-weight: 700;
+  }
 }
 .query-table {
   flex-grow: 1;

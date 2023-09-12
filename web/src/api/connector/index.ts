@@ -1,5 +1,5 @@
 import request from "@/axios";
-import type { QueryReq, Table } from './type'
+import type { QueryReq, Table, Query } from './type'
 import type { AxiosPromise } from "axios";
 
 enum API {
@@ -7,6 +7,7 @@ enum API {
     TABLE_URL = '/v1/tables',
     QUERY_URL = '/v1/query',
     PING_URL = '/v1/ping',
+    EXECUTE_URL = '/v1/execute',
 }
 
 export const getDatabases = (data: QueryReq): AxiosPromise<string[]> => {
@@ -24,3 +25,7 @@ export const query = (data: QueryReq): AxiosPromise<Query> => {
 export const ping = (data: any) => {
     return request.post(API.PING_URL, data);
 };
+
+export const execute = (data: any) => {
+    return request.post(API.EXECUTE_URL, data)
+}

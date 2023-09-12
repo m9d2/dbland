@@ -161,6 +161,18 @@ func (c OracleConnector) Ddl(db *sqlx.DB, table string) (string, error) {
 	return result, err
 }
 
+func (c OracleConnector) Execute(db *sqlx.DB, sqlStr string) (int, error) {
+	result, err := db.Exec(sqlStr)
+	if err != nil {
+		return 0, err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rows), err
+}
+
 func (c OracleConnector) dsn(database *model.ConnectionConfig) string {
 	port, _ := strconv.Atoi(*database.Port)
 	connStr := go_ora.BuildUrl(*database.Host, port, "TRADEVL", *database.Username, *database.Password, nil)
