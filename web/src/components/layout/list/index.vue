@@ -2,8 +2,8 @@
     <div class="d-list">
         <div class="d-list-row" :class="{ active: item.active }" @click="nodeClick(index, item)"
             v-for="(item, index) in list">
-            <div :value="index" class="d-row-content clearfix" @mouseover="handleMouseEnter(index)"
-                @mouseleave="handleMouseLeave(index)">
+            <div :value="index" class="d-row-content clearfix" @mouseover="handleMouseEnter(index)" @dblclick.prevent="handleDoubleClick(index, item)"
+                @mouseleave="handleMouseLeave(index)"> 
                 <span class="d-row-name fl" :style="rowNameStyle">{{ item.name }}</span>
                 <div class="d-row-meun fr">
                     <slot :index="index">
@@ -25,7 +25,7 @@ const props = defineProps({
     rowNameStyle: Object,
 })
 
-const emuis = defineEmits(["node-click", 'node-mouse-enter', 'node-mouse-leave']);
+const emuis = defineEmits(["node-click", 'node-mouse-enter', 'node-mouse-leave', 'node-db-click']);
 
 function nodeClick(index: number, row: Item) {
     if (props.list) {
@@ -38,6 +38,10 @@ function nodeClick(index: number, row: Item) {
 
 function handleMouseEnter(index: number) {
     emuis('node-mouse-enter', index)
+}
+
+function handleDoubleClick(index: number, row: any) {
+    emuis('node-db-click', index, row)
 }
 
 function handleMouseLeave(index: number) {

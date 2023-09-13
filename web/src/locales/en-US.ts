@@ -5,6 +5,7 @@ const messages = {
         select: 'Select',
         search: 'Search',
         delete: 'Delete',
+        homepage: 'Home',
     },
     database: {
         button: {

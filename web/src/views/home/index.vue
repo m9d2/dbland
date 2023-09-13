@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="main">
     <div class="left">
       <div class="logo">
         <a href="#" style="color: var(--color-text); font-size: 14px; font-weight: bold">
@@ -60,7 +60,7 @@ const setActiveIndex = (index: number) => {
 </script>
 
 <style lang="scss" scoped>
-.wrapper {
+.main {
   height: 100%;
   display: flex;
   overflow: hidden;

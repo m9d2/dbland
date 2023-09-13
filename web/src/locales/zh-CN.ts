@@ -5,6 +5,7 @@ const messages = {
         select: '选择',
         search: '查询',
         delete: '删除',
+        homepage: '首页',
     },
     database: {
         button: {
