@@ -1,76 +1,55 @@
 <template>
+  <div
+    style="padding: 0 8px;background-color: var(--color-background-deep); border-bottom: 1px solid var(--color-border); height: 30px; line-height: 30px;">
+    <el-link :underline="false" v-show="firstData" @click="loadConfigs">首页</el-link>
+    <el-icon v-show="firstData" >
+      <ArrowRight />
+    </el-icon>
+    <el-link :underline="false" @click="loadDatabases">{{ firstData }}</el-link>
+    <el-icon v-show="seconedData">
+      <ArrowRight />
+    </el-icon>
+    <el-link :underline="false">{{ seconedData }}</el-link>
+  </div>
+
   <div class="main-box">
     <div class="tree-box">
-      <div
-        class="search"
-        style="display: flex; border-radius: 5px; padding: 8px"
-      >
-        <el-input
-          v-model="filterText"
-          style="height: 32px"
-          placeholder="查询"
-        />
+      <div class="search" style="display: flex; border-radius: 5px; padding: 8px;">
+        <el-input v-model="filterText" style="height: 32px" :placeholder="placeholder" size="small" />
       </div>
-      <div class="tree">
-        <el-tree
-          ref="treeRef"
-          :data="data"
-          :props="defaultProps"
-          lazy
-          :load="loadData"
-          empty-text=""
-          :filter-node-method="filterNode"
-          :node-key="data.id"
-          @node-click="nodeClick"
-        >
-          <template #default="{ node }">
-            <span @dblclick="handleNodeDblClick(node)">
-              <span
-                v-if="node.level === Level.DATABASE"
-                class="iconfont"
-                style="margin-right: 5px;"
-              >
-                &#xe685;
-              </span>
-              <span
-                v-if="node.level === Level.TABLE"
-                class="iconfont .icon-biaoge"
-                style="margin-right: 5px"
-              >
-                &#xe615;
-              </span>
-              <span>{{ node.label }}</span>
-            </span>
-          </template>
-        </el-tree>
-      </div>
+
+      <List class="tree" :list="listData" style="margin: 0 20px;" @node-click="clickNode"
+        :row-name-style="{fontWeight: 300, height: '26px', lineHeight: '26px', marginTop: '0'}"
+        @node-mouse-enter="handleMouseEnter" @node-mouse-leave="handleMouseLeave">
+      </List>
+
       <div class="new-query">
-        <el-button type="primary" style="width: 100%" @click="newTab(null)"
-          >New Query</el-button
-        >
+        <el-button type="primary" style="width: 100%" @click="newTab(null)">{{ $t('database.button.new_query')
+        }}</el-button>
       </div>
     </div>
     <div class="main">
       <div class="shortcuts" v-if="shortcutsVisible">
         <span class="logo-text">DBLAND</span>
       </div>
-      <Tab
-        :isResultVisible="isResultVisible"
-        ref="childRef"
-        @messageUpdated="handlerMessageUpdate"
-      />
+      <Tab :isResultVisible="isResultVisible" ref="childRef" @messageUpdated="handlerMessageUpdate" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, provide, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { ElNotification } from "element-plus";
 import { ElTree } from "element-plus";
+import { ArrowRight } from '@element-plus/icons-vue'
 import { getConfigs } from "@/api/config";
 import { getDatabases, getTables } from "@/api/connector";
 import type { DBConfig } from "@/api/config/type";
 import Tab from "@/views/database/tab/index.vue";
+import i18n from '@/plugins/i18n'
+import type { AxiosPromise } from "axios";
+import List from '@/components/layout/list/index.vue'
+import { TreeLevelEnum } from "@/common/enums";
 
 const treeRef = ref<InstanceType<typeof ElTree>>();
 // data
@@ -91,13 +70,16 @@ interface Tree {
   [key: string]: any;
 }
 
-let data = reactive([]);
 const filterText = ref("");
 const isResultVisible = ref();
 const shortcutsVisible = ref(true);
 const childRef = ref();
 const currentConfig = ref();
 const currentDatabase = ref();
+const placeholder = i18n.global.t('common.search')
+const listData = ref()
+const firstData = ref()
+const seconedData = ref()
 
 const handleNodeDblClick = (node: any) => {
   if (node.level === 3) {
@@ -124,88 +106,84 @@ const handlerMessageUpdate = (data: any) => {
   shortcutsVisible.value = !data;
 };
 
-const loadData = (node: any, resolve: any) => {
-  let childNodes: any = [];
-  setTimeout(async () => {
-    switch (node.level) {
-      case Level.ROOT:
-        try {
-          const { data } = await getConfigs();
-          if (data) {
-            data.forEach((config: DBConfig) => {
-              config.level = Level.CONFIG;
-              config.leaf = false;
-              childNodes.push(config);
-            });
-          }
-        } catch (error: any) {
-          ElNotification({
-            title: "error",
-            message: error.message,
-            type: "error",
-          });
-        } finally {
-          resolve(childNodes);
-        }
+function handleMouseEnter(index: number) {
+}
 
-        break;
-      case Level.CONFIG:
-        try {
-          const cid = node.data.id
-          const { data } = await getDatabases({ cid: cid });
-          for (let i = 0; i < data.length; i++) {
-            let child = {
-              name: data[i],
-              level: Level.DATABASE,
-              cid: cid,
-            };
-            childNodes.push(child);
-          }
-        } catch (error: any) {
-          ElNotification({
-            title: "error",
-            message: error.message,
-            type: "error",
-          });
-        } finally {
-          resolve(childNodes);
-        }
+function handleMouseLeave(index: number) {
+}
 
-        break;
-      case Level.DATABASE:
-        try {
-          const cid = node.data.cid
-          const { data } = await getTables({
-            cid: cid,
-            db: node.data.name,
-          });
-          childNodes = data
-            ? data.map((table) => ({
-                name: table.name,
-                level: Level.TABLE,
-                cid: cid,
-                leaf: true,
-              }))
-            : [];
-        } catch (error: any) {
-          ElNotification({
-            title: "error",
-            message: error.message,
-            type: "error",
-          });
-        } finally {
-          resolve(childNodes);
-        }
-        break;
-      case Level.TABLE:
-        // 处理 Level.TABLE 的情况
-        break;
-    }
-  }, 100);
+function clickNode(index: number, row: any) {
+  const level = row.level
+  if (level == TreeLevelEnum.CONFIG) {
+    loadDatabases(row.id)
+    firstData.value = row.name
+  }
+  if (level == TreeLevelEnum.DATABASE) {
+    loadTables(row.cid, row.name)
+    seconedData.value = row.name
+  }
+}
 
-  node.loading = false;
-  node.expanded = true;
-};
+onMounted(() => {
+  loadConfigs();
+})
+
+function loadConfigs() {
+  try {
+    
+    let nodes: any = []
+    const response: AxiosPromise<DBConfig[]> = getConfigs();
+    response.then((res: any) => {
+      if (res.data) {
+        res.data.forEach((data: any) => {
+          data.active = false
+          data.level = TreeLevelEnum.CONFIG
+          nodes.push(data)
+        })
+        listData.value = nodes
+      }
+    });
+  } catch (error: any) {
+    ElNotification({
+      title: 'error',
+      message: error.message,
+      type: 'error'
+    })
+  } finally {
+    firstData.value = ''
+    seconedData.value = ''
+  }
+}
+
+async function loadDatabases(cid: number) {
+  let nodes: any = []
+  const { data } = await getDatabases({ cid: cid });
+  for (let i = 0; i < data.length; i++) {
+    let child = {
+      name: data[i],
+      level: Level.DATABASE,
+      cid: cid,
+    };
+    nodes.push(child)
+  }
+  listData.value = nodes
+}
+
+async function loadTables(cid: number, db: string) {
+  const { data } = await getTables({
+    cid: cid,
+    db: db,
+  });
+  const nodes = data
+    ? data.map((table) => ({
+      name: table.name,
+      level: Level.TABLE,
+      cid: cid,
+      leaf: true,
+    }))
+    : []
+  listData.value = nodes
+}
 
 watch(filterText, (val) => {
   treeRef.value!.filter(val);
@@ -235,14 +213,14 @@ const filterNode = (value: string, data: Tree) => {
   position: relative;
   display: flex;
   flex-direction: column;
-  .search {
-    height: 60px;
-  }
+
+
   .tree {
     height: 100%;
     overflow: auto;
     flex-grow: 1;
   }
+
   .new-query {
     width: 200px;
     height: 48px;
@@ -258,6 +236,7 @@ const filterNode = (value: string, data: Tree) => {
   font-size: var(--font-size) !important;
   --el-tree-node-hover-bg-color: var(--tree-node-hover-bg-color);
 }
+
 .shortcuts {
   display: flex;
   justify-content: center;

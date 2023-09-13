@@ -1,4 +1,4 @@
-import request from "@/axios";
+import request from "@/plugins/axios";
 import type { DBConfig } from "./type"
 import type { AxiosPromise } from "axios";
 

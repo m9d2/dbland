@@ -33,6 +33,7 @@ import {
   Setting,
 } from '@element-plus/icons-vue'
 import { onMounted } from 'vue';
+import i18n from '@/plugins/i18n'
 
 const menuItems = [
   { route: '/', icon: Coin },

@@ -4,7 +4,7 @@
             v-for="(item, index) in list">
             <div :value="index" class="d-row-content clearfix" @mouseover="handleMouseEnter(index)"
                 @mouseleave="handleMouseLeave(index)">
-                <span class="d-row-name fl">{{ item.name }}</span>
+                <span class="d-row-name fl" :style="rowNameStyle">{{ item.name }}</span>
                 <div class="d-row-meun fr">
                     <slot :index="index">
                     </slot>
@@ -22,6 +22,7 @@ const props = defineProps({
     list: {
         type: Array as () => Item[],
     },
+    rowNameStyle: Object,
 })
 
 const emuis = defineEmits(["node-click", 'node-mouse-enter', 'node-mouse-leave']);
@@ -47,7 +48,6 @@ function handleMouseLeave(index: number) {
 <style lang="scss" scoped>
 .d-list {
     .d-list-row {
-
         box-sizing: border-box;
         height: 30px;
         line-height: 30px;

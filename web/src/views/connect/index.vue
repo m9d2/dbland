@@ -9,7 +9,7 @@
             <el-link v-show="index === activeIndex" :underline="false" :icon="ArrowDown" />
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item :icon="Delete">删除</el-dropdown-item>
+                <el-dropdown-item :icon="Delete">{{ $t('common.delete') }}</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>

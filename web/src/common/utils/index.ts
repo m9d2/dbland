@@ -101,3 +101,21 @@ function parseSqlQuery(sqlQuery: string): { databaseName: string, tableName: str
     }
     return null;
 }
+
+export function readFileContent(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const content = event.target?.result as string;
+        resolve(content);
+      };
+  
+      reader.onerror = (event: ProgressEvent<FileReader>) => {
+        reject(event.target?.error);
+      };
+  
+      reader.readAsText(file);
+    });
+  }
+  

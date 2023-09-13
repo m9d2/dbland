@@ -24,8 +24,8 @@
           default-first-option
         />
       </el-select>
-      <el-button @click="formatSql" size="small">Format</el-button>
-      <el-button @click="querySql" size="small">Run</el-button>
+      <el-button @click="formatSql" size="small">{{ $t('database.button.format') }}</el-button>
+      <el-button @click="querySql" size="small">{{ $t('database.button.run') }}</el-button>
     </div>
     <div class="query-console">
       <Console class="code" ref="consoleRef" :sql="sqlStr" />
@@ -49,14 +49,14 @@
     <div class="query-status">
       <div class="status-left">
         <span v-show="showQueryStatus" style="margin-left: 8px"
-          >Total: {{ total }}</span
+          >{{ $t('database.lable.total') }}: {{ total }}</span
         >
       </div>
       <div class="status-center">
         <label>{{ sqlStr }}</label>
       </div>
       <div class="status-right">
-        <span v-show="showQueryStatus">Elapsed Time: {{ elapsedTime }}s</span>
+        <span v-show="showQueryStatus">{{ $t('database.lable.elapsed_time') }}: {{ elapsedTime }}s</span>
       </div>
     </div>
   </div>

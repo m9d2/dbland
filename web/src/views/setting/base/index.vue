@@ -1,15 +1,15 @@
 <template>
     <div class="base-box">
         <div class="title-box">
-            <span class="title" style="margin-right: 20px;">设置主题颜色</span>
+            <span class="title" style="margin-right: 20px;">{{ $t('setting.basic.color') }}</span>
             <el-color-picker v-model="themeColor" @change="setColor" />
-            <el-link style="margin-left: 8px;" @click="restore">恢复默认</el-link>
+            <el-link style="margin-left: 8px;" @click="restore">{{ $t('setting.basic.restore') }}</el-link>
         </div>
         <div class="title-box">
-            <span class="title" style="margin-right: 20px;">选择语言</span>
-            <el-select v-model="defaultLanguage" class="m-2" placeholder="language" size="small">
-                <el-option key="chinese" label="中文" value="chinese" />
-                <el-option key="chinese" label="English" value="english" />
+            <span class="title" style="margin-right: 20px;">{{ $t('setting.basic.select_language') }}</span>
+            <el-select v-model="language" class="m-2" placeholder="language" size="small" @change="changeLanguage">
+                <el-option key="zh" label="中文" value="zh" />
+                <el-option key="en" label="English" value="en" />
             </el-select>
         </div>
         <el-divider />
@@ -18,9 +18,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+const { locale } = useI18n()
 
 const themeColor = ref('#1973ED')
-const defaultLanguage = ref('chinese')
+const language = ref('en')
 
 function setColor() {
     const root = document.documentElement
@@ -39,8 +41,12 @@ function restore() {
 
     themeColor.value = color
 
-    // save
     localStorage.setItem('color-primary', color)
+}
+
+function changeLanguage() {
+    locale.value = language.value;
+    localStorage.setItem('language', language.value)
 }
 
 </script>

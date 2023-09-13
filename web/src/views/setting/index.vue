@@ -1,7 +1,7 @@
 <template>
   <div class="setting-box">
     <div class="setting-left">
-      <span style="text-align: center;font-size: 20px; font-weight: bold; margin: 20px 0">设置</span>
+      <span style="text-align: center;font-size: 20px; font-weight: bold; margin: 20px 0">{{ $t('setting.title') }}</span>
       <List :list="settings" style="margin: 0 20px;" @node-click="nodeClick"></List>
     </div>
     <div class="setting-content">
@@ -16,18 +16,18 @@
 import { ref } from 'vue';
 import List from '@/components/layout/list/index.vue'
 import { useRouter } from 'vue-router'
+import i18n from '@/plugins/i18n'
 
 const router = useRouter()
 
 const settings = ref(
   [
     {
-      name: '基础设置',
-      active: true,
+      name: i18n.global.t('setting.menu.basic'),
       path: '/setting'
     },
     {
-      name: '关于我们',
+      name: i18n.global.t('setting.menu.other'),
       path: '/about'
     }
   ]
