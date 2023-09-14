@@ -24,7 +24,7 @@ onMounted(() => {
 })
 
 const initEditor = () => {
-    editor = monaco.editor.create(document.getElementById(id.value), {
+  editor = monaco.editor.create(document.getElementById(id.value), {
     value: props.sql,
     theme: 'vs', // 官方自带三种主题vs, hc-black, or vs-dark
     minimap: { // 关闭小地图
@@ -57,28 +57,28 @@ const initEditor = () => {
   monaco.languages.registerCompletionItemProvider('sql', {
     provideCompletionItems() {
       let suggestions: any = [];
-      sqlLanguage.keywords.forEach(item => {
+      sqlLanguage.keywords.forEach((item: any) => {
         suggestions.push({
           label: item,
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: item
         });
       })
-      sqlLanguage.operators.forEach(item => {
+      sqlLanguage.operators.forEach((item: any) => {
         suggestions.push({
           label: item,
           kind: monaco.languages.CompletionItemKind.Operator,
           insertText: item
         });
       })
-      sqlLanguage.builtinFunctions.forEach(item => {
+      sqlLanguage.builtinFunctions.forEach((item: any) => {
         suggestions.push({
           label: item,
           kind: monaco.languages.CompletionItemKind.Function,
           insertText: item
         });
       })
-      sqlLanguage.builtinVariables.forEach(item => {
+      sqlLanguage.builtinVariables.forEach((item: any) => {
         suggestions.push({
           label: item,
           kind: monaco.languages.CompletionItemKind.Variable,

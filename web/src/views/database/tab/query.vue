@@ -27,7 +27,7 @@
 
         <el-tooltip effect="dark" :content="$t('common.delete')">
           <el-link :underline="false" @click="deleteRow">
-            <el-icon>
+            <el-icon style="font-weight: 700;">
               <Minus />
             </el-icon>
           </el-link>
@@ -35,7 +35,7 @@
 
         <el-tooltip effect="dark" :content="$t('common.modify')">
           <el-link :underline="false" @click="modifyRow">
-            <el-icon>
+            <el-icon style="font-weight: 700;">
               <Edit />
             </el-icon></el-link>
         </el-tooltip>

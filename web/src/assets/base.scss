@@ -20,6 +20,7 @@
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 
   --font-size: 12px;
+  --el-font-size-base: var(--font-size);
   --vt-c-primary: #1973ED;
 }
 
@@ -36,7 +37,7 @@
 }
 
 .el-table {
-  --el-table-current-row-bg-color: var(var(--color-background))
+  --el-table-current-row-bg-color: var(--color-background);
 }
 
 .dark {
