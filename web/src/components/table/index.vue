@@ -3,10 +3,13 @@
     @row-contextmenu="contextmenu" 
     :header-cell-class-name="headerCellClassName" 
     :header-row-class-name="headerRowClassName"
+    @current-change="handlerCurrentChange"
+    highlight-current-row
     show-overflow-tooltip>
     <template #empty>
       <el-empty :image-size="200"></el-empty>
     </template>
+    <!-- <el-table-column type="selection" width="38" /> -->
     <el-table-column v-for="column in columns" :key="column" :prop="column" :label="column" width="200" min-width="90"
       sortable="true" resizable>
       <template #default="{ row, column }">
@@ -42,7 +45,7 @@ defineOptions({
   name: "Table",
 });
 
-const emuis = defineEmits(["row-contextmenu"]);
+const emuis = defineEmits(["row-contextmenu", "row-current-change"]);
 
 function contextmenu(row: any, column: any, event: any) {
   emuis("row-contextmenu", row, column, event);
@@ -54,6 +57,9 @@ function headerCellClassName(row: any) {
 
 function headerRowClassName(row: any) {
   return 'header-row'
+}
+function handlerCurrentChange(currentRow: any) {
+  emuis("row-current-change", currentRow);
 }
 </script>
 <style lang="scss">
@@ -75,5 +81,9 @@ function headerRowClassName(row: any) {
 }
 .header-row {
   color: var(--color-text);
+}
+
+.current-row {
+  background-color: var(--color-background-deep)!important;
 }
 </style>

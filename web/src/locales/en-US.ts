@@ -6,6 +6,11 @@ const messages = {
         search: 'Search',
         delete: 'Delete',
         homepage: 'Home',
+        add: 'Insert',
+        modify: 'Modify',
+        refresh: 'Refresh',
+        confirm: 'Confirm',
+        cancel: 'Cancel',
     },
     database: {
         button: {

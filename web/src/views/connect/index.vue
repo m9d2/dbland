@@ -1,7 +1,7 @@
 <template>
   <div class="connect-box">
     <div class="connect-left">
-      <span style="text-align: center;font-size: 20px; font-weight: bold; margin: 20px 0">Connections</span>
+      <span style="text-align: center;font-size: 20px; font-weight: bold; margin: 20px 0">{{ $t('connect.title') }}</span>
       <List :list="configs" style="margin: 0 20px;" @node-click="clickConfig" @node-mouse-enter="handleMouseEnter"
         @node-mouse-leave="handleMouseLeave">
         <template #default="{ index }">

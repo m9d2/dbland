@@ -1,12 +1,11 @@
 <template>
-  <el-tabs v-model="activeTab" class="tabs-content" closable @tab-click="tabClick"
-           @tab-remove="removeTab">
+  <el-tabs v-model="activeTab" class="tabs-content" closable @tab-click="tabClick" @tab-remove="removeTab">
     <el-tab-pane v-for="item in tabsData" :key="item.name" :label="item.title" :name="item.name" lazy>
       <template #label>
-          <span class="custom-tabs-label">
-            <span class="iconfont icon-biaoge blue" style="padding-right: 8px;"></span>
-            <span>{{ item.title }}</span>
-          </span>
+        <span class="custom-tabs-label">
+          <span class="iconfont icon-biaoge blue" style="padding-right: 8px;"></span>
+          <span>{{ item.title }}</span>
+        </span>
       </template>
       <Query :config="configRef" :database="databaseRef" :sql="sqlRef"> </Query>
     </el-tab-pane>
@@ -27,9 +26,9 @@ const emit = defineEmits()
 
 let tabIndex = 0
 const activeTab = ref()
-const configRef = ref()
-const databaseRef = ref()
-const sqlRef = ref()
+const configRef = ref({})
+const databaseRef = ref({})
+const sqlRef = ref('')
 
 // change tab
 function tabClick(node: any) {
@@ -60,8 +59,13 @@ function removeTab(targetName: string) {
 
 // new tab
 function newTab(config: any, database: any, table: any) {
-  configRef.value = config
-  databaseRef.value = database
+  if (config) {
+    configRef.value = config
+  }
+  if (database) {
+    databaseRef.value = database
+  }
+
   isResultVisible.value = true
   if (table) {
     sqlRef.value = createQuerySql(database.name, table)
@@ -84,16 +88,20 @@ defineExpose({ newTab })
   display: flex;
   flex-direction: column;
 }
+
 .el-tabs__content {
   height: 100%;
   flex-grow: 1;
 }
+
 .el-tab-pane {
   height: 100%;
 }
+
 .el-tabs__header {
   margin: 0 0 8px;
 }
+
 .el-tabs__nav-scroll {
   background-color: var(--color-background-deep);
   border-left: 1px solid var(--color-border);
@@ -108,9 +116,8 @@ defineExpose({ newTab })
 .el-tabs__item:last-child {
   border-right: none
 }
+
 .custom-tabs-label {
   font-size: 12px;
   vertical-align: middle;
-}
-
-</style>
+}</style>

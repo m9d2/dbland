@@ -1,11 +1,16 @@
 <template>
     <div class="d-list">
-        <div class="d-list-row" :class="{ active: item.active }" @click="nodeClick(index, item)"
+        <div class="d-list-row" :class="{ active: item.active }" @click="nodeClick(index, item)" :style="rowStyle"
             v-for="(item, index) in list">
-            <div :value="index" class="d-row-content clearfix" @mouseover="handleMouseEnter(index)" @dblclick.prevent="handleDoubleClick(index, item)"
-                @mouseleave="handleMouseLeave(index)"> 
-                <span class="d-row-name fl" :style="rowNameStyle">{{ item.name }}</span>
-                <div class="d-row-meun fr">
+            <div :value="index" class="d-row-content" @mouseover="handleMouseEnter(index)"
+                @dblclick.prevent="handleDoubleClick(index, item)" @mouseleave="handleMouseLeave(index)">
+                <div class="d-row-bigin">
+                    <slot name="begin" :node="item">
+
+                    </slot>
+                </div>
+                <span class="d-row-name" :style="rowNameStyle">{{ item.name }}</span>
+                <div class="d-row-meun">
                     <slot :index="index">
                     </slot>
                 </div>
@@ -23,6 +28,7 @@ const props = defineProps({
         type: Array as () => Item[],
     },
     rowNameStyle: Object,
+    rowStyle: Object,
 })
 
 const emuis = defineEmits(["node-click", 'node-mouse-enter', 'node-mouse-leave', 'node-db-click']);
@@ -61,17 +67,12 @@ function handleMouseLeave(index: number) {
         border-radius: 5px;
 
         .d-row-content {
-
+            display: flex;
             .d-row-name {
                 font-weight: 500;
-            }
-
-            .d-row-meun {
-                width: 30px;
+                flex-grow: 1;
             }
         }
-
-
     }
 
     .d-list-row:hover {

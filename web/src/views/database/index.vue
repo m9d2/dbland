@@ -2,21 +2,13 @@
   <div class="content-box">
     <div class="header"
       style="padding: 0 8px;background-color: var(--color-background-deep); border-bottom: 1px solid var(--color-border); height: 30px; line-height: 30px;">
-      <el-link :underline="false" v-show="firstData" @click="loadConfigs">
-        <span>{{ $t('common.homepage') }}</span>
-        <el-icon v-show="firstData" style="margin-left: 4px;">
-        <ArrowRight />
-      </el-icon>
-      </el-link>
-      
-      <el-link :underline="false" @click="back" style="margin-left: 4px;">
-        <span>{{ firstData }}</span>
-        <el-icon v-show="seconedData" style="margin-left: 4px;">
-        <ArrowRight />
-      </el-icon>
-      </el-link>
-      
-      <el-link :underline="false" style="margin-left: 4px;">{{ seconedData }}</el-link>
+      <el-breadcrumb :separator-icon="ArrowRight"
+        style="height: 30px; line-height: 30px; font-size: var(--font-size); color: var(--color-text)">
+        <el-breadcrumb-item v-if="firstData" :to="{ path: '/' }" @click="loadConfigs">{{ $t('common.homepage')
+        }}</el-breadcrumb-item>
+        <el-breadcrumb-item v-show="firstData" @click="back" :to="{ path: '/' }">{{ firstData }}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ seconedData }}</el-breadcrumb-item>
+      </el-breadcrumb>
     </div>
 
     <div class="content-main">
@@ -25,9 +17,18 @@
           <el-input v-model="filterText" style="height: 32px" :placeholder="placeholder" size="small" />
         </div>
 
-        <List class="menu-list" :list="listData" @node-click="clickNode"
-          :row-name-style="{ fontWeight: 300, height: '26px', lineHeight: '26px', marginTop: '0' }"
-          @node-mouse-enter="handleMouseEnter" @node-mouse-leave="handleMouseLeave" @node-db-click="handleNodeDblClick">
+        <List class="menu-list" :list="listData" @node-click="clickNode" :row-name-style="{ fontWeight: 400 }"
+          :row-style="{ height: '26px', lineHeight: '26px', marginTop: '0' }" @node-mouse-enter="handleMouseEnter"
+          @node-mouse-leave="handleMouseLeave" @node-db-click="handleNodeDblClick">
+
+          <template #begin="{ node }">
+            <el-icon v-show="node.level == TreeLevelEnum.DATABASE" class="iconfont" style="margin: 5px">
+              <Coin />
+            </el-icon>
+            <el-icon v-show="node.level == TreeLevelEnum.TABLE" class="iconfont" style="margin: 5px">
+              <Document />
+            </el-icon>
+          </template>
         </List>
 
         <div class="new-query">
@@ -49,7 +50,7 @@
 import { ref, onMounted, watch } from "vue";
 import { ElNotification } from "element-plus";
 import { ElTree } from "element-plus";
-import { ArrowRight } from '@element-plus/icons-vue'
+import { ArrowRight, Coin, Document, Folder } from '@element-plus/icons-vue'
 import { getConfigs } from "@/api/config";
 import { getDatabases, getTables } from "@/api/connector";
 import type { DBConfig } from "@/api/config/type";
@@ -82,13 +83,19 @@ const filterText = ref("");
 const isResultVisible = ref();
 const shortcutsVisible = ref(true);
 const childRef = ref();
-const currentConfig = ref();
-const currentDatabase = ref();
+
+
 const placeholder = i18n.global.t('common.search')
 const listData = ref()
 const firstData = ref()
 const seconedData = ref()
 let currentCid: number
+let currentConfig: Object
+let currentDatabase: Object
+
+function test() {
+  console.log(11)
+}
 
 const handleNodeDblClick = (index: number, node: any) => {
   if (node.level === 3) {
@@ -99,7 +106,7 @@ const handleNodeDblClick = (index: number, node: any) => {
 function newTab(table: string) {
   isResultVisible.value = true;
   shortcutsVisible.value = false;
-  childRef.value?.newTab(currentConfig.value, currentDatabase.value, table);
+  childRef.value?.newTab(currentConfig, currentDatabase, table);
 }
 
 function back() {
@@ -124,10 +131,12 @@ function clickNode(index: number, row: any) {
     loadDatabases(row.id)
     firstData.value = row.name
     currentCid = row.id
+    currentConfig = row
   }
   if (level == TreeLevelEnum.DATABASE) {
     loadTables(row.cid, row.name)
     seconedData.value = row.name
+    currentDatabase = row
   }
 }
 
@@ -207,8 +216,10 @@ const filterNode = (value: string, data: Tree) => {
   display: flex;
   flex-direction: column;
   height: 100%;
+
   .header {
     color: var(--color-text);
+
     .el-link {
       font-size: var(--font-size);
       vertical-align: bottom;
@@ -216,12 +227,6 @@ const filterNode = (value: string, data: Tree) => {
   }
 }
 
-.el-link__inner {
-      font-weight: 700!important;
-    }
-    .el-icon {
-      font-weight: 700;
-    }
 .content-main {
   display: flex;
   flex-direction: row;

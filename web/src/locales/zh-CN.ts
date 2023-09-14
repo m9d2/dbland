@@ -6,6 +6,11 @@ const messages = {
         search: '查询',
         delete: '删除',
         homepage: '首页',
+        add: '添加',
+        modify: '编辑',
+        refresh: '刷新',
+        confirm: '确认',
+        cancel: '取消',
     },
     database: {
         button: {

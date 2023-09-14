@@ -35,6 +35,10 @@
   --tree-node-hover-bg-color: rgba(0, 0, 0, 0.03);
 }
 
+.el-table {
+  --el-table-current-row-bg-color: var(var(--color-background))
+}
+
 .dark {
   --color-background: #0a0b0c;
   --color-background-deep: #131418;
