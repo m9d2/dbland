@@ -15,7 +15,6 @@
                     </slot>
                 </div>
             </div>
-
         </div>
     </div>
 </template>
@@ -72,6 +71,9 @@ function handleMouseLeave(index: number) {
                 font-weight: 500;
                 flex-grow: 1;
             }
+        }
+        .d-row-name {
+            user-select:none;
         }
     }
 

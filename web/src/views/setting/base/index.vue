@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 const { locale } = useI18n()
 
@@ -32,6 +32,17 @@ function setColor() {
     // save
     localStorage.setItem('color-primary', themeColor.value)
 }
+
+onMounted(() => {
+    const lang = localStorage.getItem('language')
+    if(lang) {
+        language.value = lang
+    }
+    const color = localStorage.getItem('color-primary')
+    if (color) {
+        themeColor.value = color
+    }
+})
 
 function restore() {
     const color = '#1973ED'
