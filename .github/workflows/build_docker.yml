@@ -1,7 +1,8 @@
 name: build_docker
 on:
-  push:
-    branches: [ main ]
+  create:
+    tags:
+      - 'v*'
 jobs:
   build:
     runs-on: ubuntu-latest
