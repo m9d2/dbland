@@ -6,6 +6,8 @@
   <a href="https://github.com/m9d2/dbland"><img src="https://img.shields.io/github/stars/m9d2/dbland?color=%231890FF&style=flat-square" alt="Stars"></a>
 </p>
 
+## 简介
+Web版本数据库连接工具，快速安装，内存占用少
 
 ## UI界面
 
@@ -13,3 +15,9 @@
 
 
 ## 快速开始
+### 使用Docker安装
+
+```
+docker run -d --restart=always -p 2023:2023 --name dbland m9d2/dbland:latest
+```
+[访问地址: http://127.0.0.1/ui](http://127.0.0.1/ui)
