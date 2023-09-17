@@ -22,10 +22,12 @@ jobs:
 
       - name: Build Vue project
         run: |
+          cd web
           npm install
           npm run build
           mkdir static
           cp -R dist/* static/
+          cd ../
 
       - name: Build for Linux (amd64)
         run: GOOS=linux GOARCH=amd64 go build -o dbland-linux-amd64
