@@ -19,5 +19,6 @@ export interface Query {
     columns: string,
 	tableName: string,
 	rows: any,
-	total: number,    
+	total: number,   
+    elapsed_time: number, 
 }

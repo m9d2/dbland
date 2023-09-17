@@ -18,7 +18,7 @@ const messages = {
             run: '执行',
             new_query: '新建查询',
         },
-        lable: {
+        label: {
             total: '总数',
             elapsed_time: '执行时间',
         },

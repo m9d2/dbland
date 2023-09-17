@@ -1,6 +1,6 @@
 module dbland
 
-go 1.21
+go 1.21.1
 
 require (
 	github.com/gin-contrib/sessions v0.0.5

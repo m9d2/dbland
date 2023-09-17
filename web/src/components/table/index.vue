@@ -1,34 +1,31 @@
 <template>
-  <el-table v-loading="loading" :data="data" size="small" border empty-text=" " :height="height"
+  <el-table v-loading="loading" :data="data" size="small" :border="true" empty-text="" :height="height"
     @row-contextmenu="contextmenu" 
     :header-cell-class-name="headerCellClassName" 
     :header-row-class-name="headerRowClassName"
     @current-change="handlerCurrentChange"
-    highlight-current-row
-    show-overflow-tooltip>
+    :highlight-current-row="true"
+    :show-overflow-tooltip="true">
     <template #empty>
       <el-empty :image-size="200"></el-empty>
     </template>
-    <!-- <el-table-column type="selection" width="38" /> -->
-    <el-table-column v-for="column in columns" :key="column" :prop="column" :label="column" width="200" min-width="90"
+    <el-table-column v-for="column in columns" :column-key="column.column_name" :prop="column.column_name" :label="column.column_name" width="200" min-width="90"
       sortable="true" resizable>
       <template #default="{ row, column }">
         <span :class="{ 'null-value': row[column.property] == null, }">
-          {{ row[column.property] != null ? row[column.property] : '<NULL>' }}
+          {{ row[column.property] != null ? row[column.property] : '(NULL)' }}
         </span>
       </template>
     </el-table-column>
   </el-table>
 </template>
 <script setup lang="ts">
-import type { Column, Data } from "./type";
-
-const props = defineProps({
+defineProps({
   columns: {
-    type: Array as () => Column[],
+    type: Array as () => any[],
   },
   data: {
-    type: Array as () => Data[],
+    type: Array as () => any[],
   },
   loading: {
     type: Boolean,
@@ -45,10 +42,10 @@ defineOptions({
   name: "Table",
 });
 
-const emuis = defineEmits(["row-contextmenu", "row-current-change"]);
+const emits = defineEmits(["row-contextmenu", "row-current-change"]);
 
 function contextmenu(row: any, column: any, event: any) {
-  emuis("row-contextmenu", row, column, event);
+  emits("row-contextmenu", row, column, event);
 }
 
 function headerCellClassName(row: any) {
@@ -59,7 +56,7 @@ function headerRowClassName(row: any) {
   return 'header-row'
 }
 function handlerCurrentChange(currentRow: any) {
-  emuis("row-current-change", currentRow);
+  emits("row-current-change", currentRow);
 }
 </script>
 <style lang="scss">

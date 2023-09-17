@@ -1,5 +1,10 @@
 package connectors
 
+const (
+	Text   = "text"
+	Number = "number"
+)
+
 type Column struct {
 	ColumnName    string `db:"COLUMN_NAME" json:"column_name"`
 	ColumnType    string `db:"COLUMN_TYPE" json:"column_type"`
@@ -7,7 +12,7 @@ type Column struct {
 }
 
 type Query struct {
-	Columns     []string         `json:"columns"`
+	Columns     []Column         `json:"columns"`
 	TableName   string           `json:"table_name"`
 	Rows        []map[string]any `json:"rows"`
 	Total       int              `json:"total"`

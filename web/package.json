@@ -6,6 +6,7 @@
     "dev": "vite",
     "test": "vite --mode test",
     "prod": "vite --mode production",
+    "build": "vite build",
     "build:test": "vue-tsc && vite build --mode test",
     "build:prod": "vue-tsc && vite build --mode production",
     "preview": "vite preview"

@@ -1,46 +1,42 @@
 <template>
-  <el-dialog style="width: 50%;">
-    <el-form :model="formData" v-for="row in list" :label-width="labelWIdth" label-position="right"
-    >
-      <el-form-item :label="row.key" >
-        <el-input v-model="row.value" />
+  <el-dialog class="d-dialog" style="width: 50%; min-width: 500px; height: 80%; overflow: scroll; border-radius: 5px;">
+    <el-form :model="formData" :label-width="labelWidth" label-position="right">
+      <el-form-item v-for="row in list" :label="row.key" :key="row.key">
+        <el-input v-model="formData[row.key]" :type="row.type" />
       </el-form-item>
-
     </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-        <el-button type="primary" @click="confirm">
-          {{ $t('common.confirm') }}
-        </el-button>
+        <el-button type="primary" @click="confirm">{{ $t('common.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onBeforeMount } from 'vue'
 
-const labelWIdth = ref()
+const labelWidth = ref()
 const props = defineProps({
+  columns: {
+    type: Object,
+    default: null
+  },
   row: Object,
 })
 const formData = reactive({})
 const emit = defineEmits(['confirm', 'cancel'])
-const formLabelAlign = reactive({
-  name: '',
-  region: '',
-  type: '',
-})
 interface Row {
   key: string,
   value: any,
+  type: string,
 }
 
 function calculateStringWidth(text: string): number {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
-  if (context === null) {
+  if (!context) {
     return 100;
   }
   context.font = '12px Arial';
@@ -48,18 +44,26 @@ function calculateStringWidth(text: string): number {
   return metrics.width;
 }
 
+onBeforeMount(() => {
+  Object.assign(formData, props.row)
+})
+
+
 const list = computed(() => {
-  const keys: string[] = Object.keys(props.row)
   const data: Row[] = []
   let width = 0
-  for (const key of keys) {
-    data.push({ key: key, value: props.row[key] })
-    const stringWidth = calculateStringWidth(key)
+  for (const key of props.columns) {
+    let value
+    if (props.row) {
+      value = props.row[key.column_name]
+    }
+    data.push({ key: key.column_name, value: value, type: key.column_type })
+    const stringWidth = calculateStringWidth(key.column_name)
     if (stringWidth > width) {
       width = stringWidth
     }
   }
-  labelWIdth.value = width + 30
+  labelWidth.value = width + 30
   return data
 })
 
@@ -72,18 +76,18 @@ function cancel() {
   emit('cancel')
 }
 
-const form = {
-
-}
-
 </script>
 <style scoped>
+.d-dialog {
+  width: 50%; 
+  height: 60%;
+  overflow: scroll;
+}
 .el-form {
   padding: 0 48px;
 }
 
-.el-form-item{
+.el-form-item {
   font-size: var(--font-size);
 }
-
 </style>

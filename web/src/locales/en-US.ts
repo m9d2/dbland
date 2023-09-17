@@ -18,7 +18,7 @@ const messages = {
             run: 'Run',
             new_query: 'New Query',
         },
-        lable: {
+        label: {
             total: 'Total',
             elapsed_time: 'Elapsed Time',
         },

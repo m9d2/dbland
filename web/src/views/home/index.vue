@@ -3,7 +3,7 @@
     <div class="left">
       <div class="logo">
         <a href="#" style="color: var(--color-text); font-size: 14px; font-weight: bold">
-          <el-image style="width: 40px; height: 40px" src="/src/assets/logo.svg" />
+          <el-image style="width: 40px; height: 40px" :src="logo" />
         </a>
       </div>
       <div class="nav">
@@ -34,6 +34,7 @@ import {
 } from '@element-plus/icons-vue'
 import { onMounted } from 'vue';
 import i18n from '@/plugins/i18n'
+import logo from '@/assets/img/logo.svg'
 
 const menuItems = [
   { route: '/', icon: Coin },

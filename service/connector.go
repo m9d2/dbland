@@ -116,7 +116,7 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 	}
 
 	defer func() {
-		_ = db.Close()
+		err = db.Close()
 	}()
 
 	err = connector.Use(db, req.Database)
@@ -128,6 +128,9 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 	var sqlStr = ""
 	if req.Page == 0 && req.Size == 0 {
 		result, err = connector.Query(db, req.Sql)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		offset := (req.Page - 1) * req.Size
 		sqlStr = req.Sql + fmt.Sprintf(" limit %v OFFSET %v", req.Size, offset)
@@ -137,7 +140,10 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 	elapsedTime := time.Since(startTime)
 	cost := elapsedTime.Seconds()
 	str := fmt.Sprintf("%.3f", cost)
-	cost, _ = strconv.ParseFloat(str, 64)
+	cost, err = strconv.ParseFloat(str, 64)
+	if err != nil {
+		return nil, err
+	}
 	result.ElapsedTime = cost
 
 	var countSql = fmt.Sprintf("select count(1) FROM (%v) as _A", req.Sql)

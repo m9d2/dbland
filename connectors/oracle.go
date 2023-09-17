@@ -127,7 +127,7 @@ func (c OracleConnector) Query(db *sqlx.DB, sqlStr string) (*Query, error) {
 
 	query := &Query{
 		Rows:    result,
-		Columns: columns,
+		Columns: nil,
 		Total:   len(result),
 	}
 

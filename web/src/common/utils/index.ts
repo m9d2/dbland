@@ -30,14 +30,15 @@ export function findKeyByValue<T extends string>(enumObject: Record<string, T>, 
 }
 
 export function createDeleteSql(database: string, sqlStr: string, row: any): string | Error {
+    console.log(row)
     const keys = Reflect.ownKeys(row);
     const conditions = [];
     let table
     for (const key of keys) {
         if (typeof row[key] === 'string') {
-            conditions.push(`${key}='${row[key]}'`)
+            conditions.push(`\`${key}\` = '${row[key]}'`)
         } else{
-            conditions.push(`${key}=${row[key]}`)
+            conditions.push(`\`${key}\` = ${row[key]}`)
         }
     }
 

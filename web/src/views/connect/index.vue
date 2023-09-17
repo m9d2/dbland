@@ -5,7 +5,7 @@
       <List :list="configs" style="margin: 0 20px;" @node-click="clickConfig" @node-mouse-enter="handleMouseEnter"
         @node-mouse-leave="handleMouseLeave">
         <template #default="{ index }">
-          <el-dropdown style="vertical-align: center;" size="small" trigger="hover">
+          <el-dropdown style="vertical-align: center;" size="small" trigger="click">
             <el-link v-show="index === activeIndex" :underline="false" :icon="ArrowDown" />
             <template #dropdown>
               <el-dropdown-menu>

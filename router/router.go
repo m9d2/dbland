@@ -16,6 +16,7 @@ func InitRouter() *gin.Engine {
 	gin.SetMode(config.Conf.Server.Environment)
 	r := gin.New()
 	r.Use(Logger())
+	r.Static("/ui", "./static")
 	cookieStore := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("sid", cookieStore))
 	r.Use(corsMiddleware())

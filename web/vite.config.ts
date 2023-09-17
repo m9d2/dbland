@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       vue(),
     ],
+    base: '/ui',
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url))

@@ -54,17 +54,17 @@
       @row-current-change="handlerCurrentChange" @row-contextmenu="tableDbClick">
     </Table>
 
-    <Modify v-model="showModify" :row="currentRow" @cancel="modiftCancel" @confirm="modifyConfirm"></Modify>
+    <Form v-model="showModify" :row="currentRow" :columns="tableColumns" @cancel="handlerCancel" @confirm="handlerConfirm"></Form>
 
     <div class="query-status">
       <div class="status-left">
-        <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.lable.total') }}: {{ total }}</span>
+        <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total') }}: {{ total }}</span>
       </div>
       <div class="status-center">
         <label>{{ sqlStr }}</label>
       </div>
       <div class="status-right">
-        <span v-show="showQueryStatus">{{ $t('database.lable.elapsed_time') }}: {{ elapsedTime }}s</span>
+        <span v-show="showQueryStatus">{{ $t('database.label.elapsed_time') }}: {{ elapsedTime }}s</span>
       </div>
     </div>
   </div>
@@ -74,7 +74,7 @@
 import { onMounted, ref } from "vue";
 import Console from "@/components/console/index.vue";
 import Table from "@/components/table/index.vue";
-import Modify from './modiry.vue';
+import Form from "@/components/form/index.vue";
 import { format } from "sql-formatter";
 import { getConfigs } from "@/api/config";
 import { getDatabases, query, execute } from "@/api/connector";
@@ -100,7 +100,7 @@ const tableData = ref();
 const tableColumns = ref();
 const loading = ref(false);
 let sqlStr: string;
-const elapsedTime = ref<string>();
+const elapsedTime = ref<number>();
 const showQueryStatus = ref(false);
 const total = ref();
 let currentRow: any
@@ -119,31 +119,41 @@ const props = defineProps({
 });
 
 function insertRow() {
-
+  showModify.value = true
 }
 
-function deleteRow() {
+async function deleteRow() {
 
+  try {
+    console.log(configValueRef.value)
+    const sql = createDeleteSql(dbValueRef.value, sqlStr, currentRow)
+    await execute({sql: sql, cid: configValueRef.value})
+    await querySql()
+  } catch (error) {
+    ElNotification({
+      message: error.message,
+      type: "error",
+    });
+  }
 }
 
 function modifyRow() {
   showModify.value = true
 }
 
-function refresh() {
-
+async function refresh() {
+  await querySql()
 }
 
 function handlerCurrentChange(row: any) {
   currentRow = row
 }
 
-function modiftCancel() {
+function handlerCancel() {
   showModify.value = false
 }
 
-function modifyConfirm() {
-  console.log(currentRow)
+function handlerConfirm() {
   showModify.value = false
 }
 
@@ -225,8 +235,6 @@ async function querySql() {
 }
 
 function tableDbClick(row: any, column: any, event: any) {
-  console.log(row);
-  console.log(column);
   event.preventDefault();
   ContextMenu.showContextMenu({
     x: event.x,
@@ -256,7 +264,7 @@ function tableDbClick(row: any, column: any, event: any) {
             console.log('column', column)
             const sql = createDeleteSql('', sqlStr, row);
             const { data } = await execute({ cid: configValueRef.value, sql: sql });
-            querySql()
+            await querySql()
             ElNotification({
               message: 'Affected rows: ' + data,
               type: "success",

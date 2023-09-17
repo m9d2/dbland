@@ -2,6 +2,7 @@ package connectors
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"log/slog"
@@ -130,7 +131,7 @@ func (c DefaultConnector) Query(db *sqlx.DB, sqlStr string) (*Query, error) {
 		_ = rows.Close()
 	}()
 
-	columns, err := rows.Columns()
+	columnNames, err := rows.Columns()
 	if err != nil {
 		return nil, err
 	}
@@ -138,11 +139,20 @@ func (c DefaultConnector) Query(db *sqlx.DB, sqlStr string) (*Query, error) {
 	columnTypes, err := rows.ColumnTypes()
 
 	var result []map[string]interface{}
-	values := make([][]byte, len(columns))
-	scans := make([]interface{}, len(columns))
+	values := make([][]byte, len(columnNames))
+	scans := make([]interface{}, len(columnNames))
+	columns := make([]Column, len(columnNames))
 
 	for i, _ := range columns {
 		scans[i] = &values[i]
+		columnType, err := convertColumnType(columnTypes[i].DatabaseTypeName())
+		if err != nil {
+			return nil, err
+		}
+		columns[i] = Column{
+			ColumnName: columnNames[i],
+			ColumnType: columnType,
+		}
 	}
 
 	for rows.Next() {
@@ -158,18 +168,20 @@ func (c DefaultConnector) Query(db *sqlx.DB, sqlStr string) (*Query, error) {
 				row[columnType.Name()] = nil
 				continue
 			}
-			switch typeName {
-			case "TINYINT", "SMALLINT", "INT", "INTEGER", "BIGINT", "UNSIGNED BIGINT", "UNSIGNED TINYINT":
+
+			cColumnType, err := convertColumnType(columnTypes[i].DatabaseTypeName())
+			if err != nil {
+				return nil, err
+			}
+			if cColumnType == Text {
+				row[columnType.Name()] = string(value)
+			} else if cColumnType == Number {
 				val, err := strconv.Atoi(string(value))
 				if err != nil {
 					return nil, err
 				}
 				row[columnType.Name()] = val
-				break
-			case "TEXT", "VARCHAR", "DATETIME", "BIT", "DATE":
-				row[columnType.Name()] = string(value)
-				break
-			default:
+			} else {
 				slog.Error("dont support type", "type name", typeName)
 				break
 			}
@@ -235,4 +247,16 @@ func (c DefaultConnector) getColumnType(key string, columnTypes []*sql.ColumnTyp
 		}
 	}
 	return nil
+}
+
+func convertColumnType(columnType string) (string, error) {
+	switch columnType {
+	case "TINYINT", "SMALLINT", "INT", "INTEGER", "BIGINT", "UNSIGNED BIGINT", "UNSIGNED TINYINT":
+		return Number, nil
+	case "TEXT", "VARCHAR", "DATETIME", "BIT", "DATE", "CHAR":
+		return Text, nil
+	default:
+		err := fmt.Errorf("dont support type, %s", columnType)
+		return "", err
+	}
 }
