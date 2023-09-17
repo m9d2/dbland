@@ -14,9 +14,6 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: m9d2/dbland
-      - name: Replace release with dev
-        run: |
-          sed -i 's/release/dev/g' Dockerfile
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
