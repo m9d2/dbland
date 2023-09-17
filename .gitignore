@@ -21,3 +21,4 @@ bin-release/
 # information for Eclipse / Flash Builder.
 dbland.db
 web/node_modules/
+web/dist

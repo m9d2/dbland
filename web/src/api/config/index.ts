@@ -18,7 +18,7 @@ export const updateConfig = (data: DBConfig) => {
     return request.put(API.CONFIG_URL, data);
 };
 
-export const deleteConfig = (id: number) => {
+export const deleteById = (id: number) => {
     return request.delete(API.CONFIG_URL + '/' + id);
 };
 

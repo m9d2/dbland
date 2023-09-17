@@ -1,8 +1,7 @@
-name: Build on Tag
+name: build_docker
 on:
-  create:
-    tags:
-      - 'v*'
+  push:
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -9,7 +9,7 @@
             <el-link v-show="index === activeIndex" :underline="false" :icon="ArrowDown" />
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item :icon="Delete">{{ $t('common.delete') }}</el-dropdown-item>
+                <el-dropdown-item :icon="Delete" @click="deleteConfig(index)">{{ $t('common.delete') }}</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -48,9 +48,9 @@ import Item from './item/index.vue'
 import Form from './form/index.vue'
 import { onMounted, ref, nextTick } from "vue";
 import type { DBConfig } from "@/api/config/type";
-import { getConfigs, deleteConfig } from "@/api/config";
+import { getConfigs, deleteById } from "@/api/config";
 import { ElNotification } from "element-plus";
-import { MoreFilled, Delete, ArrowDown } from '@element-plus/icons-vue'
+import { Delete, ArrowDown } from '@element-plus/icons-vue'
 import { findKeyByValue } from '@/common/utils'
 import type { AxiosPromise } from 'axios';
 import { DbTypeEnum } from '@/common/enums'
@@ -83,7 +83,20 @@ function loadConfigs() {
     });
   } catch (error: any) {
     ElNotification({
-      title: 'error',
+      message: error.message,
+      type: 'error'
+    })
+  }
+}
+
+async function deleteConfig(index) {
+  try {
+    const id = configs.value[index].id
+    console.log(id)
+    await deleteById(id)
+    loadConfigs()
+  } catch (error) {
+    ElNotification({
       message: error.message,
       type: 'error'
     })
