@@ -61,6 +61,7 @@ function nodeClick(index: number, row: any) {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: auto;
 }
 
 .setting-main {

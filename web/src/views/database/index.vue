@@ -161,7 +161,6 @@ function loadConfigs() {
     });
   } catch (error: any) {
     ElNotification({
-      title: 'error',
       message: error.message,
       type: 'error'
     })

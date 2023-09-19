@@ -54,7 +54,7 @@
       @row-current-change="handlerCurrentChange" @row-contextmenu="tableDbClick">
     </Table>
 
-    <Form v-model="showModify" :row="currentRow" :columns="tableColumns" @cancel="handlerCancel" @confirm="handlerConfirm"></Form>
+    <Form v-model="showModify" :row="currentRow" :actionType="actionType" :columns="tableColumns" @cancel="handlerCancel" @confirm="handlerConfirm"></Form>
 
     <div class="query-status">
       <div class="status-left">
@@ -83,17 +83,20 @@ import type { QueryReq } from "@/api/connector/type";
 import type { AxiosPromise } from "axios";
 import { ElNotification } from "element-plus";
 import ContextMenu from "@imengyu/vue3-context-menu";
-import { createDeleteSql } from "@/common/utils";
 import {
   Plus,
   Edit,
   Minus,
   Refresh,
 } from '@element-plus/icons-vue'
+import { ActionTypeEnum } from '@/common/enums/'
+import { CreateDatabase } from '@/service'
+import type {Database} from "@/service/database";
 
 const configs = ref();
 const configValueRef = ref();
 const databases = ref();
+let currentConfig
 const dbValueRef = ref<string>();
 const consoleRef = ref();
 const tableData = ref();
@@ -104,6 +107,7 @@ const elapsedTime = ref<number>();
 const showQueryStatus = ref(false);
 const total = ref();
 let currentRow: any
+let actionType: any
 const showModify = ref(false)
 
 const props = defineProps({
@@ -120,14 +124,25 @@ const props = defineProps({
 
 function insertRow() {
   showModify.value = true
+  actionType = ActionTypeEnum.INSERT
 }
 
 async function deleteRow() {
 
   try {
-    console.log(configValueRef.value)
-    const sql = createDeleteSql(dbValueRef.value, sqlStr, currentRow)
-    await execute({sql: sql, cid: configValueRef.value})
+    const database:Database = CreateDatabase(currentConfig, dbValueRef, sqlStr)
+    if (!currentRow) {
+      ElNotification({
+        message: 'please choose row',
+        type: 'error'
+      })
+    }
+    const sql = database.createDeleteSql(tableColumns.value, currentRow)
+    const {data} = await execute({sql: sql, cid: configValueRef.value})
+    ElNotification({
+      message: 'Affected rows: ' + data,
+      type: "success",
+    });
     await querySql()
   } catch (error) {
     ElNotification({
@@ -139,6 +154,7 @@ async function deleteRow() {
 
 function modifyRow() {
   showModify.value = true
+  actionType = ActionTypeEnum.MODIFY
 }
 
 async function refresh() {
@@ -153,7 +169,34 @@ function handlerCancel() {
   showModify.value = false
 }
 
-function handlerConfirm() {
+async function handlerConfirm(formData: any) {
+  let sql
+  const database:Database = CreateDatabase(currentConfig, dbValueRef, sqlStr)
+  if (actionType == ActionTypeEnum.INSERT) {
+    sql = database.createInsertSql(tableColumns.value, formData)
+  }
+  if (actionType == ActionTypeEnum.MODIFY) {
+    if (!currentRow) {
+      ElNotification({
+        message: 'please choose row',
+        type: 'error'
+      })
+    }
+    sql = database.createUpdateSql(tableColumns.value, formData, currentRow)
+  }
+  try {
+    const { data } = await execute({cid: configValueRef.value, sql: sql})
+    await querySql()
+    ElNotification({
+      message: 'Affected rows: ' + data,
+      type: "success",
+    });
+  } catch (error) {
+    ElNotification({
+      message: error.message,
+      type: 'error'
+    })
+  }
   showModify.value = false
 }
 
@@ -161,6 +204,7 @@ onMounted(() => {
   sqlStr = "";
   if (props.config) {
     configValueRef.value = props.config.id;
+    currentConfig = props.config
   }
   if (props.database) {
     dbValueRef.value = props.database.name;
@@ -187,6 +231,7 @@ function loadConfigs() {
       if (res.data) {
         if (!configValueRef.value) {
           configValueRef.value = res.data[0].id;
+          currentConfig = res.data[0]
         }
         changeConfig(configValueRef.value);
         configs.value = res.data;
@@ -225,7 +270,6 @@ async function querySql() {
     showQueryStatus.value = true;
   } catch (error: any) {
     ElNotification({
-      title: "error",
       message: error.message,
       type: "error",
     });
@@ -261,9 +305,9 @@ function tableDbClick(row: any, column: any, event: any) {
         label: "Delete Record",
         onClick: async () => {
           try {
-            console.log('column', column)
-            const sql = createDeleteSql('', sqlStr, row);
-            const { data } = await execute({ cid: configValueRef.value, sql: sql });
+            const database:Database = CreateDatabase(currentConfig, dbValueRef, sqlStr)
+            const sql = database.createDeleteSql(tableColumns.value, currentRow)
+            const {data} = await execute({sql: sql, cid: configValueRef.value})
             await querySql()
             ElNotification({
               message: 'Affected rows: ' + data,
@@ -276,6 +320,12 @@ function tableDbClick(row: any, column: any, event: any) {
               type: "error",
             });
           }
+        },
+      },
+      {
+        label: "Modify Record",
+        onClick: async () => {
+          modifyRow()
         },
       },
     ],

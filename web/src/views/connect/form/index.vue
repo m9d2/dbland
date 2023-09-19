@@ -21,7 +21,7 @@
       </el-col>
     </el-form-item>
     <el-form-item label="Path" v-show="showPath">
-      <el-input v-model="form.db_file" type="file" />
+      <el-input v-model="form.dbFile" />
     </el-form-item>
     <el-form-item label="User" v-show="showUser">
       <el-input v-model="form.username" />
@@ -67,7 +67,7 @@ const form = reactive({
   port: "",
   username: "",
   password: "",
-  db_file: null,
+  dbFile: null,
 });
 defineExpose({
   setConfig,
@@ -162,6 +162,7 @@ function getConfig() {
     port: form.port,
     username: form.username,
     password: form.password,
+    dbFile: form.dbFile
   };
 }
 
@@ -172,6 +173,7 @@ function setConfig(config: any) {
   form.username = config.username;
   form.name = config.name;
   form.password = config.password;
+  form.dbFile = config.dbFile
 }
 
 const save = async () => {

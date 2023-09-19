@@ -30,7 +30,7 @@ const messages = {
         title: '设置',
         menu: {
             basic: '基础设置',
-            other: '其他'
+            other: '关于'
         },
         basic: {
             color: '设置主题颜色',

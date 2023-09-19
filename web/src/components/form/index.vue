@@ -15,7 +15,9 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed, onBeforeMount } from 'vue'
+import { ref, computed } from 'vue'
+import { ActionTypeEnum } from '@/common/enums/'
+
 
 const labelWidth = ref()
 const props = defineProps({
@@ -24,8 +26,9 @@ const props = defineProps({
     default: null
   },
   row: Object,
+  actionType: String,
 })
-const formData = reactive({})
+const formData = ref({})
 const emit = defineEmits(['confirm', 'cancel'])
 interface Row {
   key: string,
@@ -44,12 +47,12 @@ function calculateStringWidth(text: string): number {
   return metrics.width;
 }
 
-onBeforeMount(() => {
-  Object.assign(formData, props.row)
-})
-
-
 const list = computed(() => {
+  formData.value = {}
+  if (props.actionType == ActionTypeEnum.MODIFY) {
+    Object.assign(formData.value, props.row)
+
+  }
   const data: Row[] = []
   let width = 0
   for (const key of props.columns) {
@@ -68,8 +71,7 @@ const list = computed(() => {
 })
 
 function confirm() {
-  console.log(formData)
-  emit('confirm')
+  emit('confirm', formData)
 }
 
 function cancel() {

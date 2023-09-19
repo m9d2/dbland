@@ -30,6 +30,9 @@ func InitRouter() *gin.Engine {
 
 		connectionConfig := api.ConnectionConfigHandler{}
 		connectionConfig.InitRouter(g)
+
+		other := api.OtherHandler{}
+		other.InitRouter(g)
 	}
 	return r
 }

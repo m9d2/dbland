@@ -3,6 +3,7 @@ package connectors
 import (
 	"database/sql"
 	"dbland/model"
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 )
@@ -12,6 +13,9 @@ type SQLiteConnector struct {
 }
 
 func (c SQLiteConnector) Ping(config *model.ConnectionConfig) error {
+	if config.DbFile == nil {
+		return errors.New("database file cannot be empty")
+	}
 	db, err := sqlx.Open("sqlite3", c.dsn(config))
 	if err != nil {
 		return err

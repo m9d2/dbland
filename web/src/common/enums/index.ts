@@ -12,3 +12,13 @@ export enum DbTypeEnum {
     PostgreSQL = 'postgresql',
     MariaDB = 'mariadb'
 }
+
+export enum ActionTypeEnum {
+    MODIFY = "modify",
+    INSERT = "insert",
+}
+
+export enum ColumnType {
+    NUMBER = "number",
+    TEXT = "text"
+}

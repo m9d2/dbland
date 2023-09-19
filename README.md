@@ -1,4 +1,4 @@
-<p align="center"><a href="https://github.com/m9d2/dbland"><img src="https://github.com/m9d2/store/blob/main/img/logo.png" alt="DBLAND" width="58" /></a></p>
+<p align="center"><a href="https://github.com/m9d2/dbland"><img src="https://github.com/m9d2/store/blob/main/img/logo.png?raw=true" alt="DBLAND" width="58" /></a></p>
 <p align="center"><b>Web version database connection tool</b></p>
 <div align="center">
 <p align="center">
@@ -21,7 +21,7 @@ Web version database connection tool, fast installation with minimal memory usag
 
 ## UI Preview
 
-![UI](https://github.com/m9d2/store/blob/main/img/iShot_2023-09-15_12.07.03.png)
+<img src="https://github.com/m9d2/store/blob/main/img/iShot_2023-09-15_12.07.03.png?raw=true?" alt="UI" width="100%" height="100%">
 
 
 ## Quick start

@@ -176,7 +176,7 @@ func (c DefaultConnector) Query(db *sqlx.DB, sqlStr string) (*Query, error) {
 			if cColumnType == Text {
 				row[columnType.Name()] = string(value)
 			} else if cColumnType == Number {
-				val, err := strconv.Atoi(string(value))
+				val, err := strconv.ParseFloat(string(value), 64)
 				if err != nil {
 					return nil, err
 				}

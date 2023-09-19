@@ -30,7 +30,7 @@ const messages = {
         title: 'Setting',
         menu: {
             basic: 'Basic Settings',
-            other: 'Other'
+            other: 'About'
         },
         basic: {
             color: 'Setting theme color',
