@@ -1,10 +1,21 @@
 name: Build and Release
 on:
   push:
-    branches: [ main ]
+    branches: [ dev ]
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  bild:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+          - os: macos-latest
+            arch: amd64
+          - os: macos-latest
+            arch: arm64
+          - os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -19,7 +30,8 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Build Vue project
+      - name: Build Vue project for Linux
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS'}}
         run: |
           cd web
           npm install
@@ -28,22 +40,38 @@ jobs:
           cp -R dist/* static/
           cd ../
 
+      - name: Build Vue project for Windows
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          cd web
+          npm install
+          npm run build
+          mkdir static
+          xcopy /E /I dist\* static\
+          cd ..
+
       - name: Build for Linux (amd64)
+        if: ${{ runner.os == 'Linux' }}
         run: GOOS=linux GOARCH=amd64 go build -o dbland-linux-amd64
 
       - name: Build for Linux (arm64)
+        if: ${{ runner.os == 'Linux' }}
         run: GOOS=linux GOARCH=arm64 go build -o dbland-linux-arm64
 
       - name: Build for macOS (amd64)
+        if: ${{ runner.os == 'macOS' && matrix.arch == 'arm64' }}
         run: GOOS=darwin GOARCH=amd64 go build -o dbland-darwin-amd64
 
       - name: Build for macOS (arm64)
+        if: ${{ runner.os == 'macOS' && matrix.arch == 'arm64' }}
         run: GOOS=darwin GOARCH=arm64 go build -o dbland-darwin-arm64
 
       - name: Build for Windows (amd64)
+        if: ${{ runner.os == 'Windows' }}
         run: GOOS=windows GOARCH=amd64 go build -o dbland-windows-amd64.exe
 
       - name: Build for Windows (arm64)
+        if: ${{ runner.os == 'Windows' }}
         run: GOOS=windows GOARCH=arm64 go build -o dbland-windows-arm64.exe
 
       - name: Create Linux tar.gz (amd64)
