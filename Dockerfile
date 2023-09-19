@@ -33,5 +33,7 @@ COPY --from=frontend /app/frontend/dist ./static
 COPY --from=backend /app/backend/dbland .
 COPY config.yaml .
 COPY schema-sqlite.sql .
+COPY README.md .
+COPY README_CN.md .
 EXPOSE 2023
 CMD ./dbland start -p 2023

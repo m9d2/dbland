@@ -15,5 +15,3 @@ elif [ "$1" = "file" ]; then
 else
   echo -e "Parameter error"
 fi
-
-
