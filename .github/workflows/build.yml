@@ -1,8 +1,7 @@
 name: Release Client
 on:
   release:
-    types:
-      - created
+    types: [ created ]
 jobs:
   upload_assets:
     strategy:
