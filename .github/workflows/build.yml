@@ -1,9 +1,7 @@
 name: Releases
 on:
   push:
-    tags:
-      - "v*"
-
+    branches: [ dev ]
 jobs:
   build:
     name: Build Go
@@ -11,10 +9,8 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
         arch:
           - amd64
-          - arm64
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
@@ -39,6 +35,7 @@ jobs:
           else
             cp -R dist/* static/
           fi
+          ls
           cd ..
 
       - name: Setup Go
