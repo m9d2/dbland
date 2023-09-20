@@ -14,7 +14,7 @@ RUN set -eux; \
         TARGET="go$GO_VERSION.linux-arm64.tar.gz"; \
     else \
         exit 1; \
-    fi && \
+    fi; \
     wget -O go.tgz https://go.dev/dl/$TARGET; \
     tar -C /usr/local -xzf go.tgz; \
     export PATH="/usr/local/go/bin:$PATH"; \
@@ -31,7 +31,6 @@ FROM alpine:3.18
 WORKDIR /app
 COPY --from=frontend /app/frontend/dist ./static
 COPY --from=backend /app/backend/dbland .
-COPY config.yaml .
-COPY schema-sqlite.sql .
+COPY config.yaml README.md README_CN.md LICENSE ./
 EXPOSE 2023
 CMD ./dbland start -p 2023

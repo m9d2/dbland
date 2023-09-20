@@ -1,0 +1,95 @@
+name: Releases
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build:
+    name: Build Go
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        arch: [amd64, arm64]
+        include:
+          - os: ubuntu-latest
+            goos: linux
+          - os: macos-latest
+            goos: darwin
+          - os: windows-latest
+            goos: windows
+    env:
+      NODE_VERSION: 14
+      GO_VERSION: 1.21.1
+      PROJECT_NAME: dbland
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Build Vue project
+        run: |
+          cd web
+          npm install
+          npm run build
+          mkdir static
+
+      - name: Prepare Static
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
+        run: |
+          ls
+          mv ./web/dist/ ./static
+
+      - name: Prepare Static
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          ls
+          xcopy .\web\dist\* .\static\ /E /I /Y
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build Go Project
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
+        run: go build -o ${{ env.PROJECT_NAME }} .
+
+      - name: Build Go Project
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: go build -o ${{ env.PROJECT_NAME }}.exe .
+
+      - name: Compress files
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
+        run: tar -czvf ${{ env.PROJECT_NAME }}-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz ${{ env.PROJECT_NAME }} config.yaml README.md LICENSE
+
+      - name: Compress files
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          $sourceFiles = "${{ env.PROJECT_NAME }}.exe", "config.yaml", "README.md", "LICENSE"
+          $zipFile = "dbland-${{ matrix.goos }}-${{ matrix.arch }}.zip"
+          Compress-Archive -Path $sourceFiles -DestinationPath $zipFile
+          Write-Host "Files compressed successfully!"  
+
+      - name: Create Release
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ${{ env.PROJECT_NAME }}-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz
+          allowUpdates: true
+
+      - name: Create Release
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ${{ env.PROJECT_NAME }}-${{ matrix.goos }}-${{ matrix.arch }}.zip
+          allowUpdates: true
