@@ -19,6 +19,10 @@ jobs:
             goos: darwin
             node: 14
             go-version: 1.21.1
+          - os: windows-latest
+            goos: windows
+            node: 14
+            go-version: 1.21.1
 
     runs-on: ${{ matrix.os }}
     permissions:
@@ -41,11 +45,11 @@ jobs:
           mkdir static
 
       - name: Prepare Static
-        if: ${{ matrix.os == "ubuntu-latest" || matrix.os == "macos-latest" }}
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
         run: mv dist/ ../static
 
       - name: Prepare Static
-        if: ${{ matrix.os == "windows-latest" }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: xcopy dist\* ..\static\ /E /I /Y
 
       - name: Setup Go
@@ -54,19 +58,19 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Build Go Project
-        if: ${{ matrix.os == "ubuntu-latest" || matrix.os == "macos-latest" }}
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
         run: go build -o dbland .
 
       - name: Build Go Project
-        if: ${{ matrix.os == "windows-latest" }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: go build -o dbland.exe .
 
       - name: Compress files
-        if: ${{ matrix.os == "ubuntu-latest" || matrix.os == "macos-latest" }}
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
         run: tar -czvf dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz dbland config.yaml README.md README_CN.md
 
       - name: Compress files
-        if: ${{ matrix.os == "windows-latest" }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: |
           $sourceFiles = "dbland.exe", "config.yaml", "README.md", "README_CN.md"
           $zipFile = "dbland-${{ matrix.goos }}-${{ matrix.arch }}.zip"
