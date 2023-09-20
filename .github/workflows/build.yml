@@ -1,7 +1,8 @@
 name: Releases
 on:
   push:
-    branches: [ dev ]
+    tags:
+      - "v*"
 jobs:
   build:
     name: Build Go
@@ -41,7 +42,6 @@ jobs:
             echo ubuntu-latest
           fi
           mv dist/ ../static
-          echo "${{ toJson(matrix) }}"
           cd ..
 
       - name: Setup Go
@@ -54,18 +54,13 @@ jobs:
 
       - name: Compress files
         run: |
-          ls
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             7z a release.zip static dbland-${{ matrix.goos }}-${{ matrix.arch }} config.yaml README.md README_CN.md
           else
-            tar -czvf release.tar.gz static dbland-${{ matrix.goos }}-${{ matrix.arch }} config.yaml README.md README_CN.md
+            tar -czvf dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz static dbland-${{ matrix.goos }}-${{ matrix.arch }} config.yaml README.md README_CN.md
           fi
 
-      - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
+      - name: Create Release
+        uses: ncipollo/release-action@v1
         with:
-          asset_path: release.tar.gz
-          asset_name: dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz
-          asset_content_type: application/gzip
-          release-tag: ${{ github.ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz
