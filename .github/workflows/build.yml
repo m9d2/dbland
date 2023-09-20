@@ -51,7 +51,7 @@ jobs:
       - name: Compress files
         run: |
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            7z a -tzip release.zip static myapp-${{ matrix.os }}-${{ matrix.arch }} config.yaml README.md README_CN.md
+            7z a release.zip static myapp-${{ matrix.os }}-${{ matrix.arch }} config.yaml README.md README_CN.md
           else
             tar -czvf release.tar.gz static myapp-${{ matrix.os }}-${{ matrix.arch }} config.yaml README.md README_CN.md
           fi
@@ -59,7 +59,7 @@ jobs:
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         with:
-          asset_path: ${{ matrix.os == windows-latest' ? 'release.zip' : 'release.tar.gz'}}
+          asset_path: ${{ matrix.os == 'windows-latest' ? 'release.zip' : 'release.tar.gz'}}
           asset_name: dbland-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.os == 'windows-latest' ? 'zip' : 'tar.gz' }}
           asset_content_type: application/${{ matrix.os == 'ubuntu-latest' ? 'gzip' : 'zip' }}
           release-tag: ${{ github.ref }}
