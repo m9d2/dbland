@@ -31,12 +31,13 @@ jobs:
           npm run build
           mkdir static
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            echo windows-latest
             xcopy /E /I dist\* ..\static\
           else
+            echo ubuntu-latest
             mv dist/ ../static
           fi
-          echo 打印目录
-          ls
+          echo matrix
           cd ..
 
       - name: Setup Go
@@ -49,6 +50,7 @@ jobs:
 
       - name: Compress files
         run: |
+          ls
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             7z a release.zip static dbland-${{ matrix.os }}-${{ matrix.arch }} config.yaml README.md README_CN.md
           else
