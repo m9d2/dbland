@@ -8,14 +8,16 @@ jobs:
     name: Build Go
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
-        arch:
-          - amd64
+        os: [ubuntu-latest, macos-latest]
+        arch: [amd64, arm64]
         include:
           - os: ubuntu-latest
             goos: linux
             node: 14
+          - os: macos-latest
+            goos: darwin
+            node: 14
+
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
@@ -55,9 +57,9 @@ jobs:
       - name: Compress files
         run: |
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            7z a release.zip static dbland-${{ matrix.goos }}-${{ matrix.arch }} config.yaml README.md README_CN.md
+            7z a release.zip dbland-${{ matrix.goos }}-${{ matrix.arch }} config.yaml README.md README_CN.md
           else
-            tar -czvf dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz static dbland-${{ matrix.goos }}-${{ matrix.arch }} config.yaml README.md README_CN.md
+            tar -czvf dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz dbland-${{ matrix.goos }}-${{ matrix.arch }} config.yaml README.md README_CN.md
           fi
 
       - name: Create Release
