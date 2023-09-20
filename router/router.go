@@ -3,11 +3,11 @@ package router
 import (
 	"dbland/api"
 	"dbland/config"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"dbland/static"
 	"github.com/gin-gonic/gin"
 	"log/slog"
 	"net"
+	"net/http"
 	"strings"
 	"time"
 )
@@ -15,11 +15,12 @@ import (
 func InitRouter() *gin.Engine {
 	gin.SetMode(config.Conf.Server.Environment)
 	r := gin.New()
+
 	r.Use(Logger())
-	r.Static("/ui", "./static")
-	cookieStore := cookie.NewStore([]byte("secret"))
-	r.Use(sessions.Sessions("sid", cookieStore))
 	r.Use(corsMiddleware())
+
+	r.StaticFS("/ui", http.FS(static.Static))
+
 	g := r.Group(config.Conf.Server.Path)
 	{
 		query := api.ConnectorHandler{}
