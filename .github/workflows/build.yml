@@ -1,22 +1,40 @@
-name: Release Client
+name: Releases
 on:
-  release:
-    types: [ created ]
+  push:
+    tags:
+      - "v*"
 jobs:
-  upload_assets:
+  build-web:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Build Vue project
+        run: |
+          cd web
+          npm install
+          npm run build
+          mkdir static
+          cp -R dist/* static/
+          cd ../
+
+  build-go:
     strategy:
-      fail-fast: false
       matrix:
-        include:
-          - os: windows-latest
-            arch: x86_64
-          - os: macos-latest
-            arch: amd64
-          - os: macos-latest
-            arch: arm64
-          - os: ubuntu-latest
-            arch: x86_64
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        arch:
+          - amd64
+          - arm64
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -27,71 +45,22 @@ jobs:
         with:
           go-version: 1.21.1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+      - name: Build Go Project
+        run: go build -o dbland-${{ matrix.os }}-${{ matrix.arch }}
 
-      - name: Build Vue project for Linux
-        if: ${{ runner.os == 'Linux' || runner.os == 'macOS'}}
+      - name: Compress files
         run: |
-          cd web
-          npm install
-          npm run build
-          mkdir static
-          cp -R dist/* static/
-          cd ../
-
-      - name: Build Vue project for Windows
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          cd web
-          npm install
-          npm run build
-          mkdir static
-          xcopy /E /I dist\* static\
-          cd ..
-
-      - name: Build for Linux
-        if: ${{ runner.os == 'Linux' }}
-        run: GOOS=linux GOARCH=amd64 go build -o dbland-linux-amd64
-
-      - name: Build for macOS (amd64)
-        if: ${{ runner.os == 'macOS' && matrix.arch == 'arm64' }}
-        run: GOOS=darwin GOARCH=amd64 go build -o dbland-darwin-amd64
-
-      - name: Build for macOS (arm64)
-        if: ${{ runner.os == 'macOS' && matrix.arch == 'arm64' }}
-        run: GOOS=darwin GOARCH=arm64 go build -o dbland-darwin-arm64
-
-      - name: Build for Windows
-        if: ${{ runner.os == 'Windows' }}
-        run: GOOS=windows GOARCH=amd64 go build -o dbland-windows-amd64.exe
-
-      - name: Create Linux tar.gz (amd64)
-        if: ${{ runner.os == 'Linux' }}
-        run: tar -czf dbland-linux-amd64.tar.gz dbland-linux-amd64
-
-      - name: Create macOS tar.gz (amd64)
-        if: ${{ runner.os == 'macOS' && matrix.arch == 'amd64' }}
-        run: tar -czf dbland-darwin-amd64.tar.gz dbland-darwin-amd64
-
-      - name: Create macOS tar.gz (arm64)
-        if: ${{ runner.os == 'macOS' && matrix.arch == 'arm64' }}
-        run: tar -czf dbland-darwin-arm64.tar.gz dbland-darwin-arm64
-
-      - name: Create Windows zip
-        if: ${{ runner.os == 'Windows' }}
-        run: zip -r dbland-windows-amd64.zip dbland-windows-amd64.exe
-
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            7z a -tzip release.zip static myapp-${{ matrix.os }}-${{ matrix.arch }} config.yaml README.md README_CN.md
+          else
+            tar -czvf release.tar.gz static myapp-${{ matrix.os }}-${{ matrix.arch }} config.yaml README.md README_CN.md
+          fi
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         with:
-          asset-path: |
-            dbland-linux-amd64.tar.gz
-            dbland-darwin-amd64.tar.gz
-            dbland-darwin-arm64.tar.gz
-            dbland-windows-amd64.zip
+          asset_path: ${{ matrix.os == windows-latest' ? 'release.zip' : 'release.tar.gz'}}
+          asset_name: dbland-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.os == 'windows-latest' ? 'zip' : 'tar.gz' }}
+          asset_content_type: application/${{ matrix.os == 'ubuntu-latest' ? 'gzip' : 'zip' }}
           release-tag: ${{ github.ref }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
