@@ -33,7 +33,7 @@ jobs:
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             xcopy /E /I dist\* ..\static\
           else
-            mv dist static
+            mv dist/ ../static
           fi
           echo 打印目录
           ls
