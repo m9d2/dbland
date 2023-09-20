@@ -37,7 +37,7 @@ jobs:
             echo ubuntu-latest
             mv dist/ ../static
           fi
-          echo matrix
+          echo ${{ matrix }}
           cd ..
 
       - name: Setup Go
