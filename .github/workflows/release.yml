@@ -46,11 +46,15 @@ jobs:
 
       - name: Prepare Static
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
-        run: mv dist/ ../static
+        run: |
+          ls
+          mv ./web/dist/ ./static
 
       - name: Prepare Static
         if: ${{ matrix.os == 'windows-latest' }}
-        run: xcopy dist\* ..\static\ /E /I /Y
+        run: |
+          ls
+          xcopy .\web\dist\* .\static\ /E /I /Y
 
       - name: Setup Go
         uses: actions/setup-go@v2
