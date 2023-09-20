@@ -59,6 +59,7 @@ jobs:
             go build -o dbland.exe .
           else
             go build -o dbland .
+          fi
       - name: Compress files
         run: |
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
