@@ -70,12 +70,12 @@ jobs:
 
       - name: Compress files
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
-        run: tar -czvf ${{ env.PROJECT_NAME }}-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz ${{ env.PROJECT_NAME }} config.yaml README.md README_CN.md
+        run: tar -czvf ${{ env.PROJECT_NAME }}-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz ${{ env.PROJECT_NAME }} config.yaml README.md LICENSE
 
       - name: Compress files
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
-          $sourceFiles = "${{ env.PROJECT_NAME }}.exe", "config.yaml", "README.md", "README_CN.md"
+          $sourceFiles = "${{ env.PROJECT_NAME }}.exe", "config.yaml", "README.md", "LICENSE"
           $zipFile = "dbland-${{ matrix.goos }}-${{ matrix.arch }}.zip"
           Compress-Archive -Path $sourceFiles -DestinationPath $zipFile
           Write-Host "Files compressed successfully!"  

@@ -8,15 +8,13 @@ RUN set -eux; \
     apk add --no-cache bash ca-certificates curl gcc libc-dev; \
     OS=$(uname -s | tr '[:upper:]' '[:lower:]') && \
     ARCH=$(uname -m | tr '[:upper:]' '[:lower:]') && \
-    echo OS: OS \
-    echo ARCH: $ARCH \
     if [ "$ARCH" = "x86_64" ]; then \
         TARGET="go$GO_VERSION.linux-amd64.tar.gz"; \
     elif [ "$ARCH" = "aarch64" ]; then \
         TARGET="go$GO_VERSION.linux-arm64.tar.gz"; \
     else \
         exit 1; \
-    fi && \
+    fi; \
     wget -O go.tgz https://go.dev/dl/$TARGET; \
     tar -C /usr/local -xzf go.tgz; \
     export PATH="/usr/local/go/bin:$PATH"; \
