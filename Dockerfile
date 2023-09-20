@@ -8,6 +8,7 @@ RUN set -eux; \
     apk add --no-cache bash ca-certificates curl gcc libc-dev; \
     OS=$(uname -s | tr '[:upper:]' '[:lower:]') && \
     ARCH=$(uname -m | tr '[:upper:]' '[:lower:]') && \
+    echo ARCH: $ARCH \
     if [ "$ARCH" = "x86_64" ]; then \
         TARGET="go$GO_VERSION.linux-amd64.tar.gz"; \
     elif [ "$ARCH" = "aarch64" ]; then \

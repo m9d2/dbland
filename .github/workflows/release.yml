@@ -18,7 +18,7 @@ jobs:
           - os: windows-latest
             goos: windows
     env:
-      NODE_VERSION: 16
+      NODE_VERSION: 14
       GO_VERSION: 1.21.1
       PROJECT_NAME: dbland
     runs-on: ${{ matrix.os }}
