@@ -1,17 +1,6 @@
-# default datasource is sqlite
-#datasource: mysql
-
 # default sqlite database file is dbland.db
 #sqlite:
-#  db-file: dbland.db
-
-# default mysql database config
-#mysql:
-#  host: 127.0.0.1
-#  port: 3306
-#  username: root
-#  password: 123456
-#  database: dbland
+#  data-path: data
 
 init-schema: true
 
