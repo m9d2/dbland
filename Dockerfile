@@ -8,6 +8,7 @@ RUN set -eux; \
     apk add --no-cache bash ca-certificates curl gcc libc-dev; \
     OS=$(uname -s | tr '[:upper:]' '[:lower:]') && \
     ARCH=$(uname -m | tr '[:upper:]' '[:lower:]') && \
+    echo OS: OS \
     echo ARCH: $ARCH \
     if [ "$ARCH" = "x86_64" ]; then \
         TARGET="go$GO_VERSION.linux-amd64.tar.gz"; \
@@ -32,8 +33,6 @@ FROM alpine:3.18
 WORKDIR /app
 COPY --from=frontend /app/frontend/dist ./static
 COPY --from=backend /app/backend/dbland .
-COPY config.yaml .
-COPY README.md .
-COPY README_CN.md .
+COPY config.yaml README.md README_CN.md LICENSE ./
 EXPOSE 2023
 CMD ./dbland start -p 2023

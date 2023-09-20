@@ -81,7 +81,15 @@ jobs:
           Write-Host "Files compressed successfully!"  
 
       - name: Create Release
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
         uses: ncipollo/release-action@v1
         with:
           artifacts: ${{ env.PROJECT_NAME }}-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz
+          allowUpdates: true
+
+      - name: Create Release
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ${{ env.PROJECT_NAME }}-${{ matrix.goos }}-${{ matrix.arch }}.zip
           allowUpdates: true
