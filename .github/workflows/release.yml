@@ -39,14 +39,14 @@ jobs:
           npm install
           npm run build
           mkdir static
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            echo windows-latest
-            xcopy dist\* ..\static\ /E /I /Y
-          else
-            echo ubuntu-latest
-            mv dist/ ../static
-          fi
-          cd ..
+
+      - name: Prepare Static
+        if: ${{ matrix.os == "ubuntu-latest" || matrix.os == "macos-latest" }}
+        run: mv dist/ ../static
+
+      - name: Prepare Static
+        if: ${{ matrix.os == "windows-latest" }}
+        run: xcopy dist\* ..\static\ /E /I /Y
 
       - name: Setup Go
         uses: actions/setup-go@v2
@@ -54,23 +54,25 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Build Go Project
-        run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            go build -o dbland.exe .
-          else
-            go build -o dbland .
-          fi
+        if: ${{ matrix.os == "ubuntu-latest" || matrix.os == "macos-latest" }}
+        run: go build -o dbland .
+
+      - name: Build Go Project
+        if: ${{ matrix.os == "windows-latest" }}
+        run: go build -o dbland.exe .
+
       - name: Compress files
+        if: ${{ matrix.os == "ubuntu-latest" || matrix.os == "macos-latest" }}
+        run: tar -czvf dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz dbland config.yaml README.md README_CN.md
+
+      - name: Compress files
+        if: ${{ matrix.os == "windows-latest" }}
         run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            $sourceFiles = "dbland.exe", "config.yaml", "README.md", "README_CN.md"
-            $zipFile = "dbland-${{ matrix.goos }}-${{ matrix.arch }}.zip"
-            Add-Type -A 'System.IO.Compression.FileSystem'
-            [System.IO.Compression.ZipFile]::CreateFromDirectory($PWD, $zipFile, $null, $false)
-            Write-Host "Files compressed successfully!"
-          else
-            tar -czvf dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz dbland config.yaml README.md README_CN.md
-          fi
+          $sourceFiles = "dbland.exe", "config.yaml", "README.md", "README_CN.md"
+          $zipFile = "dbland-${{ matrix.goos }}-${{ matrix.arch }}.zip"
+          Add-Type -A 'System.IO.Compression.FileSystem'
+          [System.IO.Compression.ZipFile]::CreateFromDirectory($PWD, $zipFile, $null, $false)
+          Write-Host "Files compressed successfully!"  
 
       - name: Create Release
         uses: ncipollo/release-action@v1
