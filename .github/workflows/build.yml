@@ -62,8 +62,8 @@ jobs:
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         with:
-          asset_path: ${{ if eq(matrix.os, 'windows-latest') }}release.zip${{ else }}release.tar.gz${{ endif }}
-          asset_name: ${{ if eq(matrix.os, 'windows-latest') }}dbland-${{ matrix.os }}-${{ matrix.arch }}.zip${{ else }}dbland-${{ matrix.os }}-${{ matrix.arch }}.tar.gz${{ endif }}
-          asset_content_type: ${{ if eq(matrix.os, 'ubuntu-latest') }}application/gzip${{ else }}application/zip${{ endif }}
+          asset_path: release.tar.gz
+          asset_name: dbland-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+          asset_content_type: application/gzip
           release-tag: ${{ github.ref }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
