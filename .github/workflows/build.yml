@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
@@ -30,7 +33,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
           - macos-latest
         arch:
           - amd64
@@ -42,6 +44,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Build Vue project
+        run: |
+          cd web
+          npm install
+          npm run build
+          mkdir static
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            xcopy /E /I dist\* static\
+          else
+            cp -R dist/* static/
+          fi
+          cd ..
 
       - name: Setup Go
         uses: actions/setup-go@v2
