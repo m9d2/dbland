@@ -13,17 +13,14 @@ jobs:
         include:
           - os: ubuntu-latest
             goos: linux
-            node: 14
-            go-version: 1.21.1
           - os: macos-latest
             goos: darwin
-            node: 14
-            go-version: 1.21.1
           - os: windows-latest
             goos: windows
-            node: 14
-            go-version: 1.21.1
-
+    env:
+      NODE_VERSION: 16
+      GO_VERSION: 1.21.1
+      PROJECT_NAME: dbland
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
@@ -31,11 +28,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node }}
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Build Vue project
         run: |
@@ -59,31 +58,30 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v2
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: ${{ env.GO_VERSION }}
 
       - name: Build Go Project
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
-        run: go build -o dbland .
+        run: go build -o ${{ env.PROJECT_NAME }} .
 
       - name: Build Go Project
         if: ${{ matrix.os == 'windows-latest' }}
-        run: go build -o dbland.exe .
+        run: go build -o ${{ env.PROJECT_NAME }}.exe .
 
       - name: Compress files
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
-        run: tar -czvf dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz dbland config.yaml README.md README_CN.md
+        run: tar -czvf ${{ env.PROJECT_NAME }}-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz ${{ env.PROJECT_NAME }} config.yaml README.md README_CN.md
 
       - name: Compress files
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
-          $sourceFiles = "dbland.exe", "config.yaml", "README.md", "README_CN.md"
+          $sourceFiles = "${{ env.PROJECT_NAME }}.exe", "config.yaml", "README.md", "README_CN.md"
           $zipFile = "dbland-${{ matrix.goos }}-${{ matrix.arch }}.zip"
-          Add-Type -A 'System.IO.Compression.FileSystem'
-          [System.IO.Compression.ZipFile]::CreateFromDirectory($PWD, $zipFile, $null, $false)
+          Compress-Archive -Path $sourceFiles -DestinationPath $zipFile
           Write-Host "Files compressed successfully!"  
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: dbland-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz
+          artifacts: ${{ env.PROJECT_NAME }}-${{ matrix.goos }}-${{ matrix.arch }}.tar.gz
           allowUpdates: true
