@@ -1,4 +1,3 @@
-import './assets/main.scss'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
@@ -9,6 +8,7 @@ import router from './plugins/router'
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import i18n from './plugins/i18n'
+import './assets/main.scss'
 
 const app = createApp(App)
 

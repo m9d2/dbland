@@ -1,31 +1,11 @@
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
-
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
-
-  --vt-c-indigo: #2c3e50;
-
-  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
-  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
-
-  --vt-c-text-light-1: #fff;
-  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
-
+  --color-white: #ffffff;
   --font-size: 12px;
-  --el-font-size-base: var(--font-size);
-  --vt-c-primary: #1973ED;
+  --color-primary: #1973ED;
 }
 
 :root {
-  --color-background: var(--vt-c-white);
+  --color-background: var(--color-white);
   --color-text: #232429;
   --color-text-light: #A9AAAA;
   --color-border: #e5e7eb;
@@ -34,10 +14,12 @@
   --color-background-hover: rgba(0, 0, 0, 0.03);
   --color-text-hover: var(--vt-c-primary);
   --tree-node-hover-bg-color: rgba(0, 0, 0, 0.03);
-}
-
-.el-table {
+  --el-font-size-base: var(--font-size);
+  --el-color-primary: var(--color-primary);
+  --el-text-color-regular: var(--color-text);
   --el-table-current-row-bg-color: var(--color-background);
+  --el-button-hover-bg-color: green;
+  --el-button-hover-text-color: var(--color-text-light);
 }
 
 .dark {

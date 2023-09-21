@@ -32,7 +32,7 @@
         </List>
 
         <div class="new-query">
-          <el-button type="primary" style="width: 100%" @click="newTab(null)">{{ $t('database.button.new_query')
+          <el-button type="primary" style="width: 100%;" @click="newTab(null)">{{ $t('database.button.new_query')
           }}</el-button>
         </div>
       </div>

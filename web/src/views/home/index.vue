@@ -48,11 +48,10 @@ onMounted(() => {
   let color = localStorage.getItem('color-primary')
   if (!color) {
     const rootStyles = getComputedStyle(document.documentElement);
-    color = rootStyles.getPropertyValue('--vt-c-primary');
+    color = rootStyles.getPropertyValue('--color-primary');
   }
   const root = document.documentElement
-  root.style.setProperty('--el-color-primary', color);
-  root.style.setProperty('--vt-c-primary', color);
+  root.style.setProperty('--color-primary', color);
 })
 
 const setActiveIndex = (index: number) => {

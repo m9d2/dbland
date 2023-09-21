@@ -26,9 +26,7 @@ const language = ref('en')
 
 function setColor() {
     const root = document.documentElement
-    root.style.setProperty('--el-color-primary', themeColor.value);
-    root.style.setProperty('--vt-c-primary', themeColor.value);
-
+    root.style.setProperty('--color-primary', themeColor.value);
     // save
     localStorage.setItem('color-primary', themeColor.value)
 }
@@ -47,11 +45,8 @@ onMounted(() => {
 function restore() {
     const color = '#1973ED'
     const root = document.documentElement
-    root.style.setProperty('--el-color-primary', color);
-    root.style.setProperty('--vt-c-primary', color);
-
+    root.style.setProperty('--color-primary', color);
     themeColor.value = color
-
     localStorage.setItem('color-primary', color)
 }
 

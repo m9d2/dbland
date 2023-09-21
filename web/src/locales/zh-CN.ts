@@ -11,6 +11,8 @@ const messages = {
         refresh: '刷新',
         confirm: '确认',
         cancel: '取消',
+        export: '导入',
+        import: '导出',
     },
     database: {
         button: {

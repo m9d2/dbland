@@ -16,37 +16,61 @@
       <Console class="code" ref="consoleRef" :sql="sqlStr" />
     </div>
     <div class="table-tool" v-if="showQueryStatus">
-      <div style="margin-left: 8px;">
-        <el-tooltip effect="dark" :content="$t('common.add')">
-          <el-link :underline="false" @click="insertRow">
-            <el-icon>
-              <Plus />
-            </el-icon>
-          </el-link>
-        </el-tooltip>
+      <div style="margin: 0 8px;" class="clearfix">
+        <div class="fl">
+          <el-tooltip effect="dark" :content="$t('common.add')">
+            <el-link :underline="false" @click="insertRow">
+              <el-icon>
+                <Plus />
+              </el-icon>
+            </el-link>
+          </el-tooltip>
+        </div>
 
-        <el-tooltip effect="dark" :content="$t('common.delete')">
-          <el-link :underline="false" @click="deleteRow">
-            <el-icon style="font-weight: 700;">
-              <Minus />
-            </el-icon>
-          </el-link>
-        </el-tooltip>
+        <div class="fl">
+          <el-tooltip effect="dark" :content="$t('common.delete')">
+            <el-link :underline="false" @click="deleteRow">
+              <el-icon style="font-weight: 700;">
+                <Minus />
+              </el-icon>
+            </el-link>
+          </el-tooltip>
+        </div>
 
-        <el-tooltip effect="dark" :content="$t('common.modify')">
-          <el-link :underline="false" @click="modifyRow">
-            <el-icon style="font-weight: 700;">
-              <Edit />
-            </el-icon></el-link>
-        </el-tooltip>
 
-        <el-tooltip effect="dark" :content="$t('common.refresh')">
-          <el-link :underline="false" @click="refresh">
-            <el-icon>
-              <Refresh />
-            </el-icon>
-          </el-link>
-        </el-tooltip>
+        <div class="fl">
+          <el-tooltip effect="dark" :content="$t('common.modify')">
+            <el-link :underline="false" @click="modifyRow">
+              <el-icon style="font-weight: 700;">
+                <Edit />
+              </el-icon></el-link>
+          </el-tooltip>
+        </div>
+
+        <div class="fl">
+          <el-tooltip effect="dark" :content="$t('common.refresh')">
+            <el-link :underline="false" @click="refresh">
+              <el-icon>
+                <Refresh />
+              </el-icon>
+            </el-link>
+          </el-tooltip>
+        </div>
+
+        <div class="fr">
+          <el-dropdown>
+            <el-button size="small" style="margin-top: 3px">
+              Import<el-icon class="el-icon--right"><arrow-down /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item>csv</el-dropdown-item>
+                <el-dropdown-item>insert sql</el-dropdown-item>
+                <el-dropdown-item>excel</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
 
       </div>
     </div>
@@ -83,6 +107,7 @@ import type { QueryReq } from "@/api/connector/type";
 import type { AxiosPromise } from "axios";
 import { ElNotification } from "element-plus";
 import ContextMenu from "@imengyu/vue3-context-menu";
+import { ArrowDown } from '@element-plus/icons-vue'
 import {
   Plus,
   Edit,
@@ -178,7 +203,7 @@ async function handlerConfirm(formData: any) {
   if (actionType == ActionTypeEnum.MODIFY) {
     if (!currentRow) {
       ElNotification({
-        message: 'please choose row',
+        message: 'No rows selected',
         type: 'error'
       })
     }
@@ -405,5 +430,12 @@ function tableDbClick(row: any, column: any, event: any) {
       color: var(--color-text);
     }
   }
+}
+
+.iconfont {
+  //color: var(--color-text);
+}
+.el-dropdown {
+  height: 30px;
 }
 </style>

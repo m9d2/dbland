@@ -81,6 +81,6 @@ function handlerCurrentChange(currentRow: any) {
 }
 
 .current-row {
-  background-color: var(--color-background-deep)!important;
+  background-color: green!important;
 }
 </style>

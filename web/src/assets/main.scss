@@ -20,7 +20,7 @@ li {
 
 @font-face {
   font-family: 'iconfont';
-  src: url('./font/iconfont.ttf?t=1693292874058') format('truetype');
+  src: url('iconfont.ttf?t=1693292874058') format('truetype');
 }
 
 .fl {
@@ -35,4 +35,9 @@ li {
   content: "";
   display: table;
   clear: both;
+}
+
+.el-button:hover, .el-button:focus {
+  --el-button-hover-bg-color: var(--el-color-primary);
+
 }

@@ -11,6 +11,8 @@ const messages = {
         refresh: 'Refresh',
         confirm: 'Confirm',
         cancel: 'Cancel',
+        export: 'Export',
+        import: 'Import',
     },
     database: {
         button: {
@@ -29,13 +31,13 @@ const messages = {
     setting: {
         title: 'Setting',
         menu: {
-            basic: 'Basic Settings',
+            basic: 'Basic',
             other: 'About'
         },
         basic: {
-            color: 'Setting theme color',
-            restore: 'Restore default',
-            select_language: 'Select Language',
+            color: 'Color',
+            restore: 'Default',
+            select_language: 'Language',
         }
     }
 }
