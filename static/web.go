@@ -2,5 +2,5 @@ package static
 
 import "embed"
 
-//go:embed index.html assets/* favicon.ico
+//go:embed *
 var Static embed.FS
