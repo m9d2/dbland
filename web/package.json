@@ -1,14 +1,12 @@
 {
   "name": "web",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "vite",
-    "test": "vite --mode test",
-    "prod": "vite --mode prod",
+    "release": "vite --mode release",
     "build": "vite build",
-    "build:test": "vite build --mode test",
-    "build:prod": "vite build --mode prod",
+    "build:release": "vite build --mode release",
     "preview": "vite preview"
   },
   "dependencies": {

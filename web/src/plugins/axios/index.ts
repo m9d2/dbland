@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseUrl = window.location.origin
+const baseUrl = import.meta.env.MODE == "release" ? window.location.origin : import.meta.env.VITE_SERVER
 const request = axios.create({
     baseURL: baseUrl,
     timeout: 10000,

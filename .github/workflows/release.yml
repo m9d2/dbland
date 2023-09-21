@@ -40,7 +40,7 @@ jobs:
         run: |
           cd web
           npm install
-          npm run build
+          npm run build release
           mkdir static
 
       - name: Prepare Static
