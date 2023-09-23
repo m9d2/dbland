@@ -22,12 +22,11 @@ defineProps({
 <style lang="scss" scoped>
 ul li:not(:first-child) {
   margin: 8px 0;
-  background-color: red;
 }
 
 li {
   border-radius: 5px;
-  background-color: var(--color-background-deep);
+  background-color: var(--db-c-bg-nav);
   text-align: center;
   height: 40px;
   line-height: 40px;
@@ -35,15 +34,15 @@ li {
 }
 
 li:hover {
-  background-color: var(--color-background-hover)
+  background-color: var(--db-c-bg-hover)
 }
 
 span {
-  color: var(--color-text)
+  color: var(--db-c-text-menu)
 }
 
 span:hover {
-  color: var(--color-text-hover);
+  color: var(--db-c-text-hover);
 }
 
 .iconfont {

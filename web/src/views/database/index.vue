@@ -1,11 +1,10 @@
 <template>
   <div class="content-box">
     <div class="header"
-      style="padding: 0 8px;background-color: var(--color-background-deep); border-bottom: 1px solid var(--color-border); height: 30px; line-height: 30px;">
+      style="padding: 0 8px;background-color: var(--db-c-bg-nav); border-bottom: 1px solid var(--db-c-border); height: 30px; line-height: 30px;">
       <el-breadcrumb :separator-icon="ArrowRight"
-        style="height: 30px; line-height: 30px; font-size: var(--font-size); color: var(--color-text)">
-        <el-breadcrumb-item v-if="firstData" :to="{ path: '/' }" @click="loadConfigs">{{ $t('common.homepage')
-        }}</el-breadcrumb-item>
+        style="height: 30px; line-height: 30px; font-size: var(--font-size); color: var(--db-c-text)">
+        <el-breadcrumb-item v-if="firstData" :to="{ path: '/' }" @click="loadConfigs">{{ $t('common.homepage') }}</el-breadcrumb-item>
         <el-breadcrumb-item v-show="firstData" @click="back" :to="{ path: '/' }">{{ firstData }}</el-breadcrumb-item>
         <el-breadcrumb-item>{{ seconedData }}</el-breadcrumb-item>
       </el-breadcrumb>
@@ -32,8 +31,7 @@
         </List>
 
         <div class="new-query">
-          <el-button type="primary" style="width: 100%;" @click="newTab(null)">{{ $t('database.button.new_query')
-          }}</el-button>
+          <el-button type="primary" style="width: 100%;" @click="newTab(null)">{{ $t('database.button.new_query') }}</el-button>
         </div>
       </div>
       <div class="content-right">
@@ -217,7 +215,7 @@ const filterNode = (value: string, data: Tree) => {
   height: 100%;
 
   .header {
-    color: var(--color-text);
+    color: var(--db-c-text-1);
 
     .el-link {
       font-size: var(--font-size);
@@ -238,9 +236,9 @@ const filterNode = (value: string, data: Tree) => {
   height: 100%;
   width: 220px;
   min-width: 220px;
-  border-right: 1px solid var(--color-border);
-  color: var(--color-text) !important;
-  background-color: var(--color-background-deep);
+  border-right: 1px solid var(--db-c-border);
+  color: var(--db-c-text-menu);
+  background-color: var(--db-c-bg-nav);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -274,7 +272,7 @@ const filterNode = (value: string, data: Tree) => {
 
   .logo-text {
     font-size: 26px;
-    color: var(--color-text);
+    color: var(--db-c-text);
     opacity: 0.15;
     font-weight: 900;
   }
@@ -285,5 +283,6 @@ const filterNode = (value: string, data: Tree) => {
   height: 100%;
   overflow: hidden;
   margin: 0 8px;
+  background-color: var(--db-c-bg);
 }
 </style>

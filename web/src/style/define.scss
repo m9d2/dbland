@@ -1,0 +1,54 @@
+:root {
+  --font-size: 14px;
+  --db-c-primary-light: #1973ed;
+  --db-c-primary-dark: #409EFF;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --db-c-border-light: #e5e7eb;
+  --db-c-text-light: #232429;
+  --db-c-text-light-2: rgba(60, 60, 67, .75);
+  --db-c-text-hover-light: var(--db-c-primary-light);
+  --db-c-text-hover-dark: var(--db-c-primary-dark);
+  --db-c-bg-light: #ffffff;
+  --db-c-bg-light-2: #f6f6f7;
+  --db-c-bg-hover-light: rgba(0, 0, 0, 0.03);
+  --db-c-bg-mute-light: #eeeef0;
+
+  --db-c-border-dark: #232429;
+  --db-c-text-dark: #E5EAF3;
+  --db-c-text-dark-2: #E5EAF3;
+  --db-c-text-hover: var(--db-c-primary);
+  --db-c-bg-dark: #141414;
+  --db-c-bg-dark-2: #141414;
+  --db-c-bg-hover-dark: #262727;
+  --db-c-bg-mute-dark: #323238;
+
+}
+
+.light {
+  --db-c-primary: var(--db-c-primary-light);
+  --db-c-border: var(--db-c-border-light);
+  --db-c-text: var(--db-c-text-light);
+  --db-c-text-hover: var(--db-c-text-hover-dark);
+  --db-c-text-nav: var(--db-c-text-light);
+  --db-c-text-menu: var(--db-c-text-light);
+  --db-c-bg: var(--db-c-bg-light);
+  --db-c-bg-nav: var(--db-c-bg-light-2);
+  --db-c-bg-mute: var(--db-c-bg-mute-light);
+  --db-c-bg-hover: var(--db-c-bg-hover-light);
+}
+
+.dark {
+  --db-c-primary: var(--db-c-primary-dark);
+  --db-c-border: var(--db-c-border-dark);
+  --db-c-text: var(--db-c-text-dark);
+  --db-c-text-hover: var(--db-c-text-hover-dark);
+  --db-c-text-nav: var(--db-c-text-dark-2);
+  --db-c-text-menu: var(--db-c-text-dark-2);
+  --db-c-bg: var(--db-c-bg-dark);
+  --db-c-bg-nav: var(--db-c-bg-dark-2);
+  --db-c-bg-mute: var(--db-c-bg-mute-dark);
+  --db-c-bg-hover: var(--db-c-bg-hover-dark);
+}

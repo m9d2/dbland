@@ -306,6 +306,7 @@ async function querySql() {
 function tableDbClick(row: any, column: any, event: any) {
   event.preventDefault();
   ContextMenu.showContextMenu({
+    theme: 'flat',
     x: event.x,
     y: event.y,
     items: [
@@ -385,7 +386,7 @@ function tableDbClick(row: any, column: any, event: any) {
 .table-tool {
   height: 30px;
   min-height: 30px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--db-c-border);
   border-bottom: none;
   line-height: 30px;
 
@@ -405,7 +406,7 @@ function tableDbClick(row: any, column: any, event: any) {
   height: 36px;
   min-height: 36px;
   line-height: 36px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--db-c-border);
   border-top: none;
 
   .status-left {
@@ -427,15 +428,23 @@ function tableDbClick(row: any, column: any, event: any) {
     margin-right: 8px;
 
     .el-icon {
-      color: var(--color-text);
+      color: var(--db-c-text-1);
     }
   }
 }
 
 .iconfont {
-  //color: var(--color-text);
+  //color: var(--db-c-text-1);
 }
 .el-dropdown {
   height: 30px;
+}
+
+.mx-context-menu-item .label {
+  font-size: 12px;
+}
+
+.mx-context-menu {
+  font-weight: var(--font-family);
 }
 </style>

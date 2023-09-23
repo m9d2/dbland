@@ -34,13 +34,16 @@ func start() {
 	repository.Initialize()
 
 	slog.Info("Start server", "port", port)
+	var err error
 	go func() {
-		err := r.Run(":" + strconv.Itoa(port))
+		err = r.Run(":" + strconv.Itoa(port))
 		if err != nil {
+			slog.Error(err.Error())
 			return
+		} else {
+			slog.Info("Service started successfully!")
 		}
 	}()
-	slog.Info("Service started successfully!")
 	select {}
 }
 

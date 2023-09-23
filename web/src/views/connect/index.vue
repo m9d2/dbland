@@ -163,9 +163,9 @@ async function clickConfig(index: number) {
   height: 100%;
   width: 220px;
   min-width: 220px;
-  border-right: 1px solid var(--color-border);
-  color: var(--color-text) !important;
-  background-color: var(--color-background-deep);
+  border-right: 1px solid var(--db-c-border);
+  color: var(--db-c-text-menu);
+  background-color: var(--db-c-bg-nav);
   position: relative;
   display: flex;
   flex-direction: column;

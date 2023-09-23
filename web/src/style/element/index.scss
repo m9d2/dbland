@@ -1,0 +1,16 @@
+@import 'element-plus/dist/index.css';
+@import 'element-plus/theme-chalk/dark/css-vars.css';
+
+ :root {
+   --el-button-hover-bg-color: var(--db-c-bg-hover);
+   --el-font-size-base: var(--font-size);
+   --el-color-primary: var(--db-c-primary);
+   --el-table-current-row-bg-color: var(--db-c-bg-hover);
+   --el-button-hover-text-color: var(--db-c-text-hover);
+   --el-text-color-primary: var(--db-c-text);
+   --el-button-bg-color: var(--db-c-primary);
+   --el-button-border-color: var(--db-c-primary);
+ }
+.el-button {
+  background-color: var(--db-c-primary);
+}

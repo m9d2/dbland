@@ -13,6 +13,7 @@ const messages = {
         cancel: '取消',
         export: '导入',
         import: '导出',
+        save: '保存',
     },
     database: {
         button: {
@@ -35,9 +36,10 @@ const messages = {
             other: '关于'
         },
         basic: {
-            color: '设置主题颜色',
+            color: '全局主题颜色',
             restore: '恢复默认',
             select_language: '选择语言',
+            font_size: '字体大小',
         }
     }
 }

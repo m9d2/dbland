@@ -4,13 +4,12 @@
             v-for="(item, index) in list">
             <div :value="index" class="d-row-content" @mouseover="handleMouseEnter(index)"
                 @dblclick.prevent="handleDoubleClick(index, item)" @mouseleave="handleMouseLeave(index)">
-                <div class="d-row-bigin">
+                <div class="d-row-begin">
                     <slot name="begin" :node="item">
-
                     </slot>
                 </div>
                 <span class="d-row-name" :style="rowNameStyle">{{ item.name }}</span>
-                <div class="d-row-meun">
+                <div class="d-row-menu">
                     <slot :index="index">
                     </slot>
                 </div>
@@ -30,7 +29,7 @@ const props = defineProps({
     rowStyle: Object,
 })
 
-const emuis = defineEmits(["node-click", 'node-mouse-enter', 'node-mouse-leave', 'node-db-click']);
+const emits = defineEmits(["node-click", 'node-mouse-enter', 'node-mouse-leave', 'node-db-click']);
 
 function nodeClick(index: number, row: Item) {
     if (props.list) {
@@ -38,19 +37,19 @@ function nodeClick(index: number, row: Item) {
             props.list[i].active = i === index;
         }
     }
-    emuis('node-click', index, row)
+  emits('node-click', index, row)
 }
 
 function handleMouseEnter(index: number) {
-    emuis('node-mouse-enter', index)
+  emits('node-mouse-enter', index)
 }
 
 function handleDoubleClick(index: number, row: any) {
-    emuis('node-db-click', index, row)
+  emits('node-db-click', index, row)
 }
 
 function handleMouseLeave(index: number) {
-    emuis('node-mouse-leave', index)
+  emits('node-mouse-leave', index)
 }
 </script>
 
@@ -75,15 +74,24 @@ function handleMouseLeave(index: number) {
         .d-row-name {
             user-select:none;
         }
+        .d-row-name:hover {
+          color: var(--db-c-text-hover);
+        }
+        .d-row-begin >*:hover {
+          color: var(--db-c-text-hover);
+        }
+        .d-row-menu:hover {
+          color: var(--db-c-text-hover);
+        }
     }
 
     .d-list-row:hover {
-        background-color: var(--tree-node-hover-bg-color);
+        background-color: var(--db-c-bg-hover);
     }
 
     .active {
-        color: var(--color-text-hover);
-        background-color: var(--tree-node-hover-bg-color);
+        color: var(--db-c-text-hover);
+        background-color: var(--db-c-bg-hover);
     }
 }
 </style>

@@ -52,6 +52,7 @@ const initEditor = () => {
     autoClosingBrackets: 'always',
     autoClosingOvertype: 'always',
     autoClosingQuotes: 'always',
+    contextmenu: false, //右键菜单
   })
 
   monaco.languages.registerCompletionItemProvider('sql', {

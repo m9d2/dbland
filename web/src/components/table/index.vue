@@ -73,11 +73,11 @@ function handlerCurrentChange(currentRow: any) {
 }
 
 .header-cell {
-  background-color: var(--color-background-deep)!important;
+  background-color: var(--db-c-bg-nav)!important;
   font-weight: 700;
 }
 .header-row {
-  color: var(--color-text);
+  color: var(--db-c-text-1);
 }
 
 .current-row {

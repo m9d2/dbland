@@ -103,14 +103,14 @@ defineExpose({ newTab })
 }
 
 .el-tabs__nav-scroll {
-  background-color: var(--color-background-deep);
-  border-left: 1px solid var(--color-border);
-  border-right: 1px solid var(--color-border);
+  background-color: var(--db-c-bg-nav);
+  border-left: 1px solid var(--db-c-border);
+  border-right: 1px solid var(--db-c-border);
   padding: 0 8px;
 }
 
 .el-tabs__item {
-  border-right: 1px solid var(--color-border);
+  border-right: 1px solid var(--db-c-border);
 }
 
 .el-tabs__item:last-child {

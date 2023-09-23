@@ -2,7 +2,7 @@
   <div class="main">
     <div class="left">
       <div class="logo">
-        <a href="#" style="color: var(--color-text); font-size: 14px; font-weight: bold">
+        <a href="#" style="color: var(--db-c-text); font-size: 14px; font-weight: bold">
           <el-image style="width: 40px; height: 40px" :src="logo" />
         </a>
       </div>
@@ -33,25 +33,30 @@ import {
   Setting,
 } from '@element-plus/icons-vue'
 import { onMounted } from 'vue';
-import i18n from '@/plugins/i18n'
 import logo from '@/assets/img/logo.svg'
 
 const menuItems = [
   { route: '/', icon: Coin },
   { route: '/connect', icon: Edit },
-  // { route: '/chart', icon: Monitor },
+  { route: '/chart', icon: Monitor },
   { route: '/setting', icon: Setting }
 ]
 let activeIndex: number
 
 onMounted(() => {
-  let color = localStorage.getItem('color-primary')
-  if (!color) {
-    const rootStyles = getComputedStyle(document.documentElement);
-    color = rootStyles.getPropertyValue('--color-primary');
-  }
   const root = document.documentElement
-  root.style.setProperty('--color-primary', color);
+  // theme color
+  let color = localStorage.getItem('color-primary')
+  if (color) {
+    root.style.setProperty('--db-c-primary', color);
+  }
+
+  // font size
+  let fontSize = localStorage.getItem('font-size')
+  if (fontSize) {
+    root.style.setProperty('--font-size', fontSize);
+  }
+
 })
 
 const setActiveIndex = (index: number) => {
@@ -69,8 +74,8 @@ const setActiveIndex = (index: number) => {
   .left {
     width: 68px;
     min-width: 68px;
-    background-color: var(--color-background-deep);
-    border: 1px solid var(--color-border);
+    background-color: var(--db-c-bg-nav);
+    border: 1px solid var(--db-c-border);
     border-top: none;
     height: 100vh;
 
@@ -100,7 +105,7 @@ ul li:not(:first-child) {
 
 li {
   border-radius: 5px;
-  background-color: var(--color-background-deep);
+  background-color: var(--db-c-bg-nav);
   height: 40px;
   margin: 8px;
   display: flex;
@@ -109,21 +114,21 @@ li {
 
   .el-icon {
     font-size: 28px;
-    color: var(--color-text);
+    color: var(--db-c-text-nav);
   }
 
   .el-icon:hover {
-    color: var(--color-text-hover);
+    color: var(--db-c-text-hover);
   }
 }
 
 li:hover {
-  background-color: var(--color-background-hover);
+  background-color: var(--db-c-bg-hover);
 }
 
 .active {
-  background-color: var(--color-background-hover);
-  color: var(--color-text-hover);
+  background-color: var(--db-c-bg-hover);
+  color: var(--db-c-text-hover);
 }
 
 .iconfont {

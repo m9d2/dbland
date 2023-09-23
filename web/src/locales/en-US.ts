@@ -13,6 +13,7 @@ const messages = {
         cancel: 'Cancel',
         export: 'Export',
         import: 'Import',
+        save: 'Save',
     },
     database: {
         button: {
@@ -35,9 +36,10 @@ const messages = {
             other: 'About'
         },
         basic: {
-            color: 'Color',
+            color: 'Global Theme Colors',
             restore: 'Default',
             select_language: 'Language',
+            font_size: 'Font size',
         }
     }
 }

@@ -1,6 +1,6 @@
 @font-face {
   font-family: "iconfont"; /* Project id  */
-  src: url('iconfont.ttf?t=1694184942531') format('truetype');
+  src: url('iconfont.ttf?t=1695354286689') format('truetype');
 }
 
 .iconfont {
@@ -11,8 +11,64 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-setting:before {
+  content: "\e78e";
+}
+
+.icon-edit-square:before {
+  content: "\e791";
+}
+
+.icon-export:before {
+  content: "\e792";
+}
+
+.icon-Import:before {
+  content: "\e793";
+}
+
+.icon-user:before {
+  content: "\e7ae";
+}
+
+.icon-linechart:before {
+  content: "\e7af";
+}
+
+.icon-database:before {
+  content: "\e7b0";
+}
+
+.icon-table:before {
+  content: "\e7de";
+}
+
+.icon-indent:before {
+  content: "\e7f3";
+}
+
+.icon-outdent:before {
+  content: "\e7f4";
+}
+
+.icon-ellipsis:before {
+  content: "\e7fc";
+}
+
+.icon-desktop:before {
+  content: "\e842";
+}
+
+.icon-github-fill:before {
+  content: "\e885";
+}
+
 .icon-mysql:before {
   content: "\ec6d";
+}
+
+.icon-Alignment-hover:before {
+  content: "\e611";
 }
 
 .icon-biaoge:before {
