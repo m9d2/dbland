@@ -8,7 +8,6 @@ import 'monaco-editor/esm/vs/basic-languages/sql/sql.contribution';
 import {language as sqlLanguage} from 'monaco-editor/esm/vs/basic-languages/sql/sql';
 import {onMounted, ref, nextTick} from 'vue'
 import { generateRandomString } from '@/common/utils'
-import { string } from 'node_modules/sql-formatter/lib/src/lexer/regexFactory';
 let editor:any
 const id = ref()
 
