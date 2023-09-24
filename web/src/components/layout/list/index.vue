@@ -77,15 +77,10 @@ function handleMouseLeave(index: number) {
         .d-row-name:hover {
           color: var(--db-c-text-hover);
         }
-        .d-row-begin >*:hover {
-          color: var(--db-c-text-hover);
-        }
-        .d-row-menu:hover {
-          color: var(--db-c-text-hover);
-        }
     }
 
     .d-list-row:hover {
+        color: var(--db-c-text-hover);
         background-color: var(--db-c-bg-hover);
     }
 

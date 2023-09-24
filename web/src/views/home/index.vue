@@ -32,9 +32,10 @@ import {
   Monitor,
   Setting,
 } from '@element-plus/icons-vue'
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import logo from '@/assets/img/logo.svg';
 import { useDark, useToggle } from '@vueuse/core'
+import { useRoute } from 'vue-router';
 
 
 const menuItems = [
@@ -43,12 +44,18 @@ const menuItems = [
   // { route: '/chart', icon: Monitor },
   { route: '/setting', icon: Setting }
 ]
-let activeIndex: number
+
 const isDark = useDark({
-  storageKey: "theme",
-  valueDark: "dark",
-  valueLight: "light",
-});
+    storageKey: "theme",
+    valueDark: "dark",
+    valueLight: "light",
+  });
+const route = useRoute();
+let activeIndex: number = findMenuItemIndex(route.path)
+
+function findMenuItemIndex(route: string): number {
+  return menuItems.findIndex(item => item.route === route);
+}
 
 onMounted(() => {
   const root = document.documentElement
@@ -57,9 +64,11 @@ onMounted(() => {
   if (color) {
     root.style.setProperty('--db-c-primary', color);
     const currentColor = root.style.getPropertyValue('--db-c-primary').trim();
+    console.log(currentColor)
     const rgbaArray = currentColor.match(/\d+/g);
     rgbaArray[3] = 0.8;
     const newColor = "rgba(" + rgbaArray.join(", ") + ")";
+    console.log(newColor)
     root.style.setProperty('--el-color-primary-light-3', newColor);
     root.style.setProperty('--el-color-primary-light-5', newColor);
     root.style.setProperty('--el-color-primary-dark-2', newColor);

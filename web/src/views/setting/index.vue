@@ -13,15 +13,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import List from '@/components/layout/list/index.vue'
 import { useRouter } from 'vue-router'
 import i18n from '@/plugins/i18n'
 
 const router = useRouter()
+const settings = ref<any>([]);
 
-const settings = ref(
-  [
+onMounted(() => {
+  settings.value = [
     {
       name: i18n.global.t('setting.menu.basic'),
       path: '/setting'
@@ -30,8 +31,8 @@ const settings = ref(
       name: i18n.global.t('setting.menu.other'),
       path: '/about'
     }
-  ]
-)
+  ];
+});
 
 function nodeClick(index: number, row: any) {
   router.replace(row.path)

@@ -1,5 +1,5 @@
 :root {
-  --font-size: 14px;
+  --font-size: 12px;
   --db-c-primary: rgba(25,115,237,1);
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
@@ -38,7 +38,7 @@
 }
 
 .dark {
-  --db-c-primary: rgba(64,158,255,1.000);
+  --db-c-primary: rgba(64, 158, 255, 1);
   --db-c-border: var(--db-c-border-dark);
   --db-c-text: var(--db-c-text-dark);
   --db-c-text-hover: var(--db-c-text-hover-dark);

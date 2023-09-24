@@ -8,6 +8,7 @@ import 'monaco-editor/esm/vs/basic-languages/sql/sql.contribution';
 import {language as sqlLanguage} from 'monaco-editor/esm/vs/basic-languages/sql/sql';
 import {onMounted, ref, nextTick} from 'vue'
 import { generateRandomString } from '@/common/utils'
+import { string } from 'node_modules/sql-formatter/lib/src/lexer/regexFactory';
 let editor:any
 const id = ref()
 
@@ -20,13 +21,19 @@ onMounted(() => {
   nextTick(() => {
     initEditor()
   })
-
 })
 
 const initEditor = () => {
+  let localTheme = localStorage.getItem('theme')
+  let theme = 'vs'
+  if (localTheme) {
+    if (localTheme == 'dark') {
+      theme = 'vs-dark'
+    }
+  }
   editor = monaco.editor.create(document.getElementById(id.value), {
     value: props.sql,
-    theme: 'vs', // 官方自带三种主题vs, hc-black, or vs-dark
+    theme: theme, // 官方自带三种主题vs, hc-black, or vs-dark
     minimap: { // 关闭小地图
       enabled: false,
     },

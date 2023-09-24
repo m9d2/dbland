@@ -14,6 +14,8 @@ type ExecutionLog struct {
 	Sql         string    `json:"sql,omitempty"`
 	Status      int       `json:"status,omitempty"`
 	Cost        float64   `json:"cost,omitempty"`
+	Ip          string    `json:"ip"`
+	UserAgent   string    `json:"user_agent"`
 	CreatedTime time.Time `json:"created_time,omitempty"`
 }
 

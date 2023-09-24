@@ -127,6 +127,7 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 
 	var sqlStr = ""
 	if req.Page == 0 && req.Size == 0 {
+		sqlStr = req.Sql
 		result, err = connector.Query(db, req.Sql)
 		if err != nil {
 			return nil, err
@@ -158,7 +159,8 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 
 	// save log
 	req.Sql = sqlStr
-	go s.saveExecutionLog(&req, cost, err)
+	println(c.Request.UserAgent())
+	go s.saveExecutionLog(&req, cost, c.ClientIP(), c.Request.UserAgent(), err)
 	return result, err
 }
 
@@ -176,7 +178,7 @@ func (s ConnectorService) Execute(c *gin.Context) (int, error) {
 	return connector.Execute(db, req.Sql)
 }
 
-func (s ConnectorService) saveExecutionLog(queryReq *QueryReq, cost float64, err error) {
+func (s ConnectorService) saveExecutionLog(queryReq *QueryReq, cost float64, ip string, userAgent string, err error) {
 	var status int
 	if err != nil {
 		status = model.ExecutionLogFail
@@ -205,6 +207,8 @@ func (s ConnectorService) saveExecutionLog(queryReq *QueryReq, cost float64, err
 		Database:    queryReq.Database,
 		Sql:         queryReq.Sql,
 		Cost:        cost,
+		Ip:          ip,
+		UserAgent:   userAgent,
 		CreatedTime: time.Now(),
 	}
 	s.executionLogRepository.Save(tx, log)

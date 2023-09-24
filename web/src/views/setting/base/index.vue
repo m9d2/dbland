@@ -36,7 +36,15 @@
 import { onMounted, reactive } from 'vue'
 import { useDark, useToggle } from '@vueuse/core'
 
-const defaultColor = 'rgba(25,115,237,1)'
+
+let localTheme = localStorage.getItem('theme')
+let defaultColor = 'rgba(25,115,237,1)'
+if (localTheme) {
+  if (localTheme == 'dark') {
+    defaultColor = 'rgba(64, 158, 255, 1)'
+  }
+}
+
 const root = document.documentElement
 const form = reactive({
   themeColor: defaultColor,
@@ -91,9 +99,11 @@ function onSubmit() {
     localStorage.setItem('font-size', form.fontSize)
   }
 
+  // theme
   if (form.theme) {
     localStorage.setItem('theme', form.theme)
     if (form.theme == 'dark') {
+      isDark.value = true
       useToggle(isDark);
     } else {
       isDark.value = false

@@ -16,11 +16,18 @@
           <el-input v-model="filterText" style="height: 32px" :placeholder="placeholder" size="small" />
         </div>
 
-        <List class="menu-list" :list="listData" @node-click="clickNode" :row-name-style="{ fontWeight: 400 }"
+        <List class="menu-list" :list="listData" @node-click="clickNode"
           :row-style="{ height: '26px', lineHeight: '26px', marginTop: '0' }" @node-mouse-enter="handleMouseEnter"
           @node-mouse-leave="handleMouseLeave" @node-db-click="handleNodeDblClick">
 
           <template #begin="{ node }">
+            <el-icon v-show="node.level == TreeLevelEnum.CONFIG" class="iconfont" style="margin: 5px">
+              <span v-show="node.type == DbTypeEnum.MySQL" class="iconfont">&#xec6d;</span>
+              <span v-show="node.type == DbTypeEnum.SQLite" class="iconfont">&#xe65a;</span>
+              <span v-show="node.type == DbTypeEnum.ORACLE" class="iconfont">&#xec48;</span>
+              <span v-show="node.type == DbTypeEnum.PostgreSQL" class="iconfont">&#xe8b7;</span>
+              <span v-show="node.type == DbTypeEnum.MariaDB" class="iconfont">&#xec6d;</span>
+            </el-icon>
             <el-icon v-show="node.level == TreeLevelEnum.DATABASE" class="iconfont" style="margin: 5px">
               <Coin />
             </el-icon>
@@ -31,7 +38,7 @@
         </List>
 
         <div class="new-query">
-          <el-button type="primary" style="width: 100%;" @click="newTab(null)">{{ $t('database.button.new_query') }}</el-button>
+          <el-button type="primary" style="width: 100%;" @click="newTab('')">{{ $t('database.button.new_query') }}</el-button>
         </div>
       </div>
       <div class="content-right">
@@ -57,6 +64,7 @@ import i18n from '@/plugins/i18n'
 import type { AxiosPromise } from "axios";
 import List from '@/components/layout/list/index.vue'
 import { TreeLevelEnum } from "@/common/enums";
+import { DbTypeEnum } from '@/common/enums'
 
 const treeRef = ref<InstanceType<typeof ElTree>>();
 // data
@@ -274,7 +282,6 @@ const filterNode = (value: string, data: Tree) => {
     font-size: 26px;
     color: var(--db-c-text);
     opacity: 0.15;
-    font-weight: 900;
   }
 }
 

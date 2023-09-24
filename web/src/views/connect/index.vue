@@ -4,6 +4,15 @@
       <span style="text-align: center;font-size: 20px; font-weight: bold; margin: 20px 0">{{ $t('connect.title') }}</span>
       <List :list="configs" style="margin: 0 20px;" @node-click="clickConfig" @node-mouse-enter="handleMouseEnter"
         @node-mouse-leave="handleMouseLeave">
+        <template #begin="{ node }">
+            <el-icon class="iconfont" style="margin: 5px">
+              <span v-show="node.type == DbTypeEnum.MySQL" class="iconfont">&#xec6d;</span>
+              <span v-show="node.type == DbTypeEnum.SQLite" class="iconfont">&#xe65a;</span>
+              <span v-show="node.type == DbTypeEnum.ORACLE" class="iconfont">&#xec48;</span>
+              <span v-show="node.type == DbTypeEnum.PostgreSQL" class="iconfont">&#xe8b7;</span>
+              <span v-show="node.type == DbTypeEnum.MariaDB" class="iconfont">&#xec6d;</span>
+            </el-icon>
+        </template>
         <template #default="{ index }">
           <el-dropdown style="vertical-align: center;" size="small" trigger="click">
             <el-link v-show="index === activeIndex" :underline="false" :icon="ArrowDown" />
@@ -89,13 +98,13 @@ function loadConfigs() {
   }
 }
 
-async function deleteConfig(index) {
+async function deleteConfig(index: any) {
   try {
     const id = configs.value[index].id
     console.log(id)
     await deleteById(id)
     loadConfigs()
-  } catch (error) {
+  } catch (error: any) {
     ElNotification({
       message: error.message,
       type: 'error'

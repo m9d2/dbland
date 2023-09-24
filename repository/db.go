@@ -52,6 +52,8 @@ func executeSQL() error {
 			"sql" TEXT,
 			"status" integer,
 			"cost" integer,
+			"ip" TEXT,
+			"user_agent" TEXT,
 			"created_time" DATE
 		);
 	`
