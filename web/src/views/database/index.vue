@@ -6,7 +6,7 @@
         style="height: 30px; line-height: 30px; font-size: var(--font-size); color: var(--db-c-text)">
         <el-breadcrumb-item v-if="firstData" :to="{ path: '/' }" @click="loadConfigs">{{ $t('common.homepage') }}</el-breadcrumb-item>
         <el-breadcrumb-item v-show="firstData" @click="back" :to="{ path: '/' }">{{ firstData }}</el-breadcrumb-item>
-        <el-breadcrumb-item>{{ seconedData }}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ secondData }}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
 
@@ -86,7 +86,7 @@ const childRef = ref();
 const placeholder = i18n.global.t('common.search')
 const listData = ref()
 const firstData = ref()
-const seconedData = ref()
+const secondData = ref()
 let currentCid: number
 let currentConfig: Object
 let currentDatabase: Object
@@ -108,7 +108,7 @@ function newTab(table: string) {
 }
 
 function back() {
-  seconedData.value = ''
+  secondData.value = ''
   loadDatabases(currentCid)
 }
 
@@ -133,7 +133,7 @@ function clickNode(index: number, row: any) {
   }
   if (level == TreeLevelEnum.DATABASE) {
     loadTables(row.cid, row.name)
-    seconedData.value = row.name
+    secondData.value = row.name
     currentDatabase = row
   }
 }
@@ -164,7 +164,7 @@ function loadConfigs() {
     })
   } finally {
     firstData.value = ''
-    seconedData.value = ''
+    secondData.value = ''
   }
 }
 

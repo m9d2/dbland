@@ -33,7 +33,9 @@ import {
   Setting,
 } from '@element-plus/icons-vue'
 import { onMounted } from 'vue';
-import logo from '@/assets/img/logo.svg'
+import logo from '@/assets/img/logo.svg';
+import { useDark, useToggle } from '@vueuse/core'
+
 
 const menuItems = [
   { route: '/', icon: Coin },
@@ -42,6 +44,11 @@ const menuItems = [
   { route: '/setting', icon: Setting }
 ]
 let activeIndex: number
+const isDark = useDark({
+  storageKey: "theme",
+  valueDark: "dark",
+  valueLight: "light",
+});
 
 onMounted(() => {
   const root = document.documentElement
@@ -49,6 +56,14 @@ onMounted(() => {
   let color = localStorage.getItem('color-primary')
   if (color) {
     root.style.setProperty('--db-c-primary', color);
+    const currentColor = root.style.getPropertyValue('--db-c-primary').trim();
+    const rgbaArray = currentColor.match(/\d+/g);
+    rgbaArray[3] = 0.8;
+    const newColor = "rgba(" + rgbaArray.join(", ") + ")";
+    root.style.setProperty('--el-color-primary-light-3', newColor);
+    root.style.setProperty('--el-color-primary-light-5', newColor);
+    root.style.setProperty('--el-color-primary-dark-2', newColor);
+    root.style.setProperty('--el-color-primary-light-7', color);
   }
 
   // font size
@@ -57,6 +72,10 @@ onMounted(() => {
     root.style.setProperty('--font-size', fontSize);
   }
 
+  let theme = localStorage.getItem('theme')
+  if (theme) {
+    useToggle(isDark)
+  }
 })
 
 const setActiveIndex = (index: number) => {

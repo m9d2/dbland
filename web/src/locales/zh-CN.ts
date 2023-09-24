@@ -40,6 +40,10 @@ const messages = {
             restore: '恢复默认',
             select_language: '选择语言',
             font_size: '字体大小',
+            theme: '主题',
+            dark: '暗黑模式',
+            light: '明亮模式',
+            auto: '自动',
         }
     }
 }

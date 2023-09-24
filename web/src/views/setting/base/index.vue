@@ -2,7 +2,7 @@
   <div class="base-box">
     <el-form :model="form" label-width="auto" label-position="left">
       <el-form-item :label="$t('setting.basic.color')">
-        <el-color-picker v-model="form.themeColor" />
+        <el-color-picker v-model="form.themeColor" show-alpha/>
         <el-link style="margin-left: 8px;" @click="restore">{{ $t('setting.basic.restore') }}</el-link>
       </el-form-item>
       <el-form-item :label="$t('setting.basic.select_language')">
@@ -15,6 +15,16 @@
         <el-input v-model="form.fontSize" size="small" style="width: 181px;" />
       </el-form-item>
 
+      <el-form-item :label="$t('setting.basic.theme')">
+        <el-radio-group v-model="form.theme" class="ml-4">
+          <el-radio label="auto" size="large">{{ $t('setting.basic.auto') }}
+          </el-radio>
+          <el-radio label="light" size="large">{{ $t('setting.basic.light') }}
+          </el-radio>
+          <el-radio label="dark" size="large">{{ $t('setting.basic.dark') }}
+          </el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">{{ $t('common.save') }}</el-button>
       </el-form-item>
@@ -23,15 +33,24 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive } from 'vue'
+import { useDark, useToggle } from '@vueuse/core'
 
-const defaultColor = '#1973ED'
+const defaultColor = 'rgba(25,115,237,1)'
 const root = document.documentElement
 const form = reactive({
   themeColor: defaultColor,
   language: 'en',
   fontSize: '12px',
+  theme: 'light'
 })
+
+
+const isDark = useDark({
+  storageKey: "theme",
+  valueDark: "dark",
+  valueLight: "light",
+});
 
 onMounted(() => {
   const lang = localStorage.getItem('language')
@@ -45,6 +64,10 @@ onMounted(() => {
   const size = localStorage.getItem('font-size')
   if (size) {
     form.fontSize = size
+  }
+  const theme = localStorage.getItem('theme')
+  if (theme) {
+    form.theme = theme
   }
 })
 
@@ -68,6 +91,15 @@ function onSubmit() {
     localStorage.setItem('font-size', form.fontSize)
   }
 
+  if (form.theme) {
+    localStorage.setItem('theme', form.theme)
+    if (form.theme == 'dark') {
+      useToggle(isDark);
+    } else {
+      isDark.value = false
+    }
+  }
+
 }
 
 </script>
@@ -75,5 +107,15 @@ function onSubmit() {
 <style scoped>
 .base-box {
   padding: 20px
+}
+.preview {
+  width: 134px;
+  height: 48px;
+}
+.ui-dark {
+  background-color: #2E2E2E;
+}
+.ui-light {
+  background-color: #DFDFDF;
 }
 </style>

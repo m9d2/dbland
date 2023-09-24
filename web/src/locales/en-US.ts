@@ -40,6 +40,10 @@ const messages = {
             restore: 'Default',
             select_language: 'Language',
             font_size: 'Font size',
+            theme: 'Theme',
+            dark: 'Dark',
+            light: 'Light',
+            auto: 'Auto',
         }
     }
 }
