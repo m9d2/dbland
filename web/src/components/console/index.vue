@@ -24,9 +24,16 @@ onMounted(() => {
 })
 
 const initEditor = () => {
+  let theme = 'vs'
+  let localTheme = localStorage.getItem('theme')
+  if (localTheme) {
+    if (localTheme == 'dark') {
+      theme = 'vs-dark'
+    }
+  }
   editor = monaco.editor.create(document.getElementById(id.value), {
     value: props.sql,
-    theme: 'vs', // 官方自带三种主题vs, hc-black, or vs-dark
+    theme: theme, // 官方自带三种主题vs, hc-black, or vs-dark
     minimap: { // 关闭小地图
       enabled: false,
     },

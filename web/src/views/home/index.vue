@@ -74,7 +74,12 @@ onMounted(() => {
 
   let theme = localStorage.getItem('theme')
   if (theme) {
-    useToggle(isDark)
+    if (theme == 'dark') {
+      isDark.value = true
+      useToggle(isDark);
+    } else {
+      isDark.value = false
+    }
   }
 })
 

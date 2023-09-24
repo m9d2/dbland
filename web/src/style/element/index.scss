@@ -4,6 +4,7 @@
  :root {
    --el-font-size-base: var(--font-size);
    --el-color-primary: var(--db-c-primary);
+   --el-text-color-regular: var(--db-c-text);
    --el-table-current-row-bg-color: var(--db-c-bg-hover);
    --el-button-hover-text-color: var(--db-c-text-hover);
    --el-text-color-primary: var(--db-c-text);
@@ -15,3 +16,7 @@
    --el-color-primary-light-9: #fff;
    --el-color-primary-light-7: rgba(25,115,237,1);
  }
+
+ .el-form-item__label {
+  font-weight: 700;
+}

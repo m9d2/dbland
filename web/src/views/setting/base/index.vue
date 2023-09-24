@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
 import { useDark, useToggle } from '@vueuse/core'
+import { ElNotification } from "element-plus";
 
 const defaultColor = 'rgba(25,115,237,1)'
 const root = document.documentElement
@@ -91,15 +92,16 @@ function onSubmit() {
     localStorage.setItem('font-size', form.fontSize)
   }
 
+  // theme
   if (form.theme) {
     localStorage.setItem('theme', form.theme)
     if (form.theme == 'dark') {
+      isDark.value = true
       useToggle(isDark);
     } else {
       isDark.value = false
     }
   }
-
 }
 
 </script>
