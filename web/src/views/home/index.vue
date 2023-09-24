@@ -40,7 +40,7 @@ import { useDark, useToggle } from '@vueuse/core'
 const menuItems = [
   { route: '/', icon: Coin },
   { route: '/connect', icon: Edit },
-  { route: '/chart', icon: Monitor },
+  // { route: '/chart', icon: Monitor },
   { route: '/setting', icon: Setting }
 ]
 let activeIndex: number
