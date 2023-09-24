@@ -25,7 +25,7 @@ FROM node:14 AS frontend
 WORKDIR /app/frontend
 COPY web .
 RUN npm install
-RUN npm run build release
+RUN npm run build:release
 
 FROM alpine:3.18
 WORKDIR /app
