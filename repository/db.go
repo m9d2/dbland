@@ -56,6 +56,13 @@ func executeSQL() error {
 			"user_agent" TEXT,
 			"created_time" DATE
 		);
+		CREATE TABLE IF NOT EXISTS "chart" (
+			"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			"title" TEXT,
+			"sql" TEXT,
+			"type" TEXT,
+			"created_time" DATE
+		);
 	`
 	_, err := DB.Exec(sqlStr)
 

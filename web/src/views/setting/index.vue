@@ -2,7 +2,7 @@
   <div class="setting-box">
     <div class="setting-left">
       <span style="text-align: center;font-size: 20px; font-weight: bold; margin: 20px 0">{{ $t('setting.title') }}</span>
-      <List :list="settings" style="margin: 0 20px;" @node-click="nodeClick"></List>
+      <List :list="settings" style="margin: 0 8px;" @node-click="nodeClick"></List>
     </div>
     <div class="setting-content">
       <div class="setting-main">
@@ -14,9 +14,9 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import List from '@/components/layout/list/index.vue'
-import { useRouter } from 'vue-router'
-import i18n from '@/plugins/i18n'
+import List from '@/components/layout/list/index.vue';
+import { useRouter } from 'vue-router';
+import i18n from '@/plugins/i18n';
 
 const router = useRouter()
 const settings = ref<any>([]);

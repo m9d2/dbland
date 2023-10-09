@@ -8,6 +8,7 @@ const messages = {
         homepage: 'Home',
         add: 'Insert',
         modify: 'Modify',
+        edit: 'Edit',
         refresh: 'Refresh',
         confirm: 'Confirm',
         cancel: 'Cancel',
@@ -44,6 +45,12 @@ const messages = {
             dark: 'Dark',
             light: 'Light',
             auto: 'Auto',
+        }
+    },
+    chart: {
+        title: 'Charts',
+        button: {
+            new_chart: 'New Chart',
         }
     }
 }

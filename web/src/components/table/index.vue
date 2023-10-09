@@ -1,6 +1,6 @@
 <template>
   <el-table v-loading="loading" :data="data" size="small" :border="true" empty-text="" :height="height"
-    @row-contextmenu="contextmenu" 
+    @row-contextmenu="handlerContextmenu" 
     :header-cell-class-name="headerCellClassName" 
     :header-row-class-name="headerRowClassName"
     @current-change="handlerCurrentChange"
@@ -44,7 +44,7 @@ defineOptions({
 
 const emits = defineEmits(["row-contextmenu", "row-current-change"]);
 
-function contextmenu(row: any, column: any, event: any) {
+function handlerContextmenu(row: any, column: any, event: any) {
   emits("row-contextmenu", row, column, event);
 }
 
@@ -81,6 +81,6 @@ function handlerCurrentChange(currentRow: any) {
 }
 
 .current-row {
-  background-color: green!important;
+  background-color: green;
 }
 </style>

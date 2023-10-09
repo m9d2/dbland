@@ -1,7 +1,7 @@
 @import "@imengyu/vue3-context-menu/lib/vue3-context-menu.css";
 :root {
   --mx-menu-text: var(--db-c-text-1);
-  --mx-menu-backgroud: var(--db-c-bg-mute);
+  --mx-menu-backgroud: var(--db-c-bg-light-2);
 }
 .mx-context-menu-item .label {
   font-size: var(--font-size);
