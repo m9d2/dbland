@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="d-dialog" style="width: 50%; min-width: 500px; height: 80%; overflow: scroll; border-radius: 5px;">
+  <el-dialog class="d-dialog" style="width: 50%; overflow: auto; border-radius: 5px;">
     <el-form :model="formData" :label-width="labelWidth" label-position="right">
       <el-form-item v-for="row in list" :label="row.key" :key="row.key">
         <el-input v-model="formData[row.key]" :type="row.type" />

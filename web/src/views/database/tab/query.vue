@@ -75,7 +75,7 @@
       </div>
     </div>
     <Table class="query-table" :columns="tableColumns" :data="tableData" :loading="loading"
-      @row-current-change="handlerCurrentChange" @row-contextmenu="tableDbClick">
+      @row-current-change="handlerCurrentChange" @row-contextmenu="handlerContextmenu">
     </Table>
 
     <Form v-model="showModify" :row="currentRow" :actionType="actionType" :columns="tableColumns" @cancel="handlerCancel" @confirm="handlerConfirm"></Form>
@@ -121,7 +121,7 @@ import type {Database} from "@/service/database";
 const configs = ref();
 const configValueRef = ref();
 const databases = ref();
-let currentConfig
+let currentConfig: Record<string, any>
 const dbValueRef = ref<string>();
 const consoleRef = ref();
 const tableData = ref();
@@ -169,7 +169,7 @@ async function deleteRow() {
       type: "success",
     });
     await querySql()
-  } catch (error) {
+  } catch (error: any) {
     ElNotification({
       message: error.message,
       type: "error",
@@ -216,7 +216,7 @@ async function handlerConfirm(formData: any) {
       message: 'Affected rows: ' + data,
       type: "success",
     });
-  } catch (error) {
+  } catch (error: any) {
     ElNotification({
       message: error.message,
       type: 'error'
@@ -303,10 +303,10 @@ async function querySql() {
   }
 }
 
-function tableDbClick(row: any, column: any, event: any) {
+function handlerContextmenu(row: any, column: any, event: any) {
   event.preventDefault();
   ContextMenu.showContextMenu({
-    theme: 'flat',
+    theme: 'mac',
     x: event.x,
     y: event.y,
     items: [
@@ -446,5 +446,8 @@ function tableDbClick(row: any, column: any, event: any) {
 
 .mx-context-menu {
   font-weight: var(--font-family);
+}
+.el-icon {
+  font-size: 13px;
 }
 </style>

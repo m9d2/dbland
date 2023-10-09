@@ -4,21 +4,21 @@
       style="padding: 0 8px;background-color: var(--db-c-bg-nav); border-bottom: 1px solid var(--db-c-border); height: 30px; line-height: 30px;">
       <el-breadcrumb :separator-icon="ArrowRight"
         style="height: 30px; line-height: 30px; font-size: var(--font-size); color: var(--db-c-text)">
-        <el-breadcrumb-item v-if="firstData" :to="{ path: '/' }" @click="loadConfigs">{{ $t('common.homepage') }}</el-breadcrumb-item>
+        <el-breadcrumb-item v-if="firstData" :to="{ path: '/' }" @click="loadConfigs">{{ $t('common.homepage')
+        }}</el-breadcrumb-item>
         <el-breadcrumb-item v-show="firstData" @click="back" :to="{ path: '/' }">{{ firstData }}</el-breadcrumb-item>
         <el-breadcrumb-item>{{ secondData }}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
 
     <div class="content-main">
-      <div class="content-left">
+      <div class="content-left" ref="containerRef">
         <div class="search">
           <el-input v-model="filterText" style="height: 32px" :placeholder="placeholder" size="small" />
         </div>
 
-        <List class="menu-list" :list="listData" @node-click="clickNode"
-          :row-style="{ height: '26px', lineHeight: '26px', marginTop: '0' }" @node-mouse-enter="handleMouseEnter"
-          @node-mouse-leave="handleMouseLeave" @node-db-click="handleNodeDblClick">
+        <List class="menu-list" style="margin: 0 8px;" :list="listData" @node-click="clickNode"
+          @node-mouse-enter="handleMouseEnter" @node-mouse-leave="handleMouseLeave" @node-db-click="handleNodeDblClick">
 
           <template #begin="{ node }">
             <el-icon v-show="node.level == TreeLevelEnum.CONFIG" class="iconfont" style="margin: 5px">
@@ -35,11 +35,26 @@
               <Document />
             </el-icon>
           </template>
+
+          <template #default="{ index }">
+            <el-dropdown style="vertical-align: center;" size="small" trigger="click">
+              <el-link v-show="index === activeIndex" :underline="false" :icon="ArrowDown" />
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item :icon="Edit" @click="editNode()">{{ $t('common.edit') }}</el-dropdown-item>
+                  <el-dropdown-item :icon="Delete" @click="deleteNode()">{{ $t('common.delete') }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </template>
         </List>
 
         <div class="new-query">
-          <el-button type="primary" style="width: 100%;" @click="newTab('')">{{ $t('database.button.new_query') }}</el-button>
+          <el-button type="primary" style="width: 100%;" @click="newTab('')">{{ $t('database.button.new_query')
+          }}</el-button>
         </div>
+
+        <div class="resize-handle" @mousedown="startResize"></div>
       </div>
       <div class="content-right">
         <div class="shortcuts" v-if="shortcutsVisible">
@@ -64,7 +79,9 @@ import i18n from '@/plugins/i18n'
 import type { AxiosPromise } from "axios";
 import List from '@/components/layout/list/index.vue'
 import { TreeLevelEnum } from "@/common/enums";
-import { DbTypeEnum } from '@/common/enums'
+import { DbTypeEnum } from '@/common/enums';
+import ContextMenu from "@imengyu/vue3-context-menu";
+import { Delete, ArrowDown, Edit } from '@element-plus/icons-vue'
 
 const treeRef = ref<InstanceType<typeof ElTree>>();
 // data
@@ -98,10 +115,9 @@ const secondData = ref()
 let currentCid: number
 let currentConfig: Object
 let currentDatabase: Object
-
-function test() {
-  console.log(11)
-}
+const activeIndex = ref()
+const resizing = ref(false)
+const containerRef = ref(null);
 
 const handleNodeDblClick = (index: number, node: any) => {
   if (node.level === 3) {
@@ -126,9 +142,11 @@ const handlerMessageUpdate = (data: any) => {
 };
 
 function handleMouseEnter(index: number) {
+  activeIndex.value = index;
 }
 
 function handleMouseLeave(index: number) {
+  activeIndex.value = null;
 }
 
 function clickNode(index: number, row: any) {
@@ -145,6 +163,26 @@ function clickNode(index: number, row: any) {
     currentDatabase = row
   }
 }
+
+function startResize() {
+  resizing.value = true;
+  document.addEventListener('mousemove', resize);
+  document.addEventListener('mouseup', stopResize);
+};
+
+function resize(event: MouseEvent) {
+  if (resizing.value && containerRef.value) {
+    const container = containerRef.value;
+    const newWidth = event.clientX - container.getBoundingClientRect().left;
+    container.style.width = newWidth + 'px';
+  }
+};
+
+function stopResize() {
+  resizing.value = false;
+  document.removeEventListener('mousemove', resize);
+  document.removeEventListener('mouseup', stopResize);
+};
 
 onMounted(() => {
   loadConfigs();
@@ -214,6 +252,14 @@ const filterNode = (value: string, data: Tree) => {
   if (!value) return true;
   return data.label.includes(value);
 };
+
+function editNode() {
+
+}
+
+function deleteNode() {
+
+}
 </script>
 
 <style lang="scss" scoped>
@@ -240,7 +286,6 @@ const filterNode = (value: string, data: Tree) => {
 }
 
 .content-left {
-  resize: both;
   height: 100%;
   width: 220px;
   min-width: 220px;
@@ -250,16 +295,26 @@ const filterNode = (value: string, data: Tree) => {
   position: relative;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   .search {
     border-radius: 5px;
     padding: 8px;
   }
 
+  .resize-handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    cursor: ew-resize;
+    background-color: var(--db-c-bg-nav);
+    z-index: 999;
+  }
+
   .menu-list {
-    overflow: auto;
     flex-grow: 1;
-    padding: 0 8px;
   }
 
   .new-query {
@@ -291,5 +346,14 @@ const filterNode = (value: string, data: Tree) => {
   overflow: hidden;
   margin: 0 8px;
   background-color: var(--db-c-bg);
+}
+
+.el-dropdown {
+  line-height: 30px;
+  vertical-align: middle;
+
+  .el-link {
+    font-size: var(--font-size);
+  }
 }
 </style>

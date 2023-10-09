@@ -12,7 +12,7 @@
             replace>
             <li :class="{ active: activeIndex === index }">
               <el-icon>
-                <component :is="item.icon" :class="{ active: activeIndex === index }" />
+                <component :is="item.icon" />
               </el-icon>
             </li>
           </router-link>
@@ -29,10 +29,10 @@
 import {
   Coin,
   Edit,
-  Monitor,
   Setting,
+  Monitor,
 } from '@element-plus/icons-vue'
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import logo from '@/assets/img/logo.svg';
 import { useDark, useToggle } from '@vueuse/core'
 import { useRoute } from 'vue-router';
@@ -41,15 +41,15 @@ import { useRoute } from 'vue-router';
 const menuItems = [
   { route: '/', icon: Coin },
   { route: '/connect', icon: Edit },
-  // { route: '/chart', icon: Monitor },
+  { route: '/chart', icon: Monitor },
   { route: '/setting', icon: Setting }
 ]
 
 const isDark = useDark({
-    storageKey: "theme",
-    valueDark: "dark",
-    valueLight: "light",
-  });
+  storageKey: "theme",
+  valueDark: "dark",
+  valueLight: "light",
+});
 const route = useRoute();
 let activeIndex: number = findMenuItemIndex(route.path)
 
@@ -64,15 +64,15 @@ onMounted(() => {
   if (color) {
     root.style.setProperty('--db-c-primary', color);
     const currentColor = root.style.getPropertyValue('--db-c-primary').trim();
-    console.log(currentColor)
     const rgbaArray = currentColor.match(/\d+/g);
-    rgbaArray[3] = 0.8;
-    const newColor = "rgba(" + rgbaArray.join(", ") + ")";
-    console.log(newColor)
-    root.style.setProperty('--el-color-primary-light-3', newColor);
-    root.style.setProperty('--el-color-primary-light-5', newColor);
-    root.style.setProperty('--el-color-primary-dark-2', newColor);
-    root.style.setProperty('--el-color-primary-light-7', color);
+    if (rgbaArray) {
+      rgbaArray[3] = '0.8';
+      const newColor = "rgba(" + rgbaArray.join(", ") + ")";
+      root.style.setProperty('--el-color-primary-light-3', newColor);
+      root.style.setProperty('--el-color-primary-light-5', newColor);
+      root.style.setProperty('--el-color-primary-dark-2', newColor);
+      root.style.setProperty('--el-color-primary-light-7', color);
+    }
   }
 
   // font size
@@ -106,6 +106,7 @@ const setActiveIndex = (index: number) => {
     border: 1px solid var(--db-c-border);
     border-top: none;
     height: 100vh;
+    box-sizing: border-box;
 
     .logo {
       text-align: center;
@@ -132,13 +133,13 @@ ul li:not(:first-child) {
 }
 
 li {
-  border-radius: 5px;
   background-color: var(--db-c-bg-nav);
   height: 40px;
-  margin: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  border: 2px solid var(--db-c-bg-nav);
 
   .el-icon {
     font-size: 28px;
@@ -157,6 +158,7 @@ li:hover {
 .active {
   background-color: var(--db-c-bg-hover);
   color: var(--db-c-text-hover);
+  border-left: 2px solid var(--db-c-text-hover);
 }
 
 .iconfont {

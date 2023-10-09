@@ -34,6 +34,9 @@ func InitRouter() *gin.Engine {
 
 		other := api.OtherHandler{}
 		other.InitRouter(g)
+
+		chart := api.ChartHandler{}
+		chart.InitRouter(g)
 	}
 	return r
 }
