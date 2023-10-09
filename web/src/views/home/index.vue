@@ -41,7 +41,7 @@ import { useRoute } from 'vue-router';
 const menuItems = [
   { route: '/', icon: Coin },
   { route: '/connect', icon: Edit },
-  { route: '/chart', icon: Monitor },
+  // { route: '/chart', icon: Monitor },
   { route: '/setting', icon: Setting }
 ]
 
