@@ -21,6 +21,7 @@ const messages = {
             format: 'Format',
             run: 'Run',
             new_query: 'New Query',
+            query: 'Query',
         },
         label: {
             total: 'Total',
@@ -33,14 +34,14 @@ const messages = {
     setting: {
         title: 'Setting',
         menu: {
-            basic: 'Basic',
-            other: 'About'
+            basic: 'Basic Settings',
+            other: 'About Us'
         },
         basic: {
             color: 'Global Theme Colors',
             restore: 'Default',
             select_language: 'Language',
-            font_size: 'Font size',
+            font_size: 'Font Size',
             theme: 'Theme',
             dark: 'Dark',
             light: 'Light',

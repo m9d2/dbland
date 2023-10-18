@@ -1,6 +1,7 @@
 import {DbTypeEnum} from "@/common/enums";
 import {Mysql} from './mysql';
 import {Sqlite} from './sqlite';
+import type { Database } from "./database";
 
 export function CreateDatabase(config: any, database: string, sql: string): Database {
     let instance: Database;

@@ -6,96 +6,100 @@
           :value="item.id" />
       </el-select>
       <el-select v-model="dbValueRef" size="small">
-        <el-option style="font-size: var(--font-size);" v-for="item in databases" :key="item" :label="item"
-          :value="item" @change="changeConfig" default-first-option />
+        <el-option style="font-size: var(--font-size);" v-for="item in databases" :key="item" :label="item" :value="item"
+          @change="changeConfig" default-first-option />
       </el-select>
-      <el-button @click="formatSql" size="small">{{ $t('database.button.format') }}</el-button>
-      <el-button @click="querySql" size="small">{{ $t('database.button.run') }}</el-button>
+      <el-button @click="formatSql" size="small" :icon="MagicStick">{{ $t('database.button.format') }}</el-button>
+      <el-button @click="querySql" size="small" :icon="CaretRight">{{ $t('database.button.run') }}</el-button>
     </div>
-    <div class="query-console">
+    <div class="query-console" :style="{ height: contentHeight + 'px' }">
       <Console class="code" ref="consoleRef" :sql="sqlStr" />
     </div>
-    <div class="table-tool" v-if="showQueryStatus">
-      <div style="margin: 0 8px;" class="clearfix">
-        <div class="fl">
-          <el-tooltip effect="dark" :content="$t('common.add')">
-            <el-link :underline="false" @click="insertRow">
-              <el-icon>
-                <Plus />
-              </el-icon>
-            </el-link>
-          </el-tooltip>
+
+    <div class="query-content">
+      <div class="resize-handle" @mousedown="startResize"></div>
+      <div class="table-tool" v-if="showQueryStatus">
+        <div style="margin: 0 8px;" class="clearfix">
+          <div class="fl">
+            <el-tooltip effect="dark" :content="$t('common.add')">
+              <el-link :underline="false" @click="insertRow">
+                <el-icon>
+                  <Plus />
+                </el-icon>
+              </el-link>
+            </el-tooltip>
+          </div>
+
+          <div class="fl">
+            <el-tooltip effect="dark" :content="$t('common.delete')">
+              <el-link :underline="false" @click="deleteRow">
+                <el-icon style="font-weight: 700;">
+                  <Minus />
+                </el-icon>
+              </el-link>
+            </el-tooltip>
+          </div>
+
+          <div class="fl">
+            <el-tooltip effect="dark" :content="$t('common.modify')">
+              <el-link :underline="false" @click="modifyRow">
+                <el-icon style="font-weight: 700;">
+                  <Edit />
+                </el-icon></el-link>
+            </el-tooltip>
+          </div>
+
+          <div class="fl">
+            <el-tooltip effect="dark" :content="$t('common.refresh')">
+              <el-link :underline="false" @click="refresh">
+                <el-icon>
+                  <Refresh />
+                </el-icon>
+              </el-link>
+            </el-tooltip>
+          </div>
+
+          <div class="fr">
+            <el-dropdown>
+              <el-button size="small" style="margin-top: 3px">
+                Import<el-icon class="el-icon--right"><arrow-down /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item>csv</el-dropdown-item>
+                  <el-dropdown-item>insert sql</el-dropdown-item>
+                  <el-dropdown-item>excel</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+
         </div>
-
-        <div class="fl">
-          <el-tooltip effect="dark" :content="$t('common.delete')">
-            <el-link :underline="false" @click="deleteRow">
-              <el-icon style="font-weight: 700;">
-                <Minus />
-              </el-icon>
-            </el-link>
-          </el-tooltip>
-        </div>
-
-
-        <div class="fl">
-          <el-tooltip effect="dark" :content="$t('common.modify')">
-            <el-link :underline="false" @click="modifyRow">
-              <el-icon style="font-weight: 700;">
-                <Edit />
-              </el-icon></el-link>
-          </el-tooltip>
-        </div>
-
-        <div class="fl">
-          <el-tooltip effect="dark" :content="$t('common.refresh')">
-            <el-link :underline="false" @click="refresh">
-              <el-icon>
-                <Refresh />
-              </el-icon>
-            </el-link>
-          </el-tooltip>
-        </div>
-
-        <div class="fr">
-          <el-dropdown>
-            <el-button size="small" style="margin-top: 3px">
-              Import<el-icon class="el-icon--right"><arrow-down /></el-icon>
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>csv</el-dropdown-item>
-                <el-dropdown-item>insert sql</el-dropdown-item>
-                <el-dropdown-item>excel</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </div>
-
       </div>
-    </div>
-    <Table class="query-table" :columns="tableColumns" :data="tableData" :loading="loading"
-      @row-current-change="handlerCurrentChange" @row-contextmenu="handlerContextmenu">
-    </Table>
+      <Table class="query-table" :columns="tableColumns" :data="tableData" :loading="loading"
+        @row-current-change="handlerCurrentChange" @row-contextmenu="handlerContextmenu">
+      </Table>
 
-    <Form v-model="showModify" :row="currentRow" :actionType="actionType" :columns="tableColumns" @cancel="handlerCancel" @confirm="handlerConfirm"></Form>
+      <Form v-model="showModify" :row="currentRow" :actionType="actionType" :columns="tableColumns"
+        @cancel="handlerCancel" @confirm="handlerConfirm"></Form>
 
-    <div class="query-status">
-      <div class="status-left">
-        <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total') }}: {{ total }}</span>
-      </div>
-      <div class="status-center">
-        <label>{{ sqlStr }}</label>
-      </div>
-      <div class="status-right">
-        <span v-show="showQueryStatus">{{ $t('database.label.elapsed_time') }}: {{ elapsedTime }}s</span>
+      <div class="query-status">
+        <div class="status-left">
+          <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total') }}: {{ total }}</span>
+        </div>
+        <div class="status-center">
+          <label>{{ sqlStr }}</label>
+        </div>
+        <div class="status-right">
+          <span v-show="showQueryStatus">{{ $t('database.label.elapsed_time') }}: {{ elapsedTime }}s</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, reactive } from "vue";
 import Console from "@/components/console/index.vue";
 import Table from "@/components/table/index.vue";
 import Form from "@/components/form/index.vue";
@@ -113,16 +117,18 @@ import {
   Edit,
   Minus,
   Refresh,
+  CaretRight,
+  MagicStick,
 } from '@element-plus/icons-vue'
 import { ActionTypeEnum } from '@/common/enums/'
 import { CreateDatabase } from '@/service'
-import type {Database} from "@/service/database";
+import type { Database } from "@/service/database";
 
 const configs = ref();
 const configValueRef = ref();
 const databases = ref();
 let currentConfig: Record<string, any>
-const dbValueRef = ref<string>();
+const dbValueRef = ref<string>("");
 const consoleRef = ref();
 const tableData = ref();
 const tableColumns = ref();
@@ -134,7 +140,7 @@ const total = ref();
 let currentRow: any
 let actionType: any
 const showModify = ref(false)
-
+const contentHeight = ref(260);
 const props = defineProps({
   config: {
     type: Object,
@@ -146,6 +152,11 @@ const props = defineProps({
     type: String,
   },
 });
+const resizeData = reactive({
+  isResizing: false,
+  startY: 0,
+  startHeight: 0,
+});
 
 function insertRow() {
   showModify.value = true
@@ -153,9 +164,8 @@ function insertRow() {
 }
 
 async function deleteRow() {
-
   try {
-    const database:Database = CreateDatabase(currentConfig, dbValueRef, sqlStr)
+    const database: Database = CreateDatabase(currentConfig, dbValueRef.value, sqlStr)
     if (!currentRow) {
       ElNotification({
         message: 'please choose row',
@@ -163,7 +173,7 @@ async function deleteRow() {
       })
     }
     const sql = database.createDeleteSql(tableColumns.value, currentRow)
-    const {data} = await execute({sql: sql, cid: configValueRef.value})
+    const { data } = await execute({ sql: sql, cid: configValueRef.value })
     ElNotification({
       message: 'Affected rows: ' + data,
       type: "success",
@@ -196,7 +206,7 @@ function handlerCancel() {
 
 async function handlerConfirm(formData: any) {
   let sql
-  const database:Database = CreateDatabase(currentConfig, dbValueRef, sqlStr)
+  const database: Database = CreateDatabase(currentConfig, dbValueRef.value, sqlStr)
   if (actionType == ActionTypeEnum.INSERT) {
     sql = database.createInsertSql(tableColumns.value, formData)
   }
@@ -210,7 +220,7 @@ async function handlerConfirm(formData: any) {
     sql = database.createUpdateSql(tableColumns.value, formData, currentRow)
   }
   try {
-    const { data } = await execute({cid: configValueRef.value, sql: sql})
+    const { data } = await execute({ cid: configValueRef.value, sql: sql })
     await querySql()
     ElNotification({
       message: 'Affected rows: ' + data,
@@ -236,6 +246,10 @@ onMounted(() => {
   }
   if (props.sql) {
     sqlStr = props.sql;
+  }
+  const height = localStorage.getItem('height')
+  if (height) {
+    contentHeight.value = parseInt(height)
   }
   loadConfigs();
 });
@@ -306,7 +320,7 @@ async function querySql() {
 function handlerContextmenu(row: any, column: any, event: any) {
   event.preventDefault();
   ContextMenu.showContextMenu({
-    theme: 'mac',
+    theme: 'flat', 
     x: event.x,
     y: event.y,
     items: [
@@ -331,9 +345,9 @@ function handlerContextmenu(row: any, column: any, event: any) {
         label: "Delete Record",
         onClick: async () => {
           try {
-            const database:Database = CreateDatabase(currentConfig, dbValueRef, sqlStr)
+            const database: Database = CreateDatabase(currentConfig, dbValueRef.value, sqlStr)
             const sql = database.createDeleteSql(tableColumns.value, currentRow)
-            const {data} = await execute({sql: sql, cid: configValueRef.value})
+            const { data } = await execute({ sql: sql, cid: configValueRef.value })
             await querySql()
             ElNotification({
               message: 'Affected rows: ' + data,
@@ -357,6 +371,29 @@ function handlerContextmenu(row: any, column: any, event: any) {
     ],
   });
 }
+
+function startResize(event: MouseEvent) {
+  resizeData.isResizing = true;
+  resizeData.startY = event.clientY;
+  resizeData.startHeight = contentHeight.value;
+
+  document.addEventListener('mousemove', resize);
+  document.addEventListener('mouseup', stopResize);
+};
+
+function resize(event: MouseEvent) {
+  if (resizeData.isResizing) {
+    const deltaY = event.clientY - resizeData.startY;
+    contentHeight.value = resizeData.startHeight + deltaY;
+    localStorage.setItem('height', contentHeight.value)
+  }
+};
+
+function stopResize() {
+  resizeData.isResizing = false;
+  document.removeEventListener('mousemove', resize);
+  document.removeEventListener('mouseup', stopResize);
+}
 </script>
 
 <style lang="scss" scoped>
@@ -379,7 +416,7 @@ function handlerContextmenu(row: any, column: any, event: any) {
   width: 100%;
 
   .code {
-    height: 260px;
+    height: 100%;
   }
 }
 
@@ -394,6 +431,13 @@ function handlerContextmenu(row: any, column: any, event: any) {
     margin-right: 8px;
     font-weight: 700;
   }
+}
+
+.query-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .query-table {
@@ -434,8 +478,9 @@ function handlerContextmenu(row: any, column: any, event: any) {
 }
 
 .iconfont {
-  //color: var(--db-c-text-1);
+  color: var(--db-c-text-1);
 }
+
 .el-dropdown {
   height: 30px;
 }
@@ -447,7 +492,20 @@ function handlerContextmenu(row: any, column: any, event: any) {
 .mx-context-menu {
   font-weight: var(--font-family);
 }
+
 .el-icon {
   font-size: 13px;
+}
+
+.resize-handle {
+  width: 100%;
+  height: 6px;
+  z-index: 999;
+}
+
+.resize-handle:hover {
+  cursor: row-resize;
+  background-color: var(--db-c-border);
+
 }
 </style>

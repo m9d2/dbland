@@ -2,7 +2,7 @@ import request from "@/plugins/axios";
 import type { QueryReq, Table, Query } from './type'
 import type { AxiosPromise } from "axios";
 
-enum API {
+export enum API {
     DATABASE_URL = '/v1/databases',
     TABLE_URL = '/v1/tables',
     QUERY_URL = '/v1/query',

@@ -1,7 +1,7 @@
 class Base {
 
-    databaseName: string
-    tableName: string
+    databaseName!: string;
+    tableName!: string;
     sqlStr: string
 
     constructor(database: string, sql: string) {

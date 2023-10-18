@@ -50,3 +50,15 @@ body {
   margin: 0;
   font-weight: normal;
 }
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background-color: var(--db-c-bg-nav);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--db-c-border)
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: darkred;
+}

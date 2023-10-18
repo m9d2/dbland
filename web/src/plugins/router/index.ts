@@ -19,21 +19,7 @@ const router = createRouter({
         {
           path: '/chart',
           component: () => import('@/views/chart/index.vue')
-        },
-        {
-          path: '/setting',
-          component: () => import('@/views/setting/index.vue'),
-          children: [
-            {
-              path: '/setting',
-              component: () => import('@/views/setting/base/index.vue')
-            },
-            {
-              path: '/about',
-              component: () => import('@/views/setting/about/index.vue')
-            },
-          ],
-        },
+        }
       ],
     },
   ]

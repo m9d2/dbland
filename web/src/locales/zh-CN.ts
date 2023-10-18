@@ -21,6 +21,7 @@ const messages = {
             format: '格式化',
             run: '执行',
             new_query: '新建查询',
+            query: '查询',
         },
         label: {
             total: '总数',

@@ -8,7 +8,7 @@
       </div>
       <div class="nav">
         <ul>
-          <router-link v-for="(item, index) in menuItems" :key="index" :to="item.route" @click="setActiveIndex(index)"
+          <router-link v-for="(item, index) in menuItems" :key="index" :to="item.route" @click="setActiveIndex(index, item)"
             replace>
             <li :class="{ active: activeIndex === index }">
               <el-icon>
@@ -16,13 +16,28 @@
               </el-icon>
             </li>
           </router-link>
+          <li >
+            <router-link to="" @click="setting">
+              <el-icon><Setting /></el-icon>
+            </router-link>
+          </li>
         </ul>
       </div>
     </div>
+    <el-dialog
+    v-model="settingVisiable"
+    :close-on-click-modal="false"
+    title="设置"
+    width="60%"
+    align-center
+  >
+  <SettingView></SettingView>
+  </el-dialog>
     <div class="content">
       <RouterView></RouterView>
     </div>
   </div>
+  
 </template>
 
 <script setup lang="ts">
@@ -32,19 +47,18 @@ import {
   Setting,
   Monitor,
 } from '@element-plus/icons-vue'
-import { onMounted } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import logo from '@/assets/img/logo.svg';
 import { useDark, useToggle } from '@vueuse/core'
 import { useRoute } from 'vue-router';
-
+import SettingView from '@/views/setting/index.vue'
 
 const menuItems = [
   { route: '/', icon: Coin },
   { route: '/connect', icon: Edit },
   // { route: '/chart', icon: Monitor },
-  { route: '/setting', icon: Setting }
 ]
-
+const settingVisiable = ref(false)
 const isDark = useDark({
   storageKey: "theme",
   valueDark: "dark",
@@ -87,9 +101,14 @@ onMounted(() => {
   }
 })
 
-const setActiveIndex = (index: number) => {
+const setActiveIndex = (index: number, item: any) => {
   activeIndex = index;
 }
+
+const setting = () => {
+  settingVisiable.value = true
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -129,7 +148,6 @@ const setActiveIndex = (index: number) => {
 
 ul li:not(:first-child) {
   margin: 8px 0;
-  background-color: red;
 }
 
 li {
