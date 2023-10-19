@@ -13,3 +13,7 @@
 .mx-context-menu {
   font-family: var(--font-family);
 }
+
+.mx-context-menu.flat, .mx-menu-bar.flat {
+  border-radius: 5px;
+}

@@ -1,39 +1,46 @@
 <template>
   <div class="base-box">
-    <el-form :model="form" label-width="auto" label-position="left">
-      <el-form-item :label="$t('setting.basic.color')">
-        <el-color-picker v-model="form.themeColor" show-alpha/>
-        <el-link style="margin-left: 8px;" @click="restore">{{ $t('setting.basic.restore') }}</el-link>
-      </el-form-item>
-      <el-form-item :label="$t('setting.basic.select_language')">
-        <el-select v-model="form.language" class="m-2" placeholder="language" size="small">
-          <el-option key="zh" label="中文" value="zh" />
-          <el-option key="en" label="English" value="en" />
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="$t('setting.basic.font_size')">
-        <el-input v-model="form.fontSize" size="small" style="width: 181px;" />
-      </el-form-item>
+    <div class="setting-base" v-if="active == 'base'">
+      <div class="setting-item">
+        <div class="base-title">
+          <span>{{ $t('setting.basic.color') }}</span>
+        </div>
+        <div class="base-content">
+          <el-color-picker v-model="themeColor" show-alpha @change="changeColor"/>
+          <el-link style="margin-left: 8px;" @click="restore">{{ $t('setting.basic.restore') }}</el-link>
+        </div>
+      </div>
 
-      <el-form-item :label="$t('setting.basic.theme')">
-        <el-radio-group v-model="form.theme" class="ml-4">
-          <el-radio label="auto" size="large">{{ $t('setting.basic.auto') }}
-          </el-radio>
-          <el-radio label="light" size="large">{{ $t('setting.basic.light') }}
-          </el-radio>
-          <el-radio label="dark" size="large">{{ $t('setting.basic.dark') }}
-          </el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">{{ $t('common.save') }}</el-button>
-      </el-form-item>
-    </el-form>
+      <div class="setting-item">
+        <div class="base-title">
+          <span>{{ $t('setting.basic.select_language') }}</span>
+        </div>
+        <div class="base-content">
+          <el-select v-model="language" @change="changeLanguage" size="default">
+            <el-option key="en" label="English" value="en" />
+            <el-option key="zh" label="中文" value="zh" />
+          </el-select>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="base-title">
+          <span>{{ $t('setting.basic.theme') }}</span>
+        </div>
+        <div class="base-content">
+          <el-select v-model="theme" @change="changeTheme" size="default">
+            <el-option key="auto" :label="$t('setting.basic.auto')" value="auto" />
+            <el-option key="light" :label="$t('setting.basic.light')" value="light" />
+            <el-option key="dark" :label="$t('setting.basic.dark')" value="dark" />
+          </el-select>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useDark, useToggle } from '@vueuse/core'
 
 
@@ -46,12 +53,12 @@ if (localTheme) {
 }
 
 const root = document.documentElement
-const form = reactive({
-  themeColor: defaultColor,
-  language: 'en',
-  fontSize: '12px',
-  theme: 'light'
-})
+const themeColor = ref(defaultColor)
+const language = ref('en')
+const fontSize = ref('12px')
+const theme = ref('auto')
+
+const active = ref('base')
 
 
 const isDark = useDark({
@@ -63,69 +70,89 @@ const isDark = useDark({
 onMounted(() => {
   const lang = localStorage.getItem('language')
   if (lang) {
-    form.language = lang
+    language.value = lang
   }
   const color = localStorage.getItem('color-primary')
   if (color) {
-    form.themeColor = color
+    themeColor.value = color
   }
   const size = localStorage.getItem('font-size')
   if (size) {
-    form.fontSize = size
+    fontSize.value = size
   }
-  const theme = localStorage.getItem('theme')
-  if (theme) {
-    form.theme = theme
+  const themeValue = localStorage.getItem('theme')
+  if (themeValue) {
+    theme.value = themeValue
   }
 })
 
 function restore() {
   root.style.setProperty('--db-c-primary', defaultColor);
-  form.themeColor = defaultColor
+  themeColor.value = defaultColor
   localStorage.setItem('color-primary', defaultColor)
 }
 
+function changeColor(value: any) {
+  root.style.setProperty('--db-c-primary', value);
+  localStorage.setItem('color-primary', value)
+}
 
-function onSubmit() {
-  // color
-  root.style.setProperty('--db-c-primary', form.themeColor);
-  localStorage.setItem('color-primary', form.themeColor)
 
-  // language
-  localStorage.setItem('language', form.language)
+function changeLanguage(value: any) {
+  localStorage.setItem('language', value)
+  window.location.reload()
+}
 
-  // font size
-  if (form.fontSize) {
-    localStorage.setItem('font-size', form.fontSize)
-  }
-
-  // theme
-  if (form.theme) {
-    localStorage.setItem('theme', form.theme)
-    if (form.theme == 'dark') {
+function changeTheme(value:any) {
+  localStorage.setItem('theme', value)
+  if (value == 'dark') {
       isDark.value = true
       useToggle(isDark);
     } else {
       isDark.value = false
     }
-  }
+}
 
+function changeFontSize(value:any) {
+  localStorage.setItem('font-size', value)
 }
 
 </script>
 
 <style scoped>
 .base-box {
-  padding: 20px
+  padding: 0 20px;
 }
+
 .preview {
   width: 134px;
   height: 48px;
 }
+
 .ui-dark {
   background-color: #2E2E2E;
 }
+
 .ui-light {
   background-color: #DFDFDF;
+}
+
+.setting-item {
+  margin-bottom: 16px;
+
+  .el-radio-group {
+    height: 32px;
+  }
+
+  .el-input {
+    height: 32px;
+  }
+}
+
+.base-title {
+  margin-bottom: 8px;
+  font-size: var(--font-size);
+  color: var(--db-c-text);
+  font-weight: bold;
 }
 </style>

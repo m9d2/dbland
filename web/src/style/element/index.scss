@@ -14,8 +14,41 @@
    --el-color-primary-dark-2: rgba(25,115,237,0.8);
    --el-color-primary-light-9: #fff;
    --el-color-primary-light-7: rgba(25,115,237,1);
+   --el-loading-spinner-size: 24px;
+   --el-loading-fullscreen-spinner-size: 24px;
+  
  }
+
+
+.el-table {
+  --el-table-current-row-bg-color: var(--db-c-bg-hover);
+  --el-table-row-hover-bg-color: var(--db-c-bg-hover);
+  --el-table-header-text-color: var(--db-c-text);
+}
 
  .el-form-item__label {
   font-weight: 700;
  }
+
+ .el-radio.el-radio--large .el-radio__label {
+  font-size: var(--font-size);
+  color: var(--db-c-text);
+}
+
+// .el-loading-spinner .circular {
+//   display: none !important;
+// }
+// .el-loading-spinner {
+//   background-size: 100px 100px;
+//   width: 100%;
+//   height: 12px;
+//   position: absolute !important;
+//   left: 48%;
+//   top: 40% !important;
+//   text-align: center;
+// }
+
+// .el-loading-spinner .circular {
+//   height: 12px;
+//   width: 12px;
+// }

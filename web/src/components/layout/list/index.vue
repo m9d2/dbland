@@ -1,9 +1,9 @@
 <template>
     <div class="d-list">
-        <div class="d-list-row" :style="rowStyle" :class="{ active: item.active }"
-            v-for="(item, index) in list">
-            <div :value="index" class="d-row-content" @mouseover="handleMouseEnter(index)" @contextmenu.native="handleContextMenu(index, item)"
-                @dblclick.prevent="handleDoubleClick(index, item)" @mouseleave="handleMouseLeave(index)">
+        <div class="d-list-row" :style="rowStyle" :class="{ active: item.active }" v-for="(item, index) in list">
+            <div :value="index" class="d-row-content" @mouseover="handleMouseEnter(index)"
+                @contextmenu.native="handleContextMenu(index, item)" @dblclick.prevent="handleDoubleClick(index, item)"
+                @mouseleave="handleMouseLeave(index)">
                 <div class="d-row-begin">
                     <slot name="begin" :node="item">
                     </slot>
@@ -12,7 +12,7 @@
                     {{ item.name }}
                 </span>
                 <div class="d-row-menu">
-                    <slot :index="index">
+                    <slot :node="item" :index="index">
                     </slot>
                 </div>
             </div>
@@ -39,19 +39,19 @@ function nodeClick(index: number, row: Item) {
             props.list[i].active = i === index;
         }
     }
-  emits('node-click', index, row)
+    emits('node-click', index, row)
 }
 
 function handleMouseEnter(index: number) {
-  emits('node-mouse-enter', index)
+    emits('node-mouse-enter', index)
 }
 
 function handleDoubleClick(index: number, row: any) {
-  emits('node-db-click', index, row)
+    emits('node-db-click', index, row)
 }
 
 function handleMouseLeave(index: number) {
-  emits('node-mouse-leave', index)
+    emits('node-mouse-leave', index)
 }
 
 function handleContextMenu(index: number, row: any) {
@@ -62,29 +62,49 @@ function handleContextMenu(index: number, row: any) {
 <style lang="scss" scoped>
 .d-list {
     overflow: auto;
+
     .d-list-row {
         box-sizing: border-box;
         height: 30px;
         line-height: 30px;
-        margin-top: 2px;
         padding: 0 8px;
-        cursor: pointer;
         border-radius: 5px;
+        display: flex;
+        width: 100%;
+        cursor: pointer;
 
         .d-row-content {
             display: flex;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+
+            .d-row-begin {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 26px;
+            }
+
             .d-row-name {
                 font-weight: 500;
                 flex-grow: 1;
+                user-select: none;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                height: 30px;
             }
-        }
-        .d-row-name {
-            user-select:none;
-            overflow: hidden;
-            text-overflow: ellipsis; 
-        }
-        .d-row-name:hover {
-          color: var(--db-c-text-hover);
+
+            .d-row-name:hover {
+                color: var(--db-c-text-hover);
+            }
+
+            .d-row-menu {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 26px;
+            }
         }
     }
 
