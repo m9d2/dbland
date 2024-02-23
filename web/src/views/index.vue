@@ -1,46 +1,41 @@
 <template>
   <div class="main">
     <div class="left">
-      <div class="logo">
-        <a href="#" style="color: var(--db-c-text); font-size: 14px; font-weight: bold">
-          <el-image style="width: 40px; height: 40px" :src="logo"/>
+      <div style="margin-top: 20px; text-align: center; display: flex; justify-content: center; align-items: center;">
+        <a href="https://github.com/m9d2/dbland" target="_blank">
+          <div class="logo">
+          <span class="logo-text unselectable">D</span>
+        </div>
         </a>
       </div>
       <div class="nav">
         <ul>
           <router-link v-for="(item, index) in menuItems" :key="index" :to="item.route"
-                       @click="setActiveIndex(index, item)"
-                       replace>
+            @click="setActiveIndex(index, item)" replace>
             <li :class="{ active: activeIndex === index }">
               <el-icon>
-                <component :is="item.icon"/>
+                <component :is="item.icon" />
               </el-icon>
             </li>
           </router-link>
           <li>
             <router-link to="" @click="setting">
               <el-icon>
-                <Setting/>
+                <Setting />
               </el-icon>
             </router-link>
           </li>
         </ul>
       </div>
     </div>
-    <el-dialog
-        v-model="settingVisible"
-        :close-on-click-modal="false"
-        :title="$t('setting.title')"
-        width="60%"
-        align-center
-    >
+    <el-dialog v-model="settingVisible" :close-on-click-modal="false" :title="$t('setting.title')" width="60%"
+      align-center>
       <SettingView></SettingView>
     </el-dialog>
     <div class="content">
       <RouterView></RouterView>
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -50,16 +45,16 @@ import {
   Setting,
   Monitor,
 } from '@element-plus/icons-vue'
-import {onMounted, ref} from 'vue';
+import { onMounted, ref } from 'vue';
 import logo from '@/assets/img/logo.svg';
-import {useDark, useToggle} from '@vueuse/core'
-import {useRoute} from 'vue-router';
+import { useDark, useToggle } from '@vueuse/core'
+import { useRoute } from 'vue-router';
 import SettingView from '@/views/setting/index.vue'
 
 const menuItems = [
-  {route: '/', icon: Coin},
-  {route: '/connect', icon: Edit},
-  {route: '/chart', icon: Monitor},
+  { route: '/', icon: Coin },
+  { route: '/connect', icon: Edit },
+  { route: '/chart', icon: Monitor },
 ]
 const settingVisible = ref(false)
 const isDark = useDark({
@@ -130,13 +125,25 @@ const setting = () => {
     box-sizing: border-box;
 
     .logo {
-      text-align: center;
-      height: 40px;
-      margin-top: 20px;
+      background-color: rgba(25,115,237,1);
+      width: 38px;
+      height: 38px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo-text {
+      font-size: 28px;
+      font-weight: bold;
+      color: #fff;
+      margin: 0 auto;
+      transform: rotate(-10deg);
     }
 
     .nav {
-      margin-top: 20px;
+      margin-top: 8px;
     }
   }
 

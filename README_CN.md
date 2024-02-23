@@ -1,4 +1,4 @@
-<p align="center"><a href="https://github.com/m9d2/dbland"><img src="https://github.com/m9d2/store/blob/main/img/logo.png" alt="DBLAND" width="58" /></a></p>
+<p align="center"><a href="https://github.com/m9d2/dbland"><img src="https://github.com/m9d2/dbland/blob/main/file/logo.png" alt="DBLAND" width="58" /></a></p>
 <p align="center"><b>Web数据库连接工具，Web version database connection tool</b></p>
 <div align="center">
 <p align="center">
