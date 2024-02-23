@@ -62,3 +62,9 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background-color: darkred;
 }
+.unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

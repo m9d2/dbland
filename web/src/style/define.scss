@@ -6,12 +6,12 @@
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
   --db-c-border-light: #e5e7eb;
-  --db-c-text-light: #232429;
-  --db-c-text-light-2: rgba(60, 60, 67, .75);
+  --db-c-text-light: rgba(15, 15, 15, 1);
+  --db-c-text-light-2: rgba(60, 60, 67, .5);
   --db-c-text-hover-light: var(--db-c-primary);
   --db-c-bg-light: #ffffff;
   --db-c-bg-light-2: #f6f6f7;
-  --db-c-bg-hover-light: rgba(0, 0, 0, 0.03);
+  --db-c-bg-hover-light: rgba(0, 0, 0, 0.05);
   --db-c-bg-mute-light: #eeeef0;
 
   --db-c-border-dark: #232429;
@@ -28,6 +28,7 @@
 .light {
   --db-c-border: var(--db-c-border-light);
   --db-c-text: var(--db-c-text-light);
+  --db-c-text-2: var(--db-c-text-light-2);
   --db-c-text-hover: var(--db-c-text-hover-light);
   --db-c-text-nav: var(--db-c-text-light);
   --db-c-text-menu: var(--db-c-text-light);
@@ -41,6 +42,7 @@
   --db-c-primary: rgba(64, 158, 255, 1);
   --db-c-border: var(--db-c-border-dark);
   --db-c-text: var(--db-c-text-dark);
+  --db-c-text-2: var(--db-c-text-dark-2);
   --db-c-text-hover: var(--db-c-text-hover-dark);
   --db-c-text-nav: var(--db-c-text-dark-2);
   --db-c-text-menu: var(--db-c-text-dark-2);

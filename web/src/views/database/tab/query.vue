@@ -2,12 +2,11 @@
   <div class="query-main">
     <div class="query-tool">
       <el-select v-model="configValueRef" size="small" @change="changeConfig" default-first-option>
-        <el-option style="font-size: var(--font-size);" v-for="item in configs" :key="item.id" :label="item.name"
-          :value="item.id" />
+        <el-option v-for="item in configs" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
       <el-select v-model="dbValueRef" size="small">
-        <el-option style="font-size: var(--font-size);" v-for="item in databases" :key="item" :label="item" :value="item"
-          @change="changeConfig" default-first-option />
+        <el-option v-for="item in databases" :key="item" :label="item" :value="item" @change="changeConfig"
+          default-first-option />
       </el-select>
       <el-button @click="formatSql" size="small" :icon="MagicStick">{{ $t('database.button.format') }}</el-button>
       <el-button @click="querySql" size="small" :icon="CaretRight">{{ $t('database.button.run') }}</el-button>
@@ -19,56 +18,41 @@
     <div class="query-content">
       <div class="resize-handle" @mousedown="startResize"></div>
       <div class="table-tool" v-if="showQueryStatus">
-        <div style="margin: 0 8px;" class="clearfix">
-          <div class="fl">
+        <div class="clearfix">
+          <div class="menu fl">
             <el-tooltip effect="dark" :content="$t('common.add')">
-              <el-link :underline="false" @click="insertRow">
-                <el-icon>
-                  <Plus />
-                </el-icon>
-              </el-link>
+              <el-link :underline="false" @click="insertRow" :icon="Plus" />
             </el-tooltip>
           </div>
 
-          <div class="fl">
+          <div class="menu fl">
             <el-tooltip effect="dark" :content="$t('common.delete')">
-              <el-link :underline="false" @click="deleteRow">
-                <el-icon style="font-weight: 700;">
-                  <Minus />
-                </el-icon>
-              </el-link>
+              <el-link :underline="false" @click="deleteRow" :disabled="!currentRow" :icon="Minus" />
             </el-tooltip>
           </div>
 
-          <div class="fl">
+          <div class="menu fl">
             <el-tooltip effect="dark" :content="$t('common.modify')">
-              <el-link :underline="false" @click="modifyRow">
-                <el-icon style="font-weight: 700;">
-                  <Edit />
-                </el-icon></el-link>
+              <el-link :underline="false" @click="modifyRow" :disabled="!currentRow" :icon="Edit" />
             </el-tooltip>
           </div>
 
-          <div class="fl">
+          <div class="menu fl">
             <el-tooltip effect="dark" :content="$t('common.refresh')">
-              <el-link :underline="false" @click="refresh">
-                <el-icon>
-                  <Refresh />
-                </el-icon>
-              </el-link>
+              <el-link :underline="false" @click="refresh" :icon="Refresh" />
             </el-tooltip>
           </div>
 
-          <div class="fr">
+          <div class="menu fr">
             <el-dropdown>
-              <el-button size="small" style="margin-top: 3px">
+              <el-button size="small">
                 Import<el-icon class="el-icon--right"><arrow-down /></el-icon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item>csv</el-dropdown-item>
-                  <el-dropdown-item>insert sql</el-dropdown-item>
-                  <el-dropdown-item>excel</el-dropdown-item>
+                  <el-dropdown-item>CSV</el-dropdown-item>
+                  <el-dropdown-item>Insert SQL</el-dropdown-item>
+                  <el-dropdown-item>Excel</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -76,22 +60,26 @@
 
         </div>
       </div>
-      <Table class="query-table" :columns="tableColumns" :data="tableData" :loading="loading"
+      <Table class="query-table" :columns="tableColumns" :data="tableData" :loading="loading" @sort-change="sortChange"
         @row-current-change="handlerCurrentChange" @row-contextmenu="handlerContextmenu">
       </Table>
 
       <Form v-model="showModify" :row="currentRow" :actionType="actionType" :columns="tableColumns"
         @cancel="handlerCancel" @confirm="handlerConfirm"></Form>
 
-      <div class="query-status">
+      <div class="query-status unselectable">
         <div class="status-left">
-          <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total') }}: {{ total }}</span>
+          <span v-show="showQueryStatus">{{ $t('database.label.elapsed_time') }}: {{ elapsedTime }}s</span>
         </div>
         <div class="status-center">
-          <label>{{ sqlStr }}</label>
+          
         </div>
-        <div class="status-right">
-          <span v-show="showQueryStatus">{{ $t('database.label.elapsed_time') }}: {{ elapsedTime }}s</span>
+        <div class="status-right" v-show="showQueryStatus">
+          <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total') }}: {{ total }}</span>
+          <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total_page') }}: {{ totalPage }}</span>
+          <el-link style="margin-left: 8px;" :icon="ArrowLeftBold" :underline="false" @click="arrowLeft"/>
+          <el-input v-model="page" size="small" style="width: 36px; margin-left: 8px;" @change="changePage"></el-input>
+          <el-link style="margin-left: 8px;" :icon="ArrowRightBold" :underline="false" @click="arrowRight"/>
         </div>
       </div>
     </div>
@@ -107,11 +95,11 @@ import { format } from "sql-formatter";
 import { getConfigs } from "@/api/config";
 import { getDatabases, query, execute } from "@/api/connector";
 import type { DBConfig } from "@/api/config/type";
-import type { QueryReq } from "@/api/connector/type";
+import type { QueryReq, Sort } from "@/api/connector/type";
 import type { AxiosPromise } from "axios";
 import { ElNotification } from "element-plus";
 import ContextMenu from "@imengyu/vue3-context-menu";
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue'
 import {
   Plus,
   Edit,
@@ -137,10 +125,13 @@ let sqlStr: string;
 const elapsedTime = ref<number>();
 const showQueryStatus = ref(false);
 const total = ref();
-let currentRow: any
+const currentRow = ref();
 let actionType: any
 const showModify = ref(false)
 const contentHeight = ref(260);
+const page = ref(1)
+const pageSize = ref(100)
+const totalPage = ref()
 const props = defineProps({
   config: {
     type: Object,
@@ -157,6 +148,7 @@ const resizeData = reactive({
   startY: 0,
   startHeight: 0,
 });
+let sort: Sort
 
 function insertRow() {
   showModify.value = true
@@ -166,13 +158,13 @@ function insertRow() {
 async function deleteRow() {
   try {
     const database: Database = CreateDatabase(currentConfig, dbValueRef.value, sqlStr)
-    if (!currentRow) {
+    if (!currentRow.value) {
       ElNotification({
         message: 'please choose row',
         type: 'error'
       })
     }
-    const sql = database.createDeleteSql(tableColumns.value, currentRow)
+    const sql = database.createDeleteSql(tableColumns.value, currentRow.value)
     const { data } = await execute({ sql: sql, cid: configValueRef.value })
     ElNotification({
       message: 'Affected rows: ' + data,
@@ -197,7 +189,7 @@ async function refresh() {
 }
 
 function handlerCurrentChange(row: any) {
-  currentRow = row
+  currentRow.value = row
 }
 
 function handlerCancel() {
@@ -211,13 +203,13 @@ async function handlerConfirm(formData: any) {
     sql = database.createInsertSql(tableColumns.value, formData)
   }
   if (actionType == ActionTypeEnum.MODIFY) {
-    if (!currentRow) {
+    if (!currentRow.value) {
       ElNotification({
         message: 'No rows selected',
         type: 'error'
       })
     }
-    sql = database.createUpdateSql(tableColumns.value, formData, currentRow)
+    sql = database.createUpdateSql(tableColumns.value, formData, currentRow.value)
   }
   try {
     const { data } = await execute({ cid: configValueRef.value, sql: sql })
@@ -294,17 +286,22 @@ function formatSql() {
 
 async function querySql() {
   loading.value = true;
+  
   sqlStr = consoleRef.value.getValue();
   try {
     const params: QueryReq = {
       cid: configValueRef.value,
       db: dbValueRef.value,
       sql: sqlStr,
+      page: Number(page.value),
+      size: Number(pageSize.value),
+      sort: sort,
     };
     const { data } = await query(params);
     tableColumns.value = data.columns;
     tableData.value = data.rows;
     total.value = data.total;
+    totalPage.value = data.total_page;
     elapsedTime.value = data.elapsed_time;
     showQueryStatus.value = true;
   } catch (error: any) {
@@ -320,7 +317,7 @@ async function querySql() {
 function handlerContextmenu(row: any, column: any, event: any) {
   event.preventDefault();
   ContextMenu.showContextMenu({
-    theme: 'flat', 
+    theme: 'flat',
     x: event.x,
     y: event.y,
     items: [
@@ -346,7 +343,7 @@ function handlerContextmenu(row: any, column: any, event: any) {
         onClick: async () => {
           try {
             const database: Database = CreateDatabase(currentConfig, dbValueRef.value, sqlStr)
-            const sql = database.createDeleteSql(tableColumns.value, currentRow)
+            const sql = database.createDeleteSql(tableColumns.value, currentRow.value)
             const { data } = await execute({ sql: sql, cid: configValueRef.value })
             await querySql()
             ElNotification({
@@ -385,7 +382,7 @@ function resize(event: MouseEvent) {
   if (resizeData.isResizing) {
     const deltaY = event.clientY - resizeData.startY;
     contentHeight.value = resizeData.startHeight + deltaY;
-    localStorage.setItem('height', contentHeight.value)
+    localStorage.setItem('height', String(contentHeight.value))
   }
 };
 
@@ -393,6 +390,35 @@ function stopResize() {
   resizeData.isResizing = false;
   document.removeEventListener('mousemove', resize);
   document.removeEventListener('mouseup', stopResize);
+}
+
+function arrowLeft() {
+  if (page.value > 1) {
+    page.value = Number(page.value) - 1
+    querySql()
+  }
+}
+
+function arrowRight() {
+  page.value = Number(page.value) + 1
+  querySql()
+}
+
+function sortChange({ column, prop, order }: any) {
+  if (!prop || !order) {
+    return;
+  }
+  if (order === 'descending') {
+    order = 'desc';
+  } else {
+    order = 'asc';
+  }
+  sort = {prop, order}
+  querySql();
+}
+
+function changePage() {
+  querySql()
 }
 </script>
 
@@ -427,9 +453,19 @@ function stopResize() {
   border-bottom: none;
   line-height: 30px;
 
-  .el-link {
+  .menu {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: bold;
+
+    .el-link {
+      font-size: 14px;
+    }
+  }
+
+  .menu:last-child {
     margin-right: 8px;
-    font-weight: 700;
+    margin-top: 3px;
   }
 }
 
@@ -500,12 +536,15 @@ function stopResize() {
 .resize-handle {
   width: 100%;
   height: 6px;
-  z-index: 999;
 }
 
 .resize-handle:hover {
   cursor: row-resize;
   background-color: var(--db-c-border);
 
+}
+
+.el-select {
+  font-size: var(--font-size);
 }
 </style>

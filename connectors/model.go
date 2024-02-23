@@ -17,6 +17,7 @@ type Query struct {
 	Rows        []map[string]any `json:"rows"`
 	Total       int              `json:"total"`
 	ElapsedTime float64          `json:"elapsed_time"`
+	TotalPage   int              `json:"total_page"`
 }
 
 type Table struct {

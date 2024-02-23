@@ -5,12 +5,15 @@ import (
 	"dbland/model"
 	"dbland/repository"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/jmoiron/sqlx"
 	"log/slog"
+	"math"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
 )
 
 type ConnectorService struct {
@@ -29,6 +32,12 @@ type QueryReq struct {
 	Table    string `json:"table"`
 	Page     int    `json:"page"`
 	Size     int    `json:"size"`
+	Sort     Sort   `json:"sort"`
+}
+
+type Sort struct {
+	Prop  string `json:"prop"`
+	Order string `json:"order"`
 }
 
 func (s ConnectorService) Ping(c *gin.Context) error {
@@ -108,8 +117,6 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	slog.Info("query", "sql", req.Sql)
-
 	db, connector, err := s.getDBAndConnector(&req)
 	if err != nil {
 		return nil, err
@@ -125,17 +132,18 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 	// exec sql
 	var result *connectors.Query
 
-	var sqlStr = ""
-	if req.Page == 0 && req.Size == 0 {
-		sqlStr = req.Sql
-		result, err = connector.Query(db, req.Sql)
-		if err != nil {
-			return nil, err
-		}
-	} else {
+	var sqlStr = req.Sql
+	if req.Sort.Prop != "" && req.Sort.Order != "" && !containsKeywords(strings.ToLower(sqlStr), "order by", "limit", "offset") {
+		sqlStr = sqlStr + fmt.Sprintf(" ORDER BY %v %v", req.Sort.Prop, req.Sort.Order)
+	}
+	if req.Page != 0 && req.Size != 0 && !containsKeywords(strings.ToLower(sqlStr), "limit", "offset") {
 		offset := (req.Page - 1) * req.Size
-		sqlStr = req.Sql + fmt.Sprintf(" limit %v OFFSET %v", req.Size, offset)
-		result, err = connector.Query(db, sqlStr)
+		sqlStr = sqlStr + fmt.Sprintf(" limit %v OFFSET %v", req.Size, offset)
+	}
+	slog.Info("Query", "sql", sqlStr)
+	result, err = connector.Query(db, sqlStr)
+	if err != nil {
+		return nil, err
 	}
 
 	elapsedTime := time.Since(startTime)
@@ -153,6 +161,7 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 	go func() {
 		count, _ := connector.Count(db, countSql)
 		result.Total = count
+		result.TotalPage = int(math.Ceil(float64(count) / float64(req.Size)))
 		wg.Done()
 	}()
 	wg.Wait()
@@ -252,4 +261,15 @@ func (s ConnectorService) getConnector(dbType string) (connectors.Connector, err
 		return nil, err
 	}
 	return connector, nil
+}
+
+func containsKeywords(str string, keywords ...string) bool {
+	for _, keyword := range keywords {
+		keywordLower := strings.ToLower(keyword)
+		index := strings.Index(str, keywordLower)
+		if index != -1 {
+			return true
+		}
+	}
+	return false
 }
