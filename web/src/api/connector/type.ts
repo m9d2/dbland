@@ -5,6 +5,7 @@ export interface QueryReq {
     table?: string,
     page?: number,
     size?: number, 
+    sort?: Sort,
 }
 
 export interface Table {
@@ -16,9 +17,16 @@ export interface Table {
 }
 
 export interface Query {
+[x: string]: any;
     columns: string,
 	tableName: string,
 	rows: any,
 	total: number,   
     elapsed_time: number, 
+    total_page: number, 
 }
+
+export type Sort = {
+    prop: string,
+    order: string
+  }

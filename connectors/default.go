@@ -2,7 +2,6 @@ package connectors
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"log/slog"
@@ -253,10 +252,9 @@ func convertColumnType(columnType string) (string, error) {
 	switch columnType {
 	case "TINYINT", "SMALLINT", "INT", "INTEGER", "BIGINT", "UNSIGNED BIGINT", "UNSIGNED TINYINT":
 		return Number, nil
-	case "TEXT", "VARCHAR", "DATETIME", "BIT", "DATE", "CHAR":
+	case "TEXT", "VARCHAR", "DATETIME", "BIT", "DATE", "CHAR", "TIMESTAMP", "JSON":
 		return Text, nil
 	default:
-		err := fmt.Errorf("dont support type, %s", columnType)
-		return "", err
+		return Text, nil
 	}
 }

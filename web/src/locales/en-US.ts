@@ -15,6 +15,7 @@ const messages = {
         export: 'Export',
         import: 'Import',
         save: 'Save',
+        connect: 'Connect',
     },
     database: {
         button: {
@@ -22,10 +23,12 @@ const messages = {
             run: 'Run',
             new_query: 'New Query',
             query: 'Query',
+            refresh: 'Refresh',
         },
         label: {
             total: 'Total',
             elapsed_time: 'Elapsed Time',
+            total_page: 'Total Page',
         },
     },
     connect: {
@@ -35,7 +38,7 @@ const messages = {
         title: 'Setting',
         menu: {
             basic: 'Basic Settings',
-            other: 'About Us'
+            about: 'About'
         },
         basic: {
             color: 'Global Theme Colors',

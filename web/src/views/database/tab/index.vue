@@ -2,7 +2,7 @@
   <el-tabs v-model="activeTab" class="tabs-content" closable @tab-click="tabClick" @tab-remove="removeTab">
     <el-tab-pane v-for="item in tabsData" :key="item.name" :label="item.title" :name="item.name" lazy>
       <template #label>
-        <span class="custom-tabs-label">
+        <span class="custom-tabs-label unselectable">
           <span class="iconfont icon-biaoge blue" style="padding-right: 8px;"></span>
           <span>{{ item.title }}</span>
         </span>
@@ -120,4 +120,5 @@ defineExpose({ newTab })
 .custom-tabs-label {
   font-size: 12px;
   vertical-align: middle;
-}</style>
+}
+</style>

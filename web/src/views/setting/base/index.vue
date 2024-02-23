@@ -3,14 +3,27 @@
     <div class="setting-base" v-if="active == 'base'">
       <div class="setting-item">
         <div class="base-title">
+          <el-link :underline="false" target="_blank" href="https://github.com/m9d2/dbland/releases">
+            <img alt="GitHub Release" src="https://img.shields.io/github/v/release/m9d2/dbland?labelColor=rgba(25%2C115%2C237%2C1)&color=%23fff">
+          </el-link>
+          <el-link style="margin-left: 8px;" :underline="false" target="_blank" href="https://github.com/m9d2/dbland/releases">
+            <img alt="GitHub License" src="https://img.shields.io/github/license/m9d2/dbland">
+          </el-link>
+          <el-link style="margin-left: 8px;" :underline="false" target="_blank" href="https://github.com/m9d2/dbland">
+            <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/m9d2%2Fdbland">
+          </el-link>
+        </div>
+      </div>
+      <el-divider />
+      <div class="setting-item">
+        <div class="base-title">
           <span>{{ $t('setting.basic.color') }}</span>
         </div>
         <div class="base-content">
-          <el-color-picker v-model="themeColor" show-alpha @change="changeColor"/>
+          <el-color-picker v-model="themeColor" show-alpha @change="changeColor" />
           <el-link style="margin-left: 8px;" @click="restore">{{ $t('setting.basic.restore') }}</el-link>
         </div>
       </div>
-
       <div class="setting-item">
         <div class="base-title">
           <span>{{ $t('setting.basic.select_language') }}</span>
@@ -22,7 +35,6 @@
           </el-select>
         </div>
       </div>
-
       <div class="setting-item">
         <div class="base-title">
           <span>{{ $t('setting.basic.theme') }}</span>
@@ -43,7 +55,6 @@
 import { onMounted, ref } from 'vue'
 import { useDark, useToggle } from '@vueuse/core'
 
-
 let localTheme = localStorage.getItem('theme')
 let defaultColor = 'rgba(25,115,237,1)'
 if (localTheme) {
@@ -57,10 +68,7 @@ const themeColor = ref(defaultColor)
 const language = ref('en')
 const fontSize = ref('12px')
 const theme = ref('auto')
-
 const active = ref('base')
-
-
 const isDark = useDark({
   storageKey: "theme",
   valueDark: "dark",
@@ -86,6 +94,8 @@ onMounted(() => {
   }
 })
 
+
+
 function restore() {
   root.style.setProperty('--db-c-primary', defaultColor);
   themeColor.value = defaultColor
@@ -103,17 +113,17 @@ function changeLanguage(value: any) {
   window.location.reload()
 }
 
-function changeTheme(value:any) {
+function changeTheme(value: any) {
   localStorage.setItem('theme', value)
   if (value == 'dark') {
-      isDark.value = true
-      useToggle(isDark);
-    } else {
-      isDark.value = false
-    }
+    isDark.value = true
+    useToggle(isDark);
+  } else {
+    isDark.value = false
+  }
 }
 
-function changeFontSize(value:any) {
+function changeFontSize(value: any) {
   localStorage.setItem('font-size', value)
 }
 
