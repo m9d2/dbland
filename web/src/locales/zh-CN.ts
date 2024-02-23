@@ -15,6 +15,7 @@ const messages = {
         export: '导入',
         import: '导出',
         save: '保存',
+        connect: '连接',
     },
     database: {
         button: {
@@ -22,10 +23,12 @@ const messages = {
             run: '执行',
             new_query: '新建查询',
             query: '查询',
+            refresh: '刷新',
         },
         label: {
             total: '总数',
             elapsed_time: '执行时间',
+            page: '页数',
         },
     },
     connect: {

@@ -120,4 +120,5 @@ defineExpose({ newTab })
 .custom-tabs-label {
   font-size: 12px;
   vertical-align: middle;
-}</style>
+}
+</style>

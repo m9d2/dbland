@@ -2,12 +2,11 @@
   <div class="query-main">
     <div class="query-tool">
       <el-select v-model="configValueRef" size="small" @change="changeConfig" default-first-option>
-        <el-option style="font-size: var(--font-size);" v-for="item in configs" :key="item.id" :label="item.name"
-          :value="item.id" />
+        <el-option v-for="item in configs" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
       <el-select v-model="dbValueRef" size="small">
-        <el-option style="font-size: var(--font-size);" v-for="item in databases" :key="item" :label="item" :value="item"
-          @change="changeConfig" default-first-option />
+        <el-option v-for="item in databases" :key="item" :label="item" :value="item" @change="changeConfig"
+          default-first-option />
       </el-select>
       <el-button @click="formatSql" size="small" :icon="MagicStick">{{ $t('database.button.format') }}</el-button>
       <el-button @click="querySql" size="small" :icon="CaretRight">{{ $t('database.button.run') }}</el-button>
@@ -19,8 +18,8 @@
     <div class="query-content">
       <div class="resize-handle" @mousedown="startResize"></div>
       <div class="table-tool" v-if="showQueryStatus">
-        <div style="margin: 0 8px;" class="clearfix">
-          <div class="fl">
+        <div class="clearfix">
+          <div class="menu fl">
             <el-tooltip effect="dark" :content="$t('common.add')">
               <el-link :underline="false" @click="insertRow">
                 <el-icon>
@@ -30,26 +29,26 @@
             </el-tooltip>
           </div>
 
-          <div class="fl">
+          <div class="menu fl">
             <el-tooltip effect="dark" :content="$t('common.delete')">
-              <el-link :underline="false" @click="deleteRow">
-                <el-icon style="font-weight: 700;">
+              <el-link :underline="false" @click="deleteRow" :disabled="!currentRow">
+                <el-icon>
                   <Minus />
                 </el-icon>
               </el-link>
             </el-tooltip>
           </div>
 
-          <div class="fl">
+          <div class="menu fl">
             <el-tooltip effect="dark" :content="$t('common.modify')">
-              <el-link :underline="false" @click="modifyRow">
-                <el-icon style="font-weight: 700;">
+              <el-link :underline="false" @click="modifyRow" :disabled="!currentRow">
+                <el-icon>
                   <Edit />
                 </el-icon></el-link>
             </el-tooltip>
           </div>
 
-          <div class="fl">
+          <div class="menu fl">
             <el-tooltip effect="dark" :content="$t('common.refresh')">
               <el-link :underline="false" @click="refresh">
                 <el-icon>
@@ -59,16 +58,16 @@
             </el-tooltip>
           </div>
 
-          <div class="fr">
+          <div class="menu fr">
             <el-dropdown>
-              <el-button size="small" style="margin-top: 3px">
+              <el-button size="small">
                 Import<el-icon class="el-icon--right"><arrow-down /></el-icon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item>csv</el-dropdown-item>
-                  <el-dropdown-item>insert sql</el-dropdown-item>
-                  <el-dropdown-item>excel</el-dropdown-item>
+                  <el-dropdown-item>CSV</el-dropdown-item>
+                  <el-dropdown-item>Insert SQL</el-dropdown-item>
+                  <el-dropdown-item>Excel</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -85,13 +84,19 @@
 
       <div class="query-status">
         <div class="status-left">
-          <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total') }}: {{ total }}</span>
+          <span v-show="showQueryStatus">{{ $t('database.label.elapsed_time') }}: {{ elapsedTime }}s</span>
         </div>
         <div class="status-center">
           <label>{{ sqlStr }}</label>
         </div>
-        <div class="status-right">
-          <span v-show="showQueryStatus">{{ $t('database.label.elapsed_time') }}: {{ elapsedTime }}s</span>
+        <div class="status-right" v-show="showQueryStatus">
+          <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total') }}: {{ total }}</span>
+          <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.page') }}: {{ page }}</span>
+          <el-link style="margin-left: 8px;" :icon="ArrowLeft" :underline="false">
+          </el-link>
+          <el-input v-model="page" style="width: 36px; height: 18px; margin-left: 8px;"></el-input>
+          <el-link style="margin-left: 8px;" :icon="ArrowRight" :underline="false">
+          </el-link>
         </div>
       </div>
     </div>
@@ -111,7 +116,7 @@ import type { QueryReq } from "@/api/connector/type";
 import type { AxiosPromise } from "axios";
 import { ElNotification } from "element-plus";
 import ContextMenu from "@imengyu/vue3-context-menu";
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import {
   Plus,
   Edit,
@@ -137,10 +142,11 @@ let sqlStr: string;
 const elapsedTime = ref<number>();
 const showQueryStatus = ref(false);
 const total = ref();
-let currentRow: any
+const currentRow = ref();
 let actionType: any
 const showModify = ref(false)
 const contentHeight = ref(260);
+const page = ref(1)
 const props = defineProps({
   config: {
     type: Object,
@@ -166,13 +172,13 @@ function insertRow() {
 async function deleteRow() {
   try {
     const database: Database = CreateDatabase(currentConfig, dbValueRef.value, sqlStr)
-    if (!currentRow) {
+    if (!currentRow.value) {
       ElNotification({
         message: 'please choose row',
         type: 'error'
       })
     }
-    const sql = database.createDeleteSql(tableColumns.value, currentRow)
+    const sql = database.createDeleteSql(tableColumns.value, currentRow.value)
     const { data } = await execute({ sql: sql, cid: configValueRef.value })
     ElNotification({
       message: 'Affected rows: ' + data,
@@ -197,7 +203,7 @@ async function refresh() {
 }
 
 function handlerCurrentChange(row: any) {
-  currentRow = row
+  currentRow.value = row
 }
 
 function handlerCancel() {
@@ -211,13 +217,13 @@ async function handlerConfirm(formData: any) {
     sql = database.createInsertSql(tableColumns.value, formData)
   }
   if (actionType == ActionTypeEnum.MODIFY) {
-    if (!currentRow) {
+    if (!currentRow.value) {
       ElNotification({
         message: 'No rows selected',
         type: 'error'
       })
     }
-    sql = database.createUpdateSql(tableColumns.value, formData, currentRow)
+    sql = database.createUpdateSql(tableColumns.value, formData, currentRow.value)
   }
   try {
     const { data } = await execute({ cid: configValueRef.value, sql: sql })
@@ -320,7 +326,7 @@ async function querySql() {
 function handlerContextmenu(row: any, column: any, event: any) {
   event.preventDefault();
   ContextMenu.showContextMenu({
-    theme: 'flat', 
+    theme: 'flat',
     x: event.x,
     y: event.y,
     items: [
@@ -346,7 +352,7 @@ function handlerContextmenu(row: any, column: any, event: any) {
         onClick: async () => {
           try {
             const database: Database = CreateDatabase(currentConfig, dbValueRef.value, sqlStr)
-            const sql = database.createDeleteSql(tableColumns.value, currentRow)
+            const sql = database.createDeleteSql(tableColumns.value, currentRow.value)
             const { data } = await execute({ sql: sql, cid: configValueRef.value })
             await querySql()
             ElNotification({
@@ -385,7 +391,7 @@ function resize(event: MouseEvent) {
   if (resizeData.isResizing) {
     const deltaY = event.clientY - resizeData.startY;
     contentHeight.value = resizeData.startHeight + deltaY;
-    localStorage.setItem('height', contentHeight.value)
+    localStorage.setItem('height', String(contentHeight.value))
   }
 };
 
@@ -427,9 +433,15 @@ function stopResize() {
   border-bottom: none;
   line-height: 30px;
 
-  .el-link {
+  .menu {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .menu:last-child {
     margin-right: 8px;
-    font-weight: 700;
+    margin-top: 3px;
   }
 }
 
@@ -507,5 +519,9 @@ function stopResize() {
   cursor: row-resize;
   background-color: var(--db-c-border);
 
+}
+
+.el-select {
+  font-size: var(--font-size);
 }
 </style>

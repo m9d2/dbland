@@ -15,6 +15,7 @@ const messages = {
         export: 'Export',
         import: 'Import',
         save: 'Save',
+        connect: 'Connect',
     },
     database: {
         button: {
@@ -22,10 +23,12 @@ const messages = {
             run: 'Run',
             new_query: 'New Query',
             query: 'Query',
+            refresh: 'Refresh',
         },
         label: {
             total: 'Total',
             elapsed_time: 'Elapsed Time',
+            page: 'Page',
         },
     },
     connect: {

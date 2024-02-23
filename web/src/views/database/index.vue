@@ -1,75 +1,68 @@
 <template>
   <div class="content-box">
-
-    <div class="header"
-      style="padding: 0 8px;background-color: var(--db-c-bg-nav); border-bottom: 1px solid var(--db-c-border); height: 30px; line-height: 30px;">
-      <el-breadcrumb :separator-icon="ArrowRight"
-        style="overflow: hidden;height: 30px; line-height: 30px; font-size: var(--font-size); color: var(--db-c-text)">
-        <el-breadcrumb-item v-if="firstData" :to="{ path: '/' }" @click="loadConfigs">{{ $t('common.homepage')
-        }}</el-breadcrumb-item>
-        <el-breadcrumb-item v-show="firstData" @click="back" :to="{ path: '/' }">{{ firstData }}</el-breadcrumb-item>
-        <el-breadcrumb-item>
-
-          <el-text truncated>
-            {{ secondData }}
-          </el-text>
-        </el-breadcrumb-item>
-      </el-breadcrumb>
-    </div>
-
     <div class="content-main">
       <div class="content-left" :style="{ width: contentWidth + 'px' }">
         <div class="search">
-          <el-input v-model="filterText" style="height: 32px" :placeholder="placeholder" size="small" />
-          <el-dropdown>
-            <el-link style="font-size: 16px; margin-left: 8px;" :icon="Menu" :underline="false">
-            </el-link>
+          <el-input v-model="filterText" :placeholder="$t('common.search')" size="small" clearable>
+            <template #prefix>
+              <el-icon class="el-input__icon">
+                <search />
+              </el-icon>
+            </template>
+          </el-input>
+          <el-link :icon="Refresh" @click="refresh" :underline="false"/>
+          <el-link :icon="Plus" @click="newTab('')" :underline="false"/>
+          <!-- <el-dropdown trigger="click">
+            <el-link style="font-size: 16px;" :underline="false" :icon="Menu" />
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="newTab('')">{{ $t('database.button.new_query') }}</el-dropdown-item>
+                <el-dropdown-item :icon="Connection" @click="$router.push('/connect')">{{ $t('common.connect') }}</el-dropdown-item>
+                <el-dropdown-item :icon="Delete">{{ $t('common.delete') }}</el-dropdown-item>
               </el-dropdown-menu>
             </template>
-          </el-dropdown>
+          </el-dropdown> -->
         </div>
+        <el-tree ref="treeRef" :props="props" :load="loadNode" empty-text="" lazy @check-change="handleCheckChange"
+          :indent="12" :highlight-current="true" :filter-node-method="filterNode" @node-click="clickNode">
+          <template v-slot="{ node, data }">
+            <div class="tree-node" @dblclick="doubleClickNode(data, node)" @mouseover="handleMouseEnter(node, data)"
+              @mouseleave="handleMouseLeave(node, data)">
+              <div class="node-content">
+                <el-icon v-show="node.level == TreeLevelEnum.CONFIG">
+                  <span v-for="item in icons" v-show="data.type == item.dbType" class="iconfont"
+                    :class="item.icon"></span>
+                </el-icon>
+                <el-icon v-show="node.level == TreeLevelEnum.DATABASE" class="iconfont">
+                  <Coin />
+                </el-icon>
+                <el-icon v-show="node.level == TreeLevelEnum.TABLE" class="iconfont">
+                  <Document />
+                </el-icon>
+                <span>{{ data.name }}</span>
+              </div>
 
-        <List class="menu-list" style="margin: 8px 8px;" :list="listData" @node-click="clickNode"
-          @node-mouse-enter="handleMouseEnter" @node-mouse-leave="handleMouseLeave" @node-db-click="handleNodeDblClick">
-
-          <template #begin="{ node }">
-            <el-icon v-show="node.level == TreeLevelEnum.CONFIG" class="iconfont" style="margin: 5px">
-              <span v-show="node.type == DbTypeEnum.MySQL" class="iconfont">&#xec6d;</span>
-              <span v-show="node.type == DbTypeEnum.SQLite" class="iconfont">&#xe65a;</span>
-              <span v-show="node.type == DbTypeEnum.ORACLE" class="iconfont">&#xec48;</span>
-              <span v-show="node.type == DbTypeEnum.PostgreSQL" class="iconfont">&#xe8b7;</span>
-              <span v-show="node.type == DbTypeEnum.MariaDB" class="iconfont">&#xec6d;</span>
-            </el-icon>
-            <el-icon v-show="node.level == TreeLevelEnum.DATABASE" class="iconfont" style="margin: 5px">
-              <Coin />
-            </el-icon>
-            <el-icon v-show="node.level == TreeLevelEnum.TABLE" class="iconfont" style="margin: 5px">
-              <Document />
-            </el-icon>
+              <div class="node-menu">
+                <el-dropdown size="small" trigger="click">
+                  <el-link v-show="data.isCurrent" :underline="false" :icon="MoreFilled" />
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item :icon="Search" @click="newTab(node.name)">{{
+                        $t('database.button.query')
+                      }}
+                      </el-dropdown-item>
+                      <el-dropdown-item :icon="Edit">{{ $t('common.edit') }}</el-dropdown-item>
+                      <el-dropdown-item :icon="Delete">{{ $t('common.delete') }}</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
+            </div>
           </template>
-
-          <template #default="{ index, node }">
-            <el-dropdown style="vertical-align: center;" size="small" trigger="click">
-              <el-link v-show="index === activeIndex && node.level == Level.TABLE" :underline="false"
-                :icon="MoreFilled" />
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item :icon="Search" @click="newTab(node.name)">{{ $t('database.button.query')
-                  }}</el-dropdown-item>
-                  <el-dropdown-item :icon="Edit">{{ $t('common.edit') }}</el-dropdown-item>
-                  <el-dropdown-item :icon="Delete">{{ $t('common.delete') }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </template>
-        </List>
+        </el-tree>
         <div class="resize-handle" @mousedown="startResize"></div>
       </div>
       <div class="content-right">
-        <div class="shortcuts" v-if="shortcutsVisible">
+        <div class="info" v-if="shortcutsVisible">
           <span class="logo-text">DBLAND</span>
         </div>
         <Tab :isResultVisible="isResultVisible" ref="childRef" @messageUpdated="handlerMessageUpdate" />
@@ -79,51 +72,76 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, reactive } from "vue";
-import { ElNotification } from "element-plus";
-import { ArrowRight, Coin, Document, Search, Menu } from '@element-plus/icons-vue'
+import { onMounted, reactive, ref, watch } from "vue";
+import { ElNotification, ElTree } from "element-plus";
+import { Coin, Document, Menu, Refresh, Edit, Delete, Search, MoreFilled, Connection, Plus } from '@element-plus/icons-vue';
 import { getConfigs } from "@/api/config";
 import { getDatabases, getTables } from "@/api/connector";
 import type { DBConfig } from "@/api/config/type";
 import Tab from "@/views/database/tab/index.vue";
-import i18n from '@/plugins/i18n'
 import type { AxiosPromise } from "axios";
-import List from '@/components/layout/list/index.vue'
-import { TreeLevelEnum } from "@/common/enums";
-import { DbTypeEnum } from '@/common/enums';
-import { Delete, Edit, MoreFilled } from '@element-plus/icons-vue'
-
-enum Level {
-  ROOT = 0,
-  CONFIG = 1,
-  DATABASE = 2,
-  TABLE = 3,
-}
-
-interface Tree {
-  [key: string]: any;
-}
+import { DbTypeEnum, TreeLevelEnum } from "@/common/enums";
+import type Node from 'element-plus/es/components/tree/src/model/node';
+import { useRouter } from 'vue-router';
 
 const filterText = ref("");
 const isResultVisible = ref();
 const shortcutsVisible = ref(true);
 const childRef = ref();
-
-const placeholder = i18n.global.t('common.search')
-const firstData = ref()
-const secondData = ref()
-let currentCid: number
-let currentConfig: Object
-let currentDatabase: Object
-const activeIndex = ref()
 const resizing = ref(false);
-const listData = ref()
 const contentWidth = ref(220)
 const resizeData = reactive({
   isResizing: false,
   startX: 0,
   startWidth: 0,
 });
+let currentConfig: Object
+let currentDatabase: Object
+const props = {
+  label: 'name',
+  children: 'children',
+  isLeaf: 'leaf',
+}
+const icons = [
+  { dbType: DbTypeEnum.MySQL, icon: 'icon-mysql' },
+  { dbType: DbTypeEnum.SQLite, icon: 'icon-sqlite' },
+  { dbType: DbTypeEnum.ORACLE, icon: 'icon-oracle' },
+  { dbType: DbTypeEnum.PostgreSQL, icon: 'icon-PostgreSQL' },
+  { dbType: DbTypeEnum.MariaDB, icon: 'icon-mysql' },
+]
+
+interface Tree {
+  name: string
+}
+
+const handleCheckChange = (
+  data: Tree,
+  checked: boolean,
+  indeterminate: boolean
+) => {
+  console.log(data, checked, indeterminate)
+}
+
+const loadNode = async (node: Node, resolve: (data: Tree[]) => void) => {
+  if (node.level === 0) {
+    const nodes: any = await loadConfigs();
+    return resolve(nodes);
+  }
+  if (node.level === 1) {
+    const nodes: any = await loadDatabases(node.data.id)
+    return resolve(nodes);
+  }
+  if (node.level === 2) {
+    const nodes: any = await loadTables(node.data.cid, node.data.name)
+    const formattedNodes = nodes.map((childNode: Node) => ({
+      ...childNode,
+      leaf: true,
+    }));
+    return resolve(formattedNodes);
+  }
+  return resolve([])
+};
+
 
 onMounted(() => {
   let width = localStorage.getItem('width')
@@ -132,21 +150,14 @@ onMounted(() => {
   }
 })
 
-const handleNodeDblClick = (index: number, node: any) => {
-  if (node.level === 3) {
-    newTab(node.name);
-  }
-};
-
-function newTab(table: string) {
+const newTab = (table: string) => {
   isResultVisible.value = true;
   shortcutsVisible.value = false;
   childRef.value?.newTab(currentConfig, currentDatabase, table);
 }
 
-function back() {
-  secondData.value = ''
-  loadDatabases(currentCid)
+const refresh = () => {
+  loadConfigs();
 }
 
 const handlerMessageUpdate = (data: any) => {
@@ -154,117 +165,107 @@ const handlerMessageUpdate = (data: any) => {
   shortcutsVisible.value = !data;
 };
 
-function handleMouseEnter(index: number) {
-  activeIndex.value = index;
+const handleMouseEnter = (node: any, data: any) => {
+  if (node.level == TreeLevelEnum.TABLE) {
+    data.isCurrent = true
+  }
 }
 
-function handleMouseLeave(index: number) {
-  activeIndex.value = null;
+const handleMouseLeave = (node: any, data: any) => {
+  if (node.level == TreeLevelEnum.TABLE) {
+    data.isCurrent = false
+  }
 }
 
-function clickNode(index: number, row: any) {
-  const level = row.level
-  if (level == TreeLevelEnum.CONFIG) {
-
-    loadDatabases(row.id)
-    firstData.value = row.name
-    currentCid = row.id
-    currentConfig = row
+const clickNode = (data: any, node: any) => {
+  const level = node.level
+  if (!level || level == TreeLevelEnum.CONFIG) {
+    currentConfig = node.data
   }
   if (level == TreeLevelEnum.DATABASE) {
-    loadTables(row.cid, row.name)
-    secondData.value = row.name
-    currentDatabase = row
+    currentDatabase = node.data
   }
 }
 
-function startResize(event: MouseEvent) {
+const doubleClickNode = (data: any, node: any) => {
+  if (node.level === 3) {
+    newTab(node.data.name);
+  }
+};
+
+const startResize = (event: MouseEvent) => {
   resizeData.isResizing = true;
   resizeData.startX = event.clientX;
   resizeData.startWidth = contentWidth.value;
-  
+
   document.addEventListener('mousemove', resize);
   document.addEventListener('mouseup', stopResize);
-};
+}
 
-function resize(event: MouseEvent) {
+const resize = (event: MouseEvent) => {
   if (resizeData.isResizing) {
     const deltaX = event.clientX - resizeData.startX;
     contentWidth.value = resizeData.startWidth + deltaX;
-    // console.log(contentWidth.value)
-    localStorage.setItem('width', contentWidth.value)
+    localStorage.setItem('width', contentWidth.value.toString())
   }
-};
+}
 
-function stopResize() {
+const stopResize = () => {
   resizing.value = false;
   document.removeEventListener('mousemove', resize);
   document.removeEventListener('mouseup', stopResize);
-};
+}
 
-onMounted(() => {
-  loadConfigs();
-})
-
-function loadConfigs() {
+const loadConfigs = async () => {
   try {
-    let nodes: any = []
     const response: AxiosPromise<DBConfig[]> = getConfigs();
-    response.then((res: any) => {
-      if (res.data) {
-        res.data.forEach((data: any) => {
-          data.active = false
-          data.level = TreeLevelEnum.CONFIG
-          nodes.push(data)
-        })
-        listData.value = nodes
-      }
-    });
+    const res = await response;
+    if (res.data) {
+      return res.data;
+    }
   } catch (error: any) {
     ElNotification({
       message: error.message,
-      type: 'error'
-    })
-  } finally {
-    firstData.value = ''
-    secondData.value = ''
+      type: 'error',
+    });
+    return [];
   }
 }
 
-async function loadDatabases(cid: number) {
-  let nodes: any = []
+const loadDatabases = async (cid: number) => {
   const { data } = await getDatabases({ cid: cid });
-  for (let i = 0; i < data.length; i++) {
-    let child = {
-      name: data[i],
-      level: Level.DATABASE,
+  return data
+    ? data.map((name) => ({
+      name: name,
       cid: cid,
-    };
-    nodes.push(child)
-  }
-  listData.value = nodes
+    }))
+    : []
 }
 
-async function loadTables(cid: number, db: string) {
+const loadTables = async (cid: number, db: string) => {
   const { data } = await getTables({
     cid: cid,
     db: db,
   });
-  const nodes = data
+  return data
     ? data.map((table) => ({
       name: table.name,
-      level: Level.TABLE,
       cid: cid,
-      leaf: true,
+      children: [],
+      isLeaf: true,
     }))
     : []
-  listData.value = nodes
 }
 
-const filterNode = (value: string, data: Tree) => {
+const treeRef = ref<InstanceType<typeof ElTree>>()
+
+watch(filterText, (val) => {
+  treeRef.value!.filter(val)
+})
+
+const filterNode = (value: string, data: any) => {
   if (!value) return true;
-  console.log(value)
-  return data.label.includes(value);
+  return data.name.includes(value);
 };
 </script>
 
@@ -274,13 +275,10 @@ const filterNode = (value: string, data: Tree) => {
   flex-direction: column;
   height: 100%;
 
-  .header {
-    color: var(--db-c-text-1);
-
-    .el-link {
-      font-size: var(--font-size);
-      vertical-align: bottom;
-    }
+  .el-link {
+    font-size: 16px;
+    vertical-align: bottom;
+    margin-left: 8px;
   }
 }
 
@@ -291,61 +289,63 @@ const filterNode = (value: string, data: Tree) => {
   overflow: hidden;
 
   .content-left {
+    flex: 0 0 auto;
     height: 100%;
     color: var(--db-c-text-menu);
     background-color: var(--db-c-bg-nav);
-    position: relative;
     display: flex;
     flex-direction: column;
     position: relative;
 
     .resize-handle {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 1px;
-    height: 100%;
-    z-index: 999;
-    width: 6px;
-    border-right: 1px solid var(--db-c-border);
-  }
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      z-index: 999;
+      width: 6px;
+      border-right: 1px solid var(--db-c-border);
+    }
 
     .search {
       border-radius: 5px;
-      padding: 8px;
+      padding: 12px;
       display: flex;
       align-items: center;
     }
-  }
 
-    .content-right {
-      flex-grow: 1;
-      height: 100%;
-      overflow: hidden;
-      margin: 0 8px;
-      background-color: var(--db-c-bg);
+    .el-icon {
+      margin: 0 5px 0 0;
     }
-
   }
 
-  .resize-handle:hover {
-    background-color: var(--db-c-border);
-    cursor: col-resize;
-  }
- 
-
-  .menu-list {
+  .content-right {
     flex-grow: 1;
+    height: 100%;
+    overflow: hidden;
+    margin: 0 8px;
+    background-color: var(--db-c-bg);
   }
 
-  .new-query {
-    height: 48px;
-    padding: 8px;
-    justify-content: center;
-    box-sizing: border-box;
-  }
+}
 
-.shortcuts {
+.resize-handle:hover {
+  background-color: var(--db-c-border);
+  cursor: col-resize;
+}
+
+.menu-list {
+  flex-grow: 1;
+}
+
+.new-query {
+  height: 48px;
+  padding: 8px;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.info {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -356,8 +356,14 @@ const filterNode = (value: string, data: Tree) => {
     color: var(--db-c-text);
     opacity: 0.15;
   }
-}
 
+  .version {
+    display: block;
+    font-size: 16px;
+    color: var(--db-c-text);
+    opacity: 0.15;
+  }
+}
 
 .el-dropdown {
   line-height: 30px;
@@ -366,5 +372,26 @@ const filterNode = (value: string, data: Tree) => {
   .el-link {
     font-size: var(--font-size);
   }
+}
+
+.node-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.el-tree {
+  padding: 0 5px;
+  color: var(--db-c-text-menu);
+  background: var(--db-c-bg-nav);
+  overflow: auto;
+}
+
+.tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 8px;
 }
 </style>

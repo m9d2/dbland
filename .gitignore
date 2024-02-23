@@ -22,3 +22,4 @@ bin-release/
 dbland.db
 web/node_modules/
 web/dist
+.DS_Store
