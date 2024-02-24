@@ -24,10 +24,6 @@ Web version database connection tool, fast installation with minimal memory usag
 <img src="https://github.com/m9d2/store/blob/main/img/iShot_2023-09-15_12.07.03.png?raw=true?" alt="UI" width="100%" height="100%">
 <img src="https://github.com/m9d2/store/blob/main/img/iShot_2023-09-24_13.57.47.png?raw=true?" alt="UI" width="100%" height="100%">
 
-
-## Demo
-https://dbland.m9d2.cn/ui
-
 ## Quick start
 ### Installing using Docker
 

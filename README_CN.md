@@ -20,10 +20,6 @@ Web版本数据库连接工具，快速安装，内存占用少
 
 ![UI界面](https://github.com/m9d2/store/blob/main/img/iShot_2023-09-15_12.07.03.png)
 
-
-## 体验地址
-https://dbland.m9d2.cn/ui
-
 ## 快速开始
 ### 使用Docker安装
 
