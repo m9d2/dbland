@@ -4,8 +4,8 @@
       <div style="margin-top: 20px; text-align: center; display: flex; justify-content: center; align-items: center;">
         <a href="https://github.com/m9d2/dbland" target="_blank">
           <div class="logo">
-          <span class="logo-text unselectable">D</span>
-        </div>
+            <span class="logo-text unselectable">D</span>
+          </div>
         </a>
       </div>
       <div class="nav">
@@ -125,7 +125,7 @@ const setting = () => {
     box-sizing: border-box;
 
     .logo {
-      background-color: rgba(25,115,237,1);
+      background-color: rgba(25, 115, 237, 1);
       width: 38px;
       height: 38px;
       border-radius: 6px;
