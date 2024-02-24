@@ -1,11 +1,4 @@
-<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 28px">
-  <a href="https://github.com/m9d2/dbland">
-    <div
-      style="height: 48px; width: 48px; background-color: rgba(25,115,237,1); border-radius: 6px; display: flex; justify-content: center; align-items: center;">
-      <div style="font-size: 38px; font-weight: bold;color: #fff;margin: 0 auto; transform: rotate(-10deg);">D</div>
-    </div>
-  </a>
-</div>
+<p align="center"><a href="https://github.com/m9d2/dbland"><img src="https://github.com/m9d2/store/blob/main/img/logo.png?raw=true" alt="DBLAND" width="200" height="200"/></a></p>
 <p align="center"><b>Web version database connection tool</b></p>
 <div align="center">
 <p align="center">
