@@ -1,6 +1,5 @@
 <p align="center"><a href="https://github.com/m9d2/dbland"><img src="https://github.com/m9d2/store/blob/main/img/logo.png?raw=true" alt="DBLAND" width="48" /></a></p>
-<p align="center"><b>Web version database connection tool</b></p>
-<p align="center"><b>Web数据库连接工具，Web version database connection tool</b></p>
+<p align="center"><b>Web数据库连接工具</b></p>
 <div align="center">
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/m9d2/dbland?color=%231890FF" alt="License: GPL v3"></a>
