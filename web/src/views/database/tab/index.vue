@@ -18,9 +18,14 @@ import { createQuerySql } from '@/common/utils'
 import Query from './query.vue'
 
 // tabs data array
-const tabsData = ref([])
+const tabsData = ref<any[]>([])
 
-const props = defineProps()
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+})
 const isResultVisible = ref(props.modelValue)
 const emit = defineEmits()
 
@@ -39,7 +44,7 @@ function removeTab(targetName: string) {
   const tabs = tabsData.value
   let activeName = activeTab.value
   if (activeName === targetName) {
-    tabs.forEach((tab, index) => {
+    tabs.forEach((tab: any, index: any) => {
       if (tab.name === targetName) {
         const nextTab = tabs[index + 1] || tabs[index - 1]
         if (nextTab) {
@@ -49,7 +54,7 @@ function removeTab(targetName: string) {
     })
   }
   activeTab.value = activeName
-  tabsData.value = tabs.filter((tab) => tab.name !== targetName)
+  tabsData.value = tabs.filter((tab: any) => tab.name !== targetName)
   if (tabsData.value.length == 0) {
     isResultVisible.value = false
     tabIndex = 0

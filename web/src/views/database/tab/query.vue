@@ -61,7 +61,7 @@
         </div>
       </div>
       <Table class="query-table" :columns="tableColumns" :data="tableData" :loading="loading" @sort-change="sortChange"
-        @row-current-change="handlerCurrentChange" @row-contextmenu="handlerContextmenu">
+        :column-width="columnWidth" @row-current-change="handlerCurrentChange" @row-contextmenu="handlerContextmenu">
       </Table>
 
       <Form v-model="showModify" :row="currentRow" :actionType="actionType" :columns="tableColumns"
@@ -72,17 +72,32 @@
           <span v-show="showQueryStatus">{{ $t('database.label.elapsed_time') }}: {{ elapsedTime }}s</span>
         </div>
         <div class="status-center">
-          
+
         </div>
         <div class="status-right" v-show="showQueryStatus">
           <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total') }}: {{ total }}</span>
-          <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total_page') }}: {{ totalPage }}</span>
-          <el-link style="margin-left: 8px;" :icon="ArrowLeftBold" :underline="false" @click="arrowLeft"/>
+          <span v-show="showQueryStatus" style="margin-left: 8px">{{ $t('database.label.total_page') }}: {{ totalPage
+          }}</span>
+          <el-link style="margin-left: 8px;" :icon="ArrowLeftBold" :underline="false" @click="arrowLeft" />
           <el-input v-model="page" size="small" style="width: 36px; margin-left: 8px;" @change="changePage"></el-input>
-          <el-link style="margin-left: 8px;" :icon="ArrowRightBold" :underline="false" @click="arrowRight"/>
+          <el-link style="margin-left: 8px;" :icon="ArrowRightBold" :underline="false" @click="arrowRight" />
         </div>
       </div>
     </div>
+
+    <el-dialog v-model="showDeleteConfirmDialog" width="300" top="35vh" :show-close="false" :close-on-click-modal="false">
+      <span style="color: var(--db-c-text);">{{ $t('message.delete_record') }}</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="deleteRecord" style="margin-right: 8px;color: var(--db-c-text);">
+            {{ $t('common.confirm') }}
+          </el-button>
+          <el-button type="primary" @click="showDeleteConfirmDialog = false">
+            {{ $t('common.cancel') }}
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -132,6 +147,8 @@ const contentHeight = ref(260);
 const page = ref(1)
 const pageSize = ref(100)
 const totalPage = ref()
+const columnWidth = ref(200)
+const showDeleteConfirmDialog = ref(false)
 const props = defineProps({
   config: {
     type: Object,
@@ -286,7 +303,7 @@ function formatSql() {
 
 async function querySql() {
   loading.value = true;
-  
+
   sqlStr = consoleRef.value.getValue();
   try {
     const params: QueryReq = {
@@ -298,7 +315,21 @@ async function querySql() {
       sort: sort,
     };
     const { data } = await query(params);
+
     tableColumns.value = data.columns;
+
+    let maxWidth = 0;
+    for (const column of tableColumns.value) {
+      const fieldLength = String(column.field).length;
+      if (fieldLength > maxWidth) {
+        maxWidth = fieldLength;
+      }
+    }
+
+    const rootStyles = getComputedStyle(document.documentElement);
+    const fontSize = rootStyles.getPropertyValue('--font-size').replace("px", "");
+
+    columnWidth.value = maxWidth * Number(fontSize);
     tableData.value = data.rows;
     total.value = data.total;
     totalPage.value = data.total_page;
@@ -341,22 +372,7 @@ function handlerContextmenu(row: any, column: any, event: any) {
       {
         label: "Delete Record",
         onClick: async () => {
-          try {
-            const database: Database = CreateDatabase(currentConfig, dbValueRef.value, sqlStr)
-            const sql = database.createDeleteSql(tableColumns.value, currentRow.value)
-            const { data } = await execute({ sql: sql, cid: configValueRef.value })
-            await querySql()
-            ElNotification({
-              message: 'Affected rows: ' + data,
-              type: "success",
-            });
-          } catch (error: any) {
-            ElNotification({
-              title: "error",
-              message: error.message,
-              type: "error",
-            });
-          }
+          showDeleteConfirmDialog.value = true
         },
       },
       {
@@ -367,6 +383,31 @@ function handlerContextmenu(row: any, column: any, event: any) {
       },
     ],
   });
+}
+
+function deleteRecord() {
+  try {
+    const database: Database = CreateDatabase(currentConfig, dbValueRef.value, sqlStr)
+    const sql = database.createDeleteSql(tableColumns.value, currentRow.value)
+    console.log(tableColumns.value, currentRow.value, sql);
+
+    execute({ sql: sql, cid: configValueRef.value }).then((res: any) => {
+      ElNotification({
+        message: 'Affected rows: ' + res.data,
+        type: "success",
+      });
+      querySql()
+    })
+    querySql()
+  } catch (error: any) {
+    ElNotification({
+      title: "error",
+      message: error.message,
+      type: "error",
+    });
+  } finally {
+    showDeleteConfirmDialog.value = false
+  }
 }
 
 function startResize(event: MouseEvent) {
@@ -413,7 +454,7 @@ function sortChange({ column, prop, order }: any) {
   } else {
     order = 'asc';
   }
-  sort = {prop, order}
+  sort = { prop, order }
   querySql();
 }
 

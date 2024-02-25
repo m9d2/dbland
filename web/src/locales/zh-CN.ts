@@ -17,6 +17,9 @@ const messages = {
         save: '保存',
         connect: '连接',
     },
+    message: {
+        delete_record: '是否确认删除？',
+    },
     database: {
         button: {
             format: '格式化',

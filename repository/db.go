@@ -2,72 +2,24 @@ package repository
 
 import (
 	"dbland/config"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
+	"dbland/model"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	"log/slog"
 )
 
-var DB *sqlx.DB
+var DB *gorm.DB
 
 func Initialize() {
 	var err error
-	DB, err = sqlx.Open("sqlite3", config.Conf.Sqlite.DataPath)
+	DB, err = gorm.Open(sqlite.Open(config.Conf.Sqlite.DataPath), &gorm.Config{})
 	if err != nil {
 		slog.Error(err.Error())
 		return
 	}
-	err = executeSQL()
+	err = DB.AutoMigrate(&model.Chart{}, &model.Config{}, &model.Log{}, &model.User{})
 	if err != nil {
 		slog.Error(err.Error())
+		return
 	}
-}
-
-func executeSQL() error {
-	sqlStr := `
-		CREATE TABLE IF NOT EXISTS "user" (
-			"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			"name" TEXT,
-			"password" TEXT,
-			"email" TEXT,
-			"username" TEXT,
-			"avatar" TEXT,
-			"status" integer,
-			"last_login_ip" TEXT,
-			"last_login_time" DATE
-		);
-		CREATE TABLE IF NOT EXISTS "config" (
-			"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			"type" TEXT,
-			"name" TEXT,
-			"host" TEXT,
-			"port" TEXT,
-			"username" TEXT,
-			"password" TEXT,
-			"db_file" TEXT
-		);
-		CREATE TABLE IF NOT EXISTS "execution_log" (
-			"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			"source" TEXT,
-			"database" TEXT,
-			"sql" TEXT,
-			"status" integer,
-			"cost" integer,
-			"ip" TEXT,
-			"user_agent" TEXT,
-			"created_time" DATE
-		);
-		CREATE TABLE IF NOT EXISTS "chart" (
-			"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			"title" TEXT,
-			"sql" TEXT,
-			"type" TEXT,
-			"created_time" DATE
-		);
-	`
-	_, err := DB.Exec(sqlStr)
-
-	if err != nil {
-		return err
-	}
-	return nil
 }

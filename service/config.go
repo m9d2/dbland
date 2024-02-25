@@ -11,43 +11,27 @@ type ConnectionConfigService struct {
 	connectionConfigRepository repository.ConnectionConfigRepository
 }
 
-func (s ConnectionConfigService) List(g *gin.Context) (*[]model.ConnectionConfig, error) {
+func (s ConnectionConfigService) List(g *gin.Context) *[]model.Config {
 	return s.connectionConfigRepository.List()
 }
 
 func (s ConnectionConfigService) Save(g *gin.Context) error {
-	config := model.NewConnectionConfig()
+	config := model.NewConfig()
 	err := g.ShouldBind(&config)
 	if err != nil {
 		return err
 	}
-	tx := repository.DB.MustBegin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback()
-		} else {
-			err = tx.Commit()
-		}
-	}()
-	s.connectionConfigRepository.Save(tx, config)
+	s.connectionConfigRepository.Save(config)
 	return nil
 }
 
 func (s ConnectionConfigService) Update(g *gin.Context) error {
-	config := model.NewConnectionConfig()
+	config := model.NewConfig()
 	err := g.ShouldBind(&config)
 	if err != nil {
 		return err
 	}
-	tx := repository.DB.MustBegin()
-	defer func() {
-		if err != nil {
-			err = tx.Rollback()
-		} else {
-			err = tx.Commit()
-		}
-	}()
-	s.connectionConfigRepository.Update(tx, config)
+	s.connectionConfigRepository.Update(config)
 	return nil
 }
 
@@ -57,14 +41,7 @@ func (s ConnectionConfigService) Delete(g *gin.Context) error {
 	if err != nil {
 		return err
 	}
-	tx := repository.DB.MustBegin()
-	defer func() {
-		if err != nil {
-			_ = tx.Rollback()
-		} else {
-			_ = tx.Commit()
-		}
-	}()
-	s.connectionConfigRepository.DeleteById(tx, uint(id))
+
+	s.connectionConfigRepository.DeleteById(uint(id))
 	return nil
 }

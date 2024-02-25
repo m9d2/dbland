@@ -3,11 +3,11 @@ package model
 import "time"
 
 type Chart struct {
-	Id          *uint      `db:"id" json:"id"`
-	Title       *string    `db:"title" json:"title"`
-	Sql         *string    `db:"sql" json:"sql"`
-	Type        *string    `db:"type" json:"type"`
-	CreatedTime *time.Time `db:"created_time" json:"created_time"`
+	Id          *uint      `json:"id"`
+	Title       *string    `json:"title"`
+	Sql         *string    `json:"sql"`
+	Type        *string    `json:"type"`
+	CreatedTime *time.Time `json:"created_time"`
 }
 
 func NewChart() *Chart {
@@ -18,4 +18,8 @@ func NewChart() *Chart {
 		Type:        nil,
 		CreatedTime: nil,
 	}
+}
+
+func (c Chart) TableName() string {
+	return "sys_chart"
 }

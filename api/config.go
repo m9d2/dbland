@@ -17,12 +17,8 @@ func (s ConnectionConfigHandler) InitRouter(g *gin.RouterGroup) {
 }
 
 func (s ConnectionConfigHandler) list(c *gin.Context) {
-	data, err := s.connectionConfigService.List(c)
-	if err != nil {
-		JSON(c, err)
-	} else {
-		JSON(c, data)
-	}
+	data := s.connectionConfigService.List(c)
+	JSON(c, data)
 }
 
 func (s ConnectionConfigHandler) add(c *gin.Context) {

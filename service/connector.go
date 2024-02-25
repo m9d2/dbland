@@ -17,11 +17,8 @@ import (
 )
 
 type ConnectorService struct {
+	connectorFactory           connectors.ConnectorFactory
 	connectionConfigRepository repository.ConnectionConfigRepository
-	mysqlConnector             connectors.MysqlConnector
-	oracleConnector            connectors.OracleConnector
-	sqLiteConnector            connectors.SQLiteConnector
-	postgreSQLConnector        connectors.PostgreSQLConnector
 	executionLogRepository     repository.ExecutionLogRepository
 }
 
@@ -41,12 +38,12 @@ type Sort struct {
 }
 
 func (s ConnectorService) Ping(c *gin.Context) error {
-	var config model.ConnectionConfig
+	var config model.Config
 	if err := c.ShouldBindJSON(&config); err != nil {
 		return err
 	}
 
-	connector, err := s.getConnector(*config.Type)
+	connector, err := s.connectorFactory.GetInstance(*config.Type)
 	if err != nil {
 		return err
 	}
@@ -61,7 +58,7 @@ func (s ConnectorService) ShowDatabases(c *gin.Context) ([]string, error) {
 		return nil, err
 	}
 
-	db, connector, err := s.getDBAndConnector(&req)
+	db, connector, err := s.getConnector(&req)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +71,7 @@ func (s ConnectorService) ShowTables(c *gin.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	db, connector, err := s.getDBAndConnector(&req)
+	db, connector, err := s.getConnector(&req)
 	if err != nil {
 		return nil, err
 	}
@@ -87,9 +84,7 @@ func (s ConnectorService) Column(c *gin.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	slog.Info("columns", "database", req.Database, "table", req.Table)
-
-	db, connector, err := s.getDBAndConnector(&req)
+	db, connector, err := s.getConnector(&req)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +99,7 @@ func (s ConnectorService) Ddl(c *gin.Context) (interface{}, error) {
 
 	slog.Info("ddl", "table", req.Table)
 
-	db, connector, err := s.getDBAndConnector(&req)
+	db, connector, err := s.getConnector(&req)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +112,7 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	db, connector, err := s.getDBAndConnector(&req)
+	db, connector, err := s.getConnector(&req)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +175,7 @@ func (s ConnectorService) Execute(c *gin.Context) (int, error) {
 	}
 
 	slog.Info("query", "sql", req.Sql)
-	db, connector, err := s.getDBAndConnector(&req)
+	db, connector, err := s.getConnector(&req)
 	if err != nil {
 		return 0, err
 	}
@@ -195,22 +190,13 @@ func (s ConnectorService) saveExecutionLog(queryReq *QueryReq, cost float64, ip 
 		status = model.ExecutionLogSuccess
 	}
 
-	var config *model.ConnectionConfig
-	config, err = s.connectionConfigRepository.GetById(queryReq.Cid)
+	var config *model.Config
+	config = s.connectionConfigRepository.GetById(queryReq.Cid)
 	if err != nil {
 		slog.Error(err.Error())
 		return
 	}
-	tx := repository.DB.MustBegin()
-	defer func() {
-		if err != nil {
-			_ = tx.Rollback()
-		} else {
-			_ = tx.Commit()
-		}
-	}()
-
-	log := &model.ExecutionLog{
+	log := &model.Log{
 		Source:      *config.Name,
 		Status:      status,
 		Database:    queryReq.Database,
@@ -220,17 +206,13 @@ func (s ConnectorService) saveExecutionLog(queryReq *QueryReq, cost float64, ip 
 		UserAgent:   userAgent,
 		CreatedTime: time.Now(),
 	}
-	s.executionLogRepository.Save(tx, log)
+	s.executionLogRepository.Save(log)
 }
 
-func (s ConnectorService) getDBAndConnector(req *QueryReq) (*sqlx.DB, connectors.Connector, error) {
-	config, err := s.connectionConfigRepository.GetById(req.Cid)
-	if err != nil {
-		return nil, nil, err
-	}
+func (s ConnectorService) getConnector(req *QueryReq) (*sqlx.DB, connectors.Connector, error) {
+	config := s.connectionConfigRepository.GetById(req.Cid)
 
-	var connector connectors.Connector
-	connector, err = s.getConnector(*config.Type)
+	connector, err := s.connectorFactory.GetInstance(*config.Type)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -242,25 +224,6 @@ func (s ConnectorService) getDBAndConnector(req *QueryReq) (*sqlx.DB, connectors
 	}
 
 	return db, connector, nil
-}
-
-func (s ConnectorService) getConnector(dbType string) (connectors.Connector, error) {
-	var connector connectors.Connector
-	switch dbType {
-	case connectors.Mysql:
-		connector = s.mysqlConnector
-	case connectors.Oracle:
-		connector = s.oracleConnector
-	case connectors.SQLite:
-		connector = s.sqLiteConnector
-	case connectors.PostgreSQL:
-		connector = s.postgreSQLConnector
-
-	default:
-		err := fmt.Errorf("database not support")
-		return nil, err
-	}
-	return connector, nil
 }
 
 func containsKeywords(str string, keywords ...string) bool {

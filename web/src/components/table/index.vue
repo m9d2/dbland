@@ -11,7 +11,7 @@
     <template #empty>
       <el-empty :image-size="200"></el-empty>
     </template>
-    <el-table-column v-for="column in columns" :column-key="column.column_name" :prop="column.column_name" :label="column.column_name" width="200"
+    <el-table-column v-for="column in columns" :column-key="column.field" :prop="column.field" :label="column.field" :width="columnWidth"
       sortable="true" resizable>
       <template #default="{ row, column }">
         <span :class="{ 'null-value': row[column.property] == null, }">
@@ -22,6 +22,8 @@
   </el-table>
 </template>
 <script setup lang="ts">
+import {ref} from 'vue'
+
 defineProps({
   columns: {
     type: Array as () => any[],
@@ -38,6 +40,10 @@ defineProps({
     type: String,
     required: false,
   },
+  columnWidth: {
+    type: Number,
+    required: false,
+  }
 });
 
 defineOptions({

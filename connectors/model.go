@@ -1,14 +1,19 @@
 package connectors
 
 const (
-	Text   = "text"
-	Number = "number"
+	Text    = "text"
+	Number  = "number"
+	Primary = "primary"
 )
 
 type Column struct {
-	ColumnName    string `db:"COLUMN_NAME" json:"column_name"`
-	ColumnType    string `db:"COLUMN_TYPE" json:"column_type"`
-	ColumnComment string `db:"COLUMN_COMMENT" json:"column_comment"`
+	Field    string `db:"field" json:"field"`
+	Type     string `db:"type" json:"type"`
+	Length   string `db:"length" json:"length"`
+	Nullable bool   `db:"nullable" json:"nullable"`
+	Key      string `db:"key" json:"key"`
+	Default  string `db:"default" json:"default"`
+	Comment  string `db:"comment" json:"comment"`
 }
 
 type Query struct {

@@ -24,16 +24,7 @@ func (s UserService) Add(c *gin.Context) error {
 	hashedPassword := string(pwd)
 	user.Password = &hashedPassword
 
-	tx := repository.DB.MustBegin()
-	defer func() {
-		if err != nil {
-			_ = tx.Rollback()
-		} else {
-			_ = tx.Commit()
-		}
-	}()
-
-	s.userRepository.Save(tx, user)
+	s.userRepository.Save(user)
 	return nil
 }
 
@@ -43,17 +34,8 @@ func (s UserService) Login(c *gin.Context) error {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
-	tx := repository.DB.MustBegin()
-	defer func() {
-		if err != nil {
-			_ = tx.Rollback()
-		} else {
-			_ = tx.Commit()
-		}
-	}()
-
 	var user *model.User
-	user, err = s.userRepository.FindByUsername(tx, username)
+	user = s.userRepository.FindByUsername(username)
 	if err != nil {
 		return err
 	}
@@ -63,7 +45,7 @@ func (s UserService) Login(c *gin.Context) error {
 		return fmt.Errorf("user does not exist")
 	}
 
-	err = s.userRepository.UpdateLastLoginTime(tx, user.Id)
+	err = s.userRepository.UpdateLastLoginTime(user.Id)
 	if err != nil {
 		return err
 	}

@@ -12,7 +12,7 @@ type SQLiteConnector struct {
 	DefaultConnector
 }
 
-func (c SQLiteConnector) Ping(config *model.ConnectionConfig) error {
+func (c SQLiteConnector) Ping(config *model.Config) error {
 	if config.DbFile == nil {
 		return errors.New("database file cannot be empty")
 	}
@@ -23,7 +23,7 @@ func (c SQLiteConnector) Ping(config *model.ConnectionConfig) error {
 	return db.Ping()
 }
 
-func (c SQLiteConnector) Connect(config *model.ConnectionConfig) (*sqlx.DB, error) {
+func (c SQLiteConnector) Connect(config *model.Config) (*sqlx.DB, error) {
 	return sqlx.Open("sqlite3", c.dsn(config))
 }
 
@@ -68,7 +68,7 @@ func (c SQLiteConnector) ShowTables(db *sqlx.DB, database string) (*[]Table, err
 
 func (c SQLiteConnector) Column(db *sqlx.DB, params ...string) (*[]Column, error) {
 	var columns []Column
-	table := params[0]
+	table := params[1]
 	sqlStr := fmt.Sprintf("PRAGMA table_info(%v)", table)
 
 	rows, err := db.Query(sqlStr)
@@ -85,19 +85,30 @@ func (c SQLiteConnector) Column(db *sqlx.DB, params ...string) (*[]Column, error
 		var id sql.NullString
 		var columnName sql.NullString
 		var columnType sql.NullString
-		var notnull sql.NullString
+		var notnull sql.NullBool
 		var dfltValue sql.NullString
-		var pk sql.NullString
+		var pk sql.NullBool
 		err = rows.Scan(&id, &columnName, &columnType, &notnull, &dfltValue, &pk)
 		if err != nil {
 			return nil, err
 		}
 
 		if columnName.Valid {
-			column.ColumnName = columnName.String
+			column.Field = columnName.String
 		}
 		if columnType.Valid {
-			column.ColumnType = columnType.String
+			column.Type = columnType.String
+		}
+		if notnull.Valid {
+			column.Nullable = notnull.Bool
+		}
+		if dfltValue.Valid {
+			column.Default = dfltValue.String
+		}
+		if pk.Valid {
+			if pk.Bool {
+				column.Key = Primary
+			}
 		}
 		columns = append(columns, column)
 	}
@@ -108,6 +119,6 @@ func (c SQLiteConnector) Ddl(db *sqlx.DB, table string) (string, error) {
 	return "", nil
 }
 
-func (c SQLiteConnector) dsn(config *model.ConnectionConfig) string {
+func (c SQLiteConnector) dsn(config *model.Config) string {
 	return fmt.Sprintf(*config.DbFile)
 }
