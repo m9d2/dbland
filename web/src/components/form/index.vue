@@ -1,6 +1,6 @@
 <template>
   <el-dialog class="d-dialog" style="width: 50%; overflow: auto; border-radius: 5px;">
-    <el-form :model="formData" :label-width="labelWidth" label-position="right">
+    <el-form :model="formData" label-width="auto" label-position="right">
       <el-form-item v-for="row in list" :label="row.key" :key="row.key">
         <el-input v-model="formData[row.key]" :type="row.type" />
       </el-form-item>
@@ -17,9 +17,8 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
 import { ActionTypeEnum } from '@/common/enums/'
+import { column } from 'element-plus/es/components/table-v2/src/common.mjs';
 
-
-const labelWidth = ref()
 const props = defineProps({
   columns: {
     type: Object,
@@ -28,7 +27,7 @@ const props = defineProps({
   row: Object,
   actionType: String,
 })
-const formData = ref({})
+const formData = ref()
 const emit = defineEmits(['confirm', 'cancel'])
 interface Row {
   key: string,
@@ -54,19 +53,14 @@ const list = computed(() => {
 
   }
   const data: Row[] = []
-  let width = 0
-  for (const key of props.columns) {
+  const column: any = props.columns
+  for (const key of column) {
     let value
     if (props.row) {
       value = props.row[key.column_name]
     }
-    data.push({ key: key.column_name, value: value, type: key.column_type })
-    const stringWidth = calculateStringWidth(key.column_name)
-    if (stringWidth > width) {
-      width = stringWidth
-    }
+    data.push({ key: key.field, value: value, type: key.type })
   }
-  labelWidth.value = width + 30
   return data
 })
 

@@ -12,7 +12,7 @@ type PostgreSQLConnector struct {
 	DefaultConnector
 }
 
-func (c PostgreSQLConnector) Ping(config *model.ConnectionConfig) error {
+func (c PostgreSQLConnector) Ping(config *model.Config) error {
 	db, err := sqlx.Open("postgres", c.dsn(config))
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func (c PostgreSQLConnector) Ping(config *model.ConnectionConfig) error {
 	return err
 }
 
-func (c PostgreSQLConnector) Connect(config *model.ConnectionConfig) (*sqlx.DB, error) {
+func (c PostgreSQLConnector) Connect(config *model.Config) (*sqlx.DB, error) {
 	return sqlx.Open("postgres", c.dsn(config))
 }
 
@@ -74,6 +74,6 @@ func (c PostgreSQLConnector) ShowTables(db *sqlx.DB, database string) (*[]Table,
 	return &tables, err
 }
 
-func (c PostgreSQLConnector) dsn(database *model.ConnectionConfig) string {
+func (c PostgreSQLConnector) dsn(database *model.Config) string {
 	return fmt.Sprintf("user=%s password=%s host=%s port=%s sslmode=disable ", *database.Username, *database.Password, *database.Host, *database.Port)
 }

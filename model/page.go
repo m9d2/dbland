@@ -1,6 +1,6 @@
 package model
 
-type QueryPage struct {
+type Page struct {
 	Columns   []string                 `json:"columns"`
 	TableName string                   `json:"table_name"`
 	Rows      []map[string]interface{} `json:"rows"`

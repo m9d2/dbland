@@ -3,7 +3,7 @@
     <div class="left">
       <div class="logo">
         <a href="#" style="color: var(--db-c-text); font-size: 14px; font-weight: bold">
-          <el-image style="width: 40px; height: 40px" :src="logo" />
+          <el-image style="width: 30px; height: 30px" :src="logo" />
         </a>
       </div>
       <div class="nav">

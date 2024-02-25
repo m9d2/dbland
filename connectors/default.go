@@ -83,7 +83,14 @@ func (c DefaultConnector) Column(db *sqlx.DB, params ...string) (*[]Column, erro
 	var columns []Column
 	schema := params[0]
 	table := params[1]
-	sqlStr := `SELECT COLUMN_NAME, COLUMN_TYPE, COLUMN_COMMENT
+	sqlStr := `SELECT 
+    			COLUMN_NAME as field,
+       			COLUMN_TYPE as type,
+       			CHARACTER_MAXIMUM_LENGTH AS 'length',
+       			IS_NULLABLE AS 'nullable',
+       			COLUMN_KEY AS 'key',
+       			COLUMN_COMMENT as comment, 
+				COLUMN_DEFAULT AS 'default'
 			FROM INFORMATION_SCHEMA.COLUMNS
 			WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`
 
@@ -101,19 +108,43 @@ func (c DefaultConnector) Column(db *sqlx.DB, params ...string) (*[]Column, erro
 		var columnName sql.NullString
 		var columnType sql.NullString
 		var columnComment sql.NullString
-		err = rows.StructScan(&column)
+		var length sql.NullString
+		var nullable sql.NullString
+		var columnKey sql.NullString
+		var columnDefault sql.NullString
+		err = rows.Scan(&columnName, &columnType, &length, &nullable, &columnKey, &columnComment, &columnDefault)
 		if err != nil {
 			return nil, err
 		}
 
 		if columnName.Valid {
-			column.ColumnName = columnName.String
+			column.Field = columnName.String
 		}
 		if columnType.Valid {
-			column.ColumnType = columnType.String
+			column.Type = columnType.String
 		}
 		if columnComment.Valid {
-			column.ColumnComment = columnComment.String
+			column.Comment = columnComment.String
+		}
+		if length.Valid {
+			column.Length = length.String
+		}
+		if nullable.Valid {
+			if nullable.String == "YES" {
+				column.Nullable = true
+			} else {
+				column.Nullable = false
+			}
+		}
+		if columnKey.Valid {
+			if columnKey.String == "PRI" {
+				column.Key = Primary
+			} else {
+				column.Key = columnKey.String
+			}
+		}
+		if columnDefault.Valid {
+			column.Default = columnDefault.String
 		}
 
 		columns = append(columns, column)
@@ -149,8 +180,8 @@ func (c DefaultConnector) Query(db *sqlx.DB, sqlStr string) (*Query, error) {
 			return nil, err
 		}
 		columns[i] = Column{
-			ColumnName: columnNames[i],
-			ColumnType: columnType,
+			Field: columnNames[i],
+			Type:  columnType,
 		}
 	}
 

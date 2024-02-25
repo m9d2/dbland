@@ -7,7 +7,7 @@ const (
 	ExecutionLogFail    = 0
 )
 
-type ExecutionLog struct {
+type Log struct {
 	Id          *uint     `json:"id,omitempty"`
 	Source      string    `json:"source,omitempty"`
 	Database    string    `json:"database,omitempty"`
@@ -19,8 +19,8 @@ type ExecutionLog struct {
 	CreatedTime time.Time `json:"created_time,omitempty"`
 }
 
-func NewExecutionLog() *ExecutionLog {
-	return &ExecutionLog{
+func NewLog() *Log {
+	return &Log{
 		Id:          nil,
 		Source:      "",
 		Sql:         "",
@@ -28,4 +28,8 @@ func NewExecutionLog() *ExecutionLog {
 		Cost:        0,
 		CreatedTime: time.Now(),
 	}
+}
+
+func (l Log) TableName() string {
+	return "sys_log"
 }

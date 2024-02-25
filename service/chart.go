@@ -11,7 +11,7 @@ type ChartService struct {
 	repository repository.ChartRepository
 }
 
-func (s ChartService) List(g *gin.Context) (*[]model.Chart, error) {
+func (s ChartService) List(g *gin.Context) *[]model.Chart {
 	return s.repository.List()
 }
 

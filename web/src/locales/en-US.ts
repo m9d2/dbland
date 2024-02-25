@@ -17,6 +17,9 @@ const messages = {
         save: 'Save',
         connect: 'Connect',
     },
+    message: {
+        delete_record: 'Delete this record?',
+    },
     database: {
         button: {
             format: 'Format',

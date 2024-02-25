@@ -18,12 +18,8 @@ func (s ChartHandler) InitRouter(g *gin.RouterGroup) {
 }
 
 func (s ChartHandler) list(c *gin.Context) {
-	data, err := s.service.List(c)
-	if err != nil {
-		JSON(c, err)
-	} else {
-		JSON(c, data)
-	}
+	data := s.service.List(c)
+	JSON(c, data)
 }
 
 func (s ChartHandler) add(c *gin.Context) {

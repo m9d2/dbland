@@ -4,10 +4,10 @@ import type {Database} from "./database";
 
 class Sqlite extends Base implements Database{
 
-    createInsertSql(column: any, row): string | Error {
+    createInsertSql(column: any, row: any): string | Error {
         const values:any[] = [];
         const columns:any[] = [];
-        for (const item: any of column) {
+        for (const item of column) {
             columns.push(`\"${item.column_name}\"`)
             const val = row.value[item.column_name]
             if (val == null) {
@@ -27,10 +27,12 @@ class Sqlite extends Base implements Database{
         return `INSERT INTO \"${result.databaseName}\".\"${result.tableName}\" (${columnsString}) VALUES (${valuesString})`;
     }
 
-    createUpdateSql(column: any, data: any, originalData): string | Error {
+    createUpdateSql(column: any, data: any, originalData: any): string | Error {
+        console.log("createUpdateSql", column, data, originalData);
+        
         const conditions: any[] = [];
         const content: any[] = [];
-        for (const item: any of column) {
+        for (const item of column) {
             const val = data.value[item.column_name]
             const originalVal = originalData[item.column_name]
             if (val == null) {
@@ -55,7 +57,7 @@ class Sqlite extends Base implements Database{
 
     createDeleteSql(column: any, row: any): string | Error {
         const conditions:any[] = [];
-        for (const item: any of column) {
+        for (const item of column) {
             const val = row[item.column_name]
             if (val == null) {
                 conditions.push(`\"${item.column_name}\" is NULL`)

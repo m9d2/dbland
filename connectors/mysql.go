@@ -11,7 +11,7 @@ type MysqlConnector struct {
 	DefaultConnector
 }
 
-func (c MysqlConnector) Ping(config *model.ConnectionConfig) error {
+func (c MysqlConnector) Ping(config *model.Config) error {
 	db, err := sqlx.Open("mysql", c.dsn(config))
 	if err != nil {
 		return err
@@ -20,7 +20,7 @@ func (c MysqlConnector) Ping(config *model.ConnectionConfig) error {
 	return err
 }
 
-func (c MysqlConnector) Connect(config *model.ConnectionConfig) (*sqlx.DB, error) {
+func (c MysqlConnector) Connect(config *model.Config) (*sqlx.DB, error) {
 	return sqlx.Open("mysql", c.dsn(config))
 }
 
@@ -30,6 +30,6 @@ func (c DefaultConnector) Use(db *sqlx.DB, database string) error {
 	return err
 }
 
-func (c MysqlConnector) dsn(database *model.ConnectionConfig) string {
+func (c MysqlConnector) dsn(database *model.Config) string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/", *database.Username, *database.Password, *database.Host, *database.Port)
 }

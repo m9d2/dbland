@@ -12,7 +12,7 @@ import (
 type OracleConnector struct {
 }
 
-func (c OracleConnector) Ping(config *model.ConnectionConfig) error {
+func (c OracleConnector) Ping(config *model.Config) error {
 	dsn := c.dsn(config)
 	db, err := sqlx.Open("oracle", dsn)
 	if err != nil {
@@ -22,7 +22,7 @@ func (c OracleConnector) Ping(config *model.ConnectionConfig) error {
 	return err
 }
 
-func (c OracleConnector) Connect(config *model.ConnectionConfig) (*sqlx.DB, error) {
+func (c OracleConnector) Connect(config *model.Config) (*sqlx.DB, error) {
 	dsn := c.dsn(config)
 	return sqlx.Open("oracle", dsn)
 }
@@ -173,7 +173,7 @@ func (c OracleConnector) Execute(db *sqlx.DB, sqlStr string) (int, error) {
 	return int(rows), err
 }
 
-func (c OracleConnector) dsn(database *model.ConnectionConfig) string {
+func (c OracleConnector) dsn(database *model.Config) string {
 	port, _ := strconv.Atoi(*database.Port)
 	connStr := go_ora.BuildUrl(*database.Host, port, "TRADEVL", *database.Username, *database.Password, nil)
 	return connStr
