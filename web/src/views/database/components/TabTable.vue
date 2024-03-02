@@ -34,7 +34,7 @@
             </el-tooltip>
           </div>
 
-<!--          <div class="menu fr">-->
+          <div class="menu fr">
 <!--            <el-dropdown>-->
 <!--              <el-button size="small">-->
 <!--                Import<el-icon class="el-icon&#45;&#45;right"><arrow-down /></el-icon>-->
@@ -47,7 +47,7 @@
 <!--                </el-dropdown-menu>-->
 <!--              </template>-->
 <!--            </el-dropdown>-->
-<!--          </div>-->
+          </div>
 
         </div>
       </div>
@@ -519,7 +519,7 @@ function changePage() {
   font-size: var(--font-size);
 }
 
-:deep(.header-cell) {
+:deep(.custom-header-cell) {
   .cell {
     overflow: hidden;
     white-space: nowrap;
@@ -528,9 +528,5 @@ function changePage() {
 
 :deep(.header-row) {
   background: red;
-}
-
-:deep(.th.el-table__cell) {
-  background: #faf7fa;
 }
 </style>
