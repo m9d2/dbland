@@ -1,187 +1,165 @@
 <template>
   <div class="content-box">
     <div class="content-main">
-      <div class="content-left" :style="{ width: contentWidth + 'px' }">
-        <div class="search">
-          <el-input v-model="filterText" :placeholder="$t('common.search')" size="small" clearable>
-            <template #prefix>
-              <el-icon class="el-input__icon">
-                <search />
-              </el-icon>
+      <div class="content-left">
+        <div id="content-tree" :style="{ width: contentWidth + 'px' }">
+          <Tree @dbclick="doubleClickNode" @click-plus="handleClickPlus" @node-click="handleNodeClick">
+            <template #node-menu="{ node }">
+              <el-dropdown size="small" trigger="click">
+                <el-link v-show="node" :underline="false" :icon="MoreFilled" />
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item :icon="Search" @click="newTab(node, 'query')">{{
+                      $t("database.button.query") }}</el-dropdown-item>
+                    <el-dropdown-item :icon="Edit">{{
+                      $t("common.edit")
+                    }}</el-dropdown-item>
+                    <el-dropdown-item :icon="Delete">{{
+                      $t("common.delete")
+                    }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </template>
-          </el-input>
-          <el-link :icon="Refresh" @click="refresh" :underline="false"/>
-          <el-link :icon="Plus" @click="newTab('')" :underline="false"/>
+          </Tree>
         </div>
-        <el-tree ref="treeRef" :props="props" :load="loadNode" empty-text="" lazy @check-change="handleCheckChange"
-          :indent="12" :highlight-current="true" :filter-node-method="filterNode" @node-click="clickNode">
-          <template v-slot="{ node, data }">
-            <div class="tree-node" @dblclick="doubleClickNode(data, node)" @mouseover="handleMouseEnter(node, data)"
-              @mouseleave="handleMouseLeave(node, data)">
-              <div class="node-content unselectable">
-                <el-icon v-show="node.level == TreeLevelEnum.CONFIG">
-                  <span v-for="item in icons" v-show="data.type == item.dbType" class="iconfont"
-                    :class="item.icon"></span>
-                </el-icon>
-                <el-icon v-show="node.level == TreeLevelEnum.DATABASE" class="iconfont">
-                  <Folder />
-                </el-icon>
-                <el-icon v-show="node.level == TreeLevelEnum.TABLE" class="iconfont">
-                  <Document />
-                </el-icon>
-                <span>{{ data.name }}</span>
-              </div>
-
-              <div class="node-menu">
-                <el-dropdown size="small" trigger="click">
-                  <el-link v-show="data.isCurrent" :underline="false" :icon="MoreFilled" />
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item :icon="Search" @click="newTab(node.name)">{{
-                        $t('database.button.query')
-                      }}
-                      </el-dropdown-item>
-                      <el-dropdown-item :icon="Edit">{{ $t('common.edit') }}</el-dropdown-item>
-                      <el-dropdown-item :icon="Delete">{{ $t('common.delete') }}</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
-              </div>
-            </div>
-          </template>
-        </el-tree>
-        <div class="resize-handle" @mousedown="startResize"></div>
+        <Resize :resize-x="true" ref-id="content-tree" class="resize" :size="contentWidth"></Resize>
       </div>
+
       <div class="content-right">
-        <div class="info" v-if="shortcutsVisible">
-          <span class="logo-text">DBLAND</span>
+        <div class="tab-content">
+          <el-tabs v-model="activeTab" class="tabs-content" closable @tab-remove="removeTab">
+            <el-tab-pane v-for="item in tabsData" :key="item.name" :label="item.title" :name="item.name" lazy>
+              <template #label>
+                <span class="custom-tabs-label unselectable">
+                  <span class="iconfont icon-biaoge blue" style="padding-right: 8px;"></span>
+                  <span>{{ item.title }}</span>
+                </span>
+              </template>
+              <template #default>
+                <TabTable :node="currentNode" v-if="item.type == TabType.TABLE" />
+                <TabQuery :node="currentNode" v-if="item.type == TabType.QUERY" />
+              </template>
+            </el-tab-pane>
+          </el-tabs>
         </div>
-        <Tab :isResultVisible="isResultVisible" ref="childRef" @messageUpdated="handlerMessageUpdate" />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, watch } from "vue";
-import { ElNotification, ElTree } from "element-plus";
-import { Coin, Document, Folder, Refresh, Edit, Delete, Search, MoreFilled, Connection, Plus } from '@element-plus/icons-vue';
-import { getConfigs } from "@/api/config";
-import { getDatabases, getTables } from "@/api/connector";
-import type { DBConfig } from "@/api/config/type";
-import Tab from "@/views/database/tab/index.vue";
-import type { AxiosPromise } from "axios";
-import { DbTypeEnum, TreeLevelEnum } from "@/common/enums";
-import type Node from 'element-plus/es/components/tree/src/model/node';
+import { reactive, ref, onBeforeMount} from "vue";
+import TabTable from './components/TabTable.vue';
+import TabQuery from './components/TabQuery.vue';
+import Tree from './components/Tree.vue';
+import Resize from '@/components/resize/index.vue';
+import {
+  Edit,
+  Delete,
+  Search,
+  MoreFilled,
+} from "@element-plus/icons-vue";
 
-const filterText = ref("");
 const isResultVisible = ref();
 const shortcutsVisible = ref(true);
-const childRef = ref();
 const resizing = ref(false);
 const contentWidth = ref(220)
+const currentNode = ref()
+const activeTab = ref()
+const tabsData = ref<any[]>([])
+let tabIndex = 0
 const resizeData = reactive({
   isResizing: false,
   startX: 0,
   startWidth: 0,
 });
-let currentConfig: Object
-let currentDatabase: Object
-const props = {
-  label: 'name',
-  children: 'children',
-  isLeaf: 'leaf',
-}
-const icons = [
-  { dbType: DbTypeEnum.MySQL, icon: 'icon-mysql' },
-  { dbType: DbTypeEnum.SQLite, icon: 'icon-sqlite' },
-  { dbType: DbTypeEnum.ORACLE, icon: 'icon-oracle' },
-  { dbType: DbTypeEnum.PostgreSQL, icon: 'icon-PostgreSQL' },
-  { dbType: DbTypeEnum.MariaDB, icon: 'icon-mysql' },
-]
 
-interface Tree {
-  name: string
+enum TabType {
+  TABLE = 'table',
+  QUERY = 'query',
 }
 
-const handleCheckChange = (
-  data: Tree,
-  checked: boolean,
-  indeterminate: boolean
-) => {
-  console.log(data, checked, indeterminate)
+const handleClickPlus = () => {
+  newTab(currentNode.value, 'query')
 }
 
-const loadNode = async (node: Node, resolve: (data: Tree[]) => void) => {
-  if (node.level === 0) {
-    const nodes: any = await loadConfigs();
-    return resolve(nodes);
-  }
-  if (node.level === 1) {
-    const nodes: any = await loadDatabases(node.data.id)
-    return resolve(nodes);
-  }
-  if (node.level === 2) {
-    const nodes: any = await loadTables(node.data.cid, node.data.name)
-    const formattedNodes = nodes.map((childNode: Node) => ({
-      ...childNode,
-      leaf: true,
-    }));
-    return resolve(formattedNodes);
-  }
-  return resolve([])
-};
-
-
-onMounted(() => {
+onBeforeMount(() => {
   let width = localStorage.getItem('width')
   if (width) {
     contentWidth.value = parseInt(width)
   }
 })
 
-const newTab = (table: string) => {
-  isResultVisible.value = true;
-  shortcutsVisible.value = false;
-  childRef.value?.newTab(currentConfig, currentDatabase, table);
+// 新建tab
+const newTab = (node: any, type: string) => {
+  let newTabName;
+  if (type == TabType.QUERY) {
+    newTabName = `${++tabIndex}`;
+    newTabName = `new query ${tabIndex}`;
+    tabsData.value.push({
+      title: `new query ${tabIndex}`,
+      name: newTabName,
+      type: TabType.QUERY,
+    });
+  }
+
+  if (type == TabType.TABLE) {
+    let tabExists = false;
+    newTabName = node.data.name + "@" + node.parent.data.name;
+    tabExists = false;
+    for (const tab in tabsData.value) {
+      if (tabsData.value[tab].name == newTabName) {
+        tabExists = true;
+        return;
+      }
+    }
+    if (!tabExists) {
+      tabsData.value.push({
+        title: newTabName,
+        name: newTabName,
+        type: TabType.TABLE,
+      });
+    }
+  }
+  activeTab.value = newTabName;
+};
+
+const handleNodeClick = (node: any) => {
+  // currentNode.value = node
 }
+
+const doubleClickNode = (node: any) => {
+  currentNode.value = node
+  if (node.level === 3) {
+    newTab(node, TabType.TABLE);
+  }
+};
 
 const refresh = async () => {
-  loadConfigs()
 }
 
-const handlerMessageUpdate = (data: any) => {
-  isResultVisible.value = data;
-  shortcutsVisible.value = !data;
-};
-
-const handleMouseEnter = (node: any, data: any) => {
-  if (node.level == TreeLevelEnum.TABLE) {
-    data.isCurrent = true
+function removeTab(targetName: string) {
+  const tabs = tabsData.value
+  let activeName = activeTab.value
+  if (activeName === targetName) {
+    tabs.forEach((tab: any, index: any) => {
+      if (tab.name === targetName) {
+        const nextTab = tabs[index + 1] || tabs[index - 1]
+        if (nextTab) {
+          activeName = nextTab.name
+        }
+      }
+    })
+  }
+  activeTab.value = activeName
+  tabsData.value = tabs.filter((tab: any) => tab.name !== targetName)
+  if (tabsData.value.length == 0) {
+    tabIndex = 0
+    shortcutsVisible.value = true
+    isResultVisible.value = false
   }
 }
-
-const handleMouseLeave = (node: any, data: any) => {
-  if (node.level == TreeLevelEnum.TABLE) {
-    data.isCurrent = false
-  }
-}
-
-const clickNode = (data: any, node: any) => {
-  const level = node.level
-  if (!level || level == TreeLevelEnum.CONFIG) {
-    currentConfig = node.data
-  }
-  if (level == TreeLevelEnum.DATABASE) {
-    currentDatabase = node.data
-  }
-}
-
-const doubleClickNode = (data: any, node: any) => {
-  if (node.level === 3) {
-    newTab(node.data.name);
-  }
-};
 
 const startResize = (event: MouseEvent) => {
   resizeData.isResizing = true;
@@ -205,58 +183,6 @@ const stopResize = () => {
   document.removeEventListener('mousemove', resize);
   document.removeEventListener('mouseup', stopResize);
 }
-
-const loadConfigs = async () => {
-  try {
-    const response: AxiosPromise<DBConfig[]> = getConfigs();
-    const res = await response;
-    if (res.data) {
-      return res.data;
-    }
-  } catch (error: any) {
-    ElNotification({
-      message: error.message,
-      type: 'error',
-    });
-    return [];
-  }
-}
-
-const loadDatabases = async (cid: number) => {
-  const { data } = await getDatabases({ cid: cid });
-  return data
-    ? data.map((name) => ({
-      name: name,
-      cid: cid,
-    }))
-    : []
-}
-
-const loadTables = async (cid: number, db: string) => {
-  const { data } = await getTables({
-    cid: cid,
-    db: db,
-  });
-  return data
-    ? data.map((table) => ({
-      name: table.name,
-      cid: cid,
-      children: [],
-      isLeaf: true,
-    }))
-    : []
-}
-
-const treeRef = ref<InstanceType<typeof ElTree>>()
-
-watch(filterText, (val) => {
-  treeRef.value!.filter(val)
-})
-
-const filterNode = (value: string, data: any) => {
-  if (!value) return true;
-  return data.name.includes(value);
-};
 </script>
 
 <style lang="scss" scoped>
@@ -264,12 +190,6 @@ const filterNode = (value: string, data: any) => {
   display: flex;
   flex-direction: column;
   height: 100%;
-
-  .el-link {
-    font-size: 16px;
-    vertical-align: bottom;
-    margin-left: 8px;
-  }
 }
 
 .content-main {
@@ -284,74 +204,28 @@ const filterNode = (value: string, data: any) => {
     color: var(--db-c-text-menu);
     background-color: var(--db-c-bg-nav);
     display: flex;
-    flex-direction: column;
-    position: relative;
+    flex-direction: row;
+    border-right: 1px solid var(--db-c-border);
+    // margin-right: 8px;
 
-    .resize-handle {
-      position: absolute;
-      top: 0;
-      right: 0;
+    .content-tree {
       height: 100%;
-      z-index: 999;
-      width: 6px;
-      border-right: 1px solid var(--db-c-border);
-    }
-
-    .search {
-      border-radius: 5px;
-      padding: 12px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
     }
 
-    .el-icon {
-      margin: 0 5px 0 0;
+    .resize {
+      // background-color: var(--db-c-bg-nav);
     }
   }
+
+
 
   .content-right {
     flex-grow: 1;
     height: 100%;
     overflow: hidden;
-    margin: 0 8px;
     background-color: var(--db-c-bg);
-  }
-
-}
-
-.resize-handle:hover {
-  background-color: var(--db-c-border);
-  cursor: col-resize;
-}
-
-.menu-list {
-  flex-grow: 1;
-}
-
-.new-query {
-  height: 48px;
-  padding: 8px;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.info {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-
-  .logo-text {
-    font-size: 26px;
-    color: var(--db-c-text);
-    opacity: 0.15;
-  }
-
-  .version {
-    display: block;
-    font-size: 16px;
-    color: var(--db-c-text);
-    opacity: 0.15;
   }
 }
 
@@ -364,24 +238,62 @@ const filterNode = (value: string, data: any) => {
   }
 }
 
-.node-content {
+.tab-content {
+  height: 100%;
+  border-left: none;
+}
+
+.el-tabs {
+  height: 100%;
   display: flex;
+  flex-direction: column;
+}
+
+.el-tab-pane {
+  height: 100%;
+}
+
+.el-tabs__header {
+  margin: 0 0 8px;
+}
+
+:deep(.el-tabs__nav-scroll) {
+  background-color: var(--db-c-bg-nav);
+  border-left: 1px solid var(--db-c-border);
+  border-right: 1px solid var(--db-c-border);
+  border-bottom: none;
+}
+
+:deep(.el-tabs__item) {
+  padding: 0 8px;
+}
+
+.el-tabs__item:last-child {
+  border-right: none
+}
+
+.custom-tabs-label {
+  font-size: 12px;
+  color: var(--db-c-text);
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
+  margin-left: 8px;
 }
 
-.el-tree {
-  padding: 0 5px;
-  color: var(--db-c-text-menu);
-  background: var(--db-c-bg-nav);
-  overflow: auto;
+:deep(.el-tabs__active-bar) {
+  height: 1px;
 }
 
-.tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-right: 8px;
+:deep(.el-tabs__header) {
+  margin: 0;
+}
+
+.no-right-border {
+  border-right: none;
+}
+.right-border {
+  border-right: 1px solid var(--db-c-border);
 }
 </style>

@@ -1,7 +1,12 @@
+import type { Sort } from "./model/sort"
+
 interface Database {
-    createInsertSql(column: any, row: any): string | Error
-    createUpdateSql(column: any, data: any, originalData: any): string | Error
-    createDeleteSql(column: any, row: any): string | Error
+
+    createQuerySql(table: string): string | undefined
+    createQueryPageSql(table: string, page: number, size: number, where: string, sort: Sort): string | undefined
+    createInsertSql(table: string, columns: Column[], row: any): string | undefined
+    createUpdateSql(table: string, columns: Column[], data: any, originalData: any): string | undefined
+    createDeleteSql(table: string, columns: Column[], row: any): string | undefined
 }
 
 export type {Database}

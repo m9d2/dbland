@@ -3,16 +3,24 @@
 </template>
 
 <script lang="ts" setup>
-import * as monaco from 'monaco-editor/esm/vs/editor/edcore.main';
+import * as monaco from "monaco-editor";
 import 'monaco-editor/esm/vs/basic-languages/sql/sql.contribution';
-import {language as sqlLanguage} from 'monaco-editor/esm/vs/basic-languages/sql/sql';
-import {onMounted, ref, nextTick} from 'vue'
-import { generateRandomString } from '@/common/utils'
-let editor:any
-const id = ref()
+import {language} from 'monaco-editor/esm/vs/basic-languages/sql/sql';
+import {onMounted, ref, nextTick, onUnmounted} from 'vue'
+import {generateRandomString} from '@/common/utils'
 
+let monacoEditor: any
+const id = ref()
+const emits = defineEmits(['change'])
 const props = defineProps({
-  sql: ''
+  tables: {
+    type: Array,
+    default: () => []
+  },
+  schemas: {
+    type: Array,
+    default: () => []
+  }
 })
 
 onMounted(() => {
@@ -22,16 +30,31 @@ onMounted(() => {
   })
 })
 
+onUnmounted(() => {
+  monacoEditor.dispose()
+})
+
 const initEditor = () => {
   let localTheme = localStorage.getItem('theme')
-  let theme = 'vs'
+  let theme = 'light'
   if (localTheme) {
     if (localTheme == 'dark') {
       theme = 'vs-dark'
     }
   }
-  editor = monaco.editor.create(document.getElementById(id.value), {
-    value: props.sql,
+
+  monaco.editor.defineTheme('light', {
+    base: 'vs',
+    inherit: true,
+    rules: [],
+    colors: {
+      'editor.background': '#ffffff',
+      'editor.lineHighlightBackground': '#f6f8fa'
+    }
+  })
+
+  monacoEditor = monaco.editor.create(document.getElementById(id.value), {
+    value: '',
     theme: theme, // 官方自带三种主题vs, hc-black, or vs-dark
     minimap: { // 关闭小地图
       enabled: false,
@@ -48,6 +71,7 @@ const initEditor = () => {
     autoIndent: true, // 自动布局
     lineNumbers: 'on',
     autoIndex: true,
+    wordWrap: 'on',
     language: 'sql',
     tabCompletion: 'on',
     cursorSmoothCaretAnimation: true,
@@ -61,34 +85,42 @@ const initEditor = () => {
     contextmenu: false, //右键菜单
   })
 
+  monacoEditor.onDidChangeModelContent((e) => {
+    emits('change', monacoEditor.getValue());
+  })
+
   monaco.languages.registerCompletionItemProvider('sql', {
     provideCompletionItems() {
       let suggestions: any = [];
-      sqlLanguage.keywords.forEach((item: any) => {
+      language.keywords.forEach((item: any) => {
         suggestions.push({
           label: item,
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: item
         });
       })
-      sqlLanguage.operators.forEach((item: any) => {
+
+      language.operators.forEach((item: any) => {
         suggestions.push({
           label: item,
           kind: monaco.languages.CompletionItemKind.Operator,
           insertText: item
         });
       })
-      sqlLanguage.builtinFunctions.forEach((item: any) => {
+
+      props.tables?.forEach((item: any) => {
         suggestions.push({
           label: item,
-          kind: monaco.languages.CompletionItemKind.Function,
-          insertText: item
+          kind: monaco.languages.CompletionItemKind.File,
+          insertText: item,
+          documentation: 'table'
         });
       })
-      sqlLanguage.builtinVariables.forEach((item: any) => {
+
+      props.schemas?.forEach((item: any) => {
         suggestions.push({
           label: item,
-          kind: monaco.languages.CompletionItemKind.Variable,
+          kind: monaco.languages.CompletionItemKind.Folder,
           insertText: item
         });
       })
@@ -98,10 +130,4 @@ const initEditor = () => {
     },
   });
 }
-
-defineExpose({
-  getValue: () => {return editor.getValue()},
-  setValue: (content: string) => editor.setValue(content),
-  dispose: () => editor.dispose(),
-})
 </script>

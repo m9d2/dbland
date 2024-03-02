@@ -22,3 +22,12 @@ export enum ColumnType {
     NUMBER = "number",
     TEXT = "text"
 }
+
+export enum ColumnKey {
+    PRIMARY = "primary",
+}
+
+export enum Direction {
+    ASC = "asc",
+    DESC = "desc"
+}

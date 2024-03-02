@@ -1,3 +1,4 @@
 export const enum Names {
-    CONFIG = "Config"
+    CONFIG = "Config",
+    DATABASE = "Database"
 }

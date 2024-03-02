@@ -1,6 +1,6 @@
 @font-face {
   font-family: "iconfont"; /* Project id  */
-  src: url('iconfont.ttf?t=1695354286689') format('truetype');
+  src: url('iconfont.ttf?t=1709280432589') format('truetype');
 }
 
 .iconfont {
@@ -11,52 +11,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-setting:before {
-  content: "\e78e";
-}
-
-.icon-edit-square:before {
-  content: "\e791";
-}
-
-.icon-export:before {
-  content: "\e792";
-}
-
-.icon-Import:before {
-  content: "\e793";
-}
-
-.icon-user:before {
-  content: "\e7ae";
-}
-
-.icon-linechart:before {
-  content: "\e7af";
-}
-
-.icon-database:before {
-  content: "\e7b0";
-}
-
-.icon-table:before {
-  content: "\e7de";
-}
-
-.icon-indent:before {
-  content: "\e7f3";
-}
-
-.icon-outdent:before {
-  content: "\e7f4";
-}
-
-.icon-ellipsis:before {
-  content: "\e7fc";
-}
-
-.icon-desktop:before {
-  content: "\e842";
+.icon-shift:before {
+  content: "\e859";
 }
 
 .icon-github-fill:before {
@@ -67,12 +23,24 @@
   content: "\ec6d";
 }
 
-.icon-Alignment-hover:before {
-  content: "\e611";
+.icon-24gl-stop:before {
+  content: "\ea77";
+}
+
+.icon-enter:before {
+  content: "\e801";
+}
+
+.icon-yunhang:before {
+  content: "\e6c1";
 }
 
 .icon-biaoge:before {
   content: "\e615";
+}
+
+.icon-control:before {
+  content: "\e80f";
 }
 
 .icon-sqlite:before {
@@ -87,7 +55,19 @@
   content: "\e8b7";
 }
 
+.icon-Command:before {
+  content: "\e695";
+}
+
+.icon-option:before {
+  content: "\e60c";
+}
+
 .icon-shujuku:before {
   content: "\e685";
+}
+
+.icon-yijianmeihua:before {
+  content: "\e624";
 }
 

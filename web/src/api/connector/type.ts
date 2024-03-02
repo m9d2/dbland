@@ -1,11 +1,8 @@
 export interface QueryReq {
     cid?: number,
     sql?: string,
-    db?: string,
+    database?: string,
     table?: string,
-    page?: number,
-    size?: number, 
-    sort?: Sort,
 }
 
 export interface Table {
@@ -25,8 +22,3 @@ export interface Query {
     elapsed_time: number, 
     total_page: number, 
 }
-
-export type Sort = {
-    prop: string,
-    order: string
-  }
