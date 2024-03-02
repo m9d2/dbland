@@ -6,88 +6,11 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "4765891",
-      "name": "setting",
-      "font_class": "setting",
-      "unicode": "e78e",
-      "unicode_decimal": 59278
-    },
-    {
-      "icon_id": "4765957",
-      "name": "edit-square",
-      "font_class": "edit-square",
-      "unicode": "e791",
-      "unicode_decimal": 59281
-    },
-    {
-      "icon_id": "4765958",
-      "name": "export",
-      "font_class": "export",
-      "unicode": "e792",
-      "unicode_decimal": 59282
-    },
-    {
-      "icon_id": "4765960",
-      "name": "Import",
-      "font_class": "Import",
-      "unicode": "e793",
-      "unicode_decimal": 59283
-    },
-    {
-      "icon_id": "4766293",
-      "name": "user",
-      "font_class": "user",
-      "unicode": "e7ae",
-      "unicode_decimal": 59310
-    },
-    {
-      "icon_id": "4766298",
-      "name": "line chart",
-      "font_class": "linechart",
-      "unicode": "e7af",
-      "unicode_decimal": 59311
-    },
-    {
-      "icon_id": "4766439",
-      "name": "database",
-      "font_class": "database",
-      "unicode": "e7b0",
-      "unicode_decimal": 59312
-    },
-    {
-      "icon_id": "4766919",
-      "name": "table",
-      "font_class": "table",
-      "unicode": "e7de",
-      "unicode_decimal": 59358
-    },
-    {
-      "icon_id": "4767050",
-      "name": "indent",
-      "font_class": "indent",
-      "unicode": "e7f3",
-      "unicode_decimal": 59379
-    },
-    {
-      "icon_id": "4767051",
-      "name": "outdent",
-      "font_class": "outdent",
-      "unicode": "e7f4",
-      "unicode_decimal": 59380
-    },
-    {
-      "icon_id": "4767094",
-      "name": "ellipsis",
-      "font_class": "ellipsis",
-      "unicode": "e7fc",
-      "unicode_decimal": 59388
-    },
-    {
-      "icon_id": "4936457",
-      "name": "desktop",
-      "font_class": "desktop",
-      "unicode": "e842",
-      "unicode_decimal": 59458
+      "icon_id": "129163",
+      "name": "shift",
+      "font_class": "shift",
+      "unicode": "e859",
+      "unicode_decimal": 59481
     },
     {
       "icon_id": "4937000",
@@ -104,11 +27,25 @@
       "unicode_decimal": 60525
     },
     {
-      "icon_id": "7111725",
-      "name": "Alignment-hover",
-      "font_class": "Alignment-hover",
-      "unicode": "e611",
-      "unicode_decimal": 58897
+      "icon_id": "7594087",
+      "name": "24gl-stop",
+      "font_class": "24gl-stop",
+      "unicode": "ea77",
+      "unicode_decimal": 60023
+    },
+    {
+      "icon_id": "8952783",
+      "name": "enter",
+      "font_class": "enter",
+      "unicode": "e801",
+      "unicode_decimal": 59393
+    },
+    {
+      "icon_id": "11383637",
+      "name": "运行",
+      "font_class": "yunhang",
+      "unicode": "e6c1",
+      "unicode_decimal": 59073
     },
     {
       "icon_id": "11641852",
@@ -116,6 +53,13 @@
       "font_class": "biaoge",
       "unicode": "e615",
       "unicode_decimal": 58901
+    },
+    {
+      "icon_id": "12309812",
+      "name": "control",
+      "font_class": "control",
+      "unicode": "e80f",
+      "unicode_decimal": 59407
     },
     {
       "icon_id": "12600909",
@@ -139,11 +83,32 @@
       "unicode_decimal": 59575
     },
     {
+      "icon_id": "23563749",
+      "name": "Command",
+      "font_class": "Command",
+      "unicode": "e695",
+      "unicode_decimal": 59029
+    },
+    {
+      "icon_id": "24501120",
+      "name": "option",
+      "font_class": "option",
+      "unicode": "e60c",
+      "unicode_decimal": 58892
+    },
+    {
       "icon_id": "29865217",
       "name": "数据库",
       "font_class": "shujuku",
       "unicode": "e685",
       "unicode_decimal": 59013
+    },
+    {
+      "icon_id": "36274363",
+      "name": "一键美化",
+      "font_class": "yijianmeihua",
+      "unicode": "e624",
+      "unicode_decimal": 58916
     }
   ]
 }

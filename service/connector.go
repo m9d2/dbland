@@ -6,7 +6,6 @@ import (
 	"dbland/repository"
 	"fmt"
 	"log/slog"
-	"math"
 	"strconv"
 	"strings"
 	"sync"
@@ -25,11 +24,8 @@ type ConnectorService struct {
 type QueryReq struct {
 	Cid      uint   `json:"cid" binding:"required"`
 	Sql      string `json:"sql"`
-	Database string `json:"db"`
+	Database string `json:"database"`
 	Table    string `json:"table"`
-	Page     int    `json:"page"`
-	Size     int    `json:"size"`
-	Sort     Sort   `json:"sort"`
 }
 
 type Sort struct {
@@ -128,13 +124,6 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 	var result *connectors.Query
 
 	var sqlStr = req.Sql
-	if req.Sort.Prop != "" && req.Sort.Order != "" && !containsKeywords(strings.ToLower(sqlStr), "order by", "limit", "offset") {
-		sqlStr = sqlStr + fmt.Sprintf(" ORDER BY %v %v", req.Sort.Prop, req.Sort.Order)
-	}
-	if req.Page != 0 && req.Size != 0 && !containsKeywords(strings.ToLower(sqlStr), "limit", "offset") {
-		offset := (req.Page - 1) * req.Size
-		sqlStr = sqlStr + fmt.Sprintf(" limit %v OFFSET %v", req.Size, offset)
-	}
 	slog.Info("Query", "sql", sqlStr)
 	result, err = connector.Query(db, sqlStr)
 	if err != nil {
@@ -150,14 +139,18 @@ func (s ConnectorService) Query(c *gin.Context) (interface{}, error) {
 	}
 	result.ElapsedTime = cost
 
-	var countSql = fmt.Sprintf("select count(1) FROM (%v) as _A", req.Sql)
 	var wg sync.WaitGroup
 	wg.Add(1)
+
 	go func() {
-		count, _ := connector.Count(db, countSql)
-		result.Total = count
-		result.TotalPage = int(math.Ceil(float64(count) / float64(req.Size)))
-		wg.Done()
+		defer wg.Done()
+		if req.Table != "" {
+			columns, err := connector.Column(db, req.Database, req.Table)
+			if err != nil {
+				slog.Error(err.Error())
+			}
+			result.Columns = *columns
+		}
 	}()
 	wg.Wait()
 

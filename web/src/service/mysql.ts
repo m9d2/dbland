@@ -1,78 +1,64 @@
-import {ColumnType} from "@/common/enums";
+import {ColumnKey} from "@/common/enums";
 import {Base} from "./base";
 import type {Database} from "./database";
+import type { Sort } from "./model/sort";
 
 class Mysql extends Base implements Database {
 
-   createInsertSql(column: any, row): string | Error {
-        const values:any[] = [];
-        const columns:any[] = [];
-        for (const item: any of column) {
-            columns.push(`\`${item.column_name}\``)
-            const val = row.value[item.column_name]
-            if (val == null) {
-                values.push('NULL')
-            } else if (item.column_type == ColumnType.NUMBER) {
-                values.push(val)
-            } else if (item.column_type == ColumnType.TEXT) {
-                values.push(`\'${val}\'`)
-            }
+    createQueryPageSql(table: string, page: number, size: number, where: string, sort: Sort): string | undefined {
+        let orderStr = '';
+        if (sort) {
+            orderStr = 'ODERY BY ' + sort.field + ' ' + sort.direction;
         }
-        const columnsString:string = columns.join(', ')
-        const valuesString:string = values.join(', ');
-        const result  = super. parseSqlQuery(this.database, this.sqlStr);
-        if (result == null) {
-            return new Error("database or table cant be null")
-        }
-        return `INSERT INTO \`${result.databaseName}\`.\`${result.tableName}\` (${columnsString}) VALUES (${valuesString})`;
+        return `SELECT * FROM \`${this.database}\`.\`${table}\` ${where} ${orderStr} LIMIT ${(page-1) * size},${(size)}`;
     }
 
-   createUpdateSql(column: any, data: any, originalData): string | Error {
-        const conditions: any[] = [];
-        const content: any[] = [];
-
-        for (const item: any of column) {
-            const val = data.value[item.column_name]
-            const originalVal = originalData[item.column_name]
-            if (val == null) {
-                content.push(`\`${item.column_name}\` = NULL`)
-                conditions.push(`\`${item.column_name}\` is NULL`)
-            } else if (item.column_type == ColumnType.NUMBER) {
-                content.push(`\`${item.column_name}\` = ${val}`)
-                conditions.push(`\`${item.column_name}\` = ${originalVal}`)
-            } else if (item.column_type == ColumnType.TEXT) {
-                content.push(`\`${item.column_name}\` = \'${val}\'`)
-                conditions.push(`\`${item.column_name}\` = \'${originalVal}\'`)
-            }
-        }
-
-        const valuesString: string = content.join(', ')
-        const conditionsString: string = conditions.join(' AND ')
-        const result  = super.parseSqlQuery(this.database, this.sqlStr);
-        if (result == null) {
-            return new Error("database or table cant be null")
-        }
-        return `UPDATE \`${result.databaseName}\`.\`${result.tableName}\` SET ${valuesString} WHERE ${conditionsString}`;
+    createQuerySql(table: string): string | undefined {
+        return `SELECT * FROM \`${this.database}\`.\`${table}\``;
     }
 
-    createDeleteSql(column: any, row: any): string | Error {
-        const conditions:any[] = [];
-        for (const item: any of column) {
-            const val = row[item.column_name]
-            if (val == null) {
-                conditions.push(`\`${item.column_name}\` is NULL`)
-            } else if (item.column_type == ColumnType.NUMBER) {
-                conditions.push(`\`${item.column_name}\` = ${val}`)
-            } else if (item.column_type == ColumnType.TEXT) {
-                conditions.push(`\`${item.column_name}\` = \'${val}\'`)
+    createInsertSql(table: string, columns: Column[], row: any): string | undefined {
+        let columnsStr = ''
+        let valuesStr = ''
+        for (let column of columns) {
+            let value = row[column.field];
+            columnsStr += `\`${column.field}\`, `
+            valuesStr += `${this.stringifyValue(value)}, `
+        }
+        return `INSERT INTO \`${this.database}\`.\`${table}\` (${this.removeLastComma(columnsStr)}) VALUES (${this.removeLastComma(valuesStr)})`;
+    }
+
+    createUpdateSql(table: string, columns: Column[], row: any, originalRow: any): string | undefined {
+        let valuesStr = ''
+        for (let column of columns) {
+            let value = row[column.field];
+            valuesStr += `\`${column.field}\` = ${this.stringifyValue(value)}, `
+        }
+        return `UPDATE \`${this.database}\`.\`${table}\` SET ${this.removeLastComma(valuesStr)} WHERE ${this.removeLastAnd(this.prepareWhereSql(columns, originalRow))}`;
+    }
+
+    createDeleteSql(table: string, columns: Column[], row: any): string | undefined {
+        return `DELETE FROM "${this.database}"."${table}" WHERE ${this.prepareWhereSql(columns, row)}`;
+    }
+
+    prepareWhereSql(columns: Column[], row: any) {
+        let sql: string = '';
+        for (let column of columns) {
+            if (column.key === ColumnKey.PRIMARY) {
+                return `\`${column.field}\` = ${row[column.field]}`
             }
         }
-        const conditionsString:string = conditions.join(' AND ');
-        const result  = super.parseSqlQuery(this.database, this.sqlStr);
-        if (result == null) {
-            return new Error("database or table cant be null")
+
+        for (let column of columns) {
+            let value = row[column.field];
+            if (value === null) {
+                sql += `\`${column.field}\` IS ${this.stringifyValue(value)} AND `
+            } else {
+                sql += `\`${column.field}\` = ${this.stringifyValue(value)} AND `
+            }
+            
         }
-        return `DELETE FROM \`${result.databaseName}\`.\`${result.tableName}\` WHERE ${conditionsString}`;
+        return this.removeLastAnd(sql);
     }
 }
 

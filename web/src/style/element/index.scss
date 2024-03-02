@@ -16,7 +16,8 @@
    --el-color-primary-light-7: rgba(25,115,237,1);
    --el-loading-spinner-size: 24px;
    --el-loading-fullscreen-spinner-size: 24px;
-  
+   --el-input-text-color: var(--db-c-text);
+   --el-button-text-color: var(--db-c-text);
  }
 
 
@@ -47,4 +48,8 @@
 .el-dropdown-menu__item:not(.is-disabled):focus {
   background-color: var(--db-c-bg-hover);
   color: var(--db-c-text-hover);
+}
+.el-tabs__content {
+  height: 100%;
+  flex-grow: 1;
 }

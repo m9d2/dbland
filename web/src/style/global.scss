@@ -30,7 +30,7 @@ li {
   clear: both;
 }
 body {
-  color: var(--db-c-text-1);
+  color: var(--db-c-text);
   background: var(--db-c-bg);
   transition:
           color 0.5s,
@@ -67,4 +67,9 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

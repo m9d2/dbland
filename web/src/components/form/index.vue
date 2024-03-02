@@ -1,4 +1,24 @@
 <template>
+
+<!--  <el-drawer-->
+<!--      :before-close="handleClose"-->
+<!--  >-->
+<!--    <template #default>-->
+<!--      <el-form :model="formData" label-width="100" label-position="left">-->
+<!--        <el-form-item v-for="row in list" :label="row.key" :key="row.key">-->
+<!--          <el-input v-model="formData[row.key]" :type="row.type" />-->
+<!--        </el-form-item>-->
+<!--      </el-form>-->
+<!--    </template>-->
+
+<!--    <template #footer>-->
+<!--      <span class="dialog-footer">-->
+<!--        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>-->
+<!--        <el-button type="primary" @click="confirm">{{ $t('common.confirm') }}</el-button>-->
+<!--      </span>-->
+<!--    </template>-->
+<!--  </el-drawer>-->
+
   <el-dialog class="d-dialog" style="width: 50%; overflow: auto; border-radius: 5px;">
     <el-form :model="formData" label-width="auto" label-position="right">
       <el-form-item v-for="row in list" :label="row.key" :key="row.key">
@@ -17,7 +37,6 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
 import { ActionTypeEnum } from '@/common/enums/'
-import { column } from 'element-plus/es/components/table-v2/src/common.mjs';
 
 const props = defineProps({
   columns: {

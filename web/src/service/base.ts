@@ -1,49 +1,32 @@
 class Base {
 
-    databaseName!: string;
-    tableName!: string;
-    sqlStr: string
+    database!: string;
 
-    constructor(database: string, sql: string) {
-        const regex:RegExp = /FROM\s+`?([^.\s`]+)`?\.`?([^.\s`]+)`?/i;
-        const matches:RegExpExecArray = regex.exec(sql);
-        if (matches && matches.length === 3) {
-            let databaseName:string = matches[1];
-            let tableName:string = matches[2];
-            if (databaseName == null && database == null) {
-                this.databaseName = ''
-            } else if (databaseName == null) {
-                this.databaseName = database
-            } else {
-                this.databaseName = databaseName
-            }
-            if (tableName == null) {
-                this.tableName = ''
-            } else {
-                this.tableName = tableName
-            }
-        }
-        this.sqlStr = sql
+    constructor(database: string) {
+        this.database = database
     }
 
-    parseSqlQuery(database: string, sqlQuery: string): { databaseName: string, tableName: string } | null {
-        const regex:RegExp = /FROM\s+`?([^.\s`]+)`?\.`?([^.\s`]+)`?/i;
-        const matches:RegExpExecArray = regex.exec(sqlQuery);
-        if (matches && matches.length === 3) {
-            let databaseName:string = matches[1];
-            let tableName:string = matches[2];
-            if(databaseName == null && database == null) {
-                databaseName = ''
-            }
-            if (databaseName == null) {
-                databaseName = database
-            }
-            if (tableName == null) {
-                tableName = ''
-            }
-            return {databaseName, tableName}
+    removeLastAnd(sql: string): string {
+        return sql.replace(/AND\s*$/, '');
+    }
+
+    removeLastComma(sql: string): string {
+        return sql.replace(/,\s*$/, '');
+    }
+
+    stringifyValue(value: any): string {
+        if (value === null || value === undefined) {
+            return 'NULL'
         }
-        return null;
+        if (typeof value === 'string') {
+            return `'${value}'`;
+        } else if (typeof value === 'number') {
+            return `${value}`;
+        } else if (typeof value === 'boolean') {
+            return value ? 'true' : 'false';
+        } else {
+            return ''; // 其他类型暂不处理
+        }
     }
 }
 
